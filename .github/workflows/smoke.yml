@@ -1,0 +1,17 @@
+name: Verificar jogo
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar JavaScript e jogo
+        run: |
+          node --check tests/smoke.mjs
+          node tests/smoke.mjs
