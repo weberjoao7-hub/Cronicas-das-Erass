@@ -15,7 +15,7 @@ function fakeContext(){
  return new Proxy(methods,{get:(target,name)=>name in target?target[name]:(()=>{}),set:(target,name,value)=>{target[name]=value;return true}});
 }
 const document={
- getElementById(id){if(!elements.has(id))elements.set(id,{id,style:{},classList:{add(){},remove(){}},addEventListener(){},setPointerCapture(){},getContext:fakeContext,querySelectorAll:()=>[],getBoundingClientRect:()=>({left:0,top:0,width:160,height:160})});return elements.get(id)},
+ getElementById(id){const dynamic=new Set(['claim','upgrade','recruitWorker','recruitWarrior','buildHere','begin','continueGame','close','choose','move','worker','train','advance']);if(dynamic.has(id)&&!(elements.get('panel')?.innerHTML||'').includes('id="'+id+'"'))return null;if(!elements.has(id))elements.set(id,{id,style:{},classList:{add(){},remove(){}},addEventListener(){},setPointerCapture(){},getContext:fakeContext,querySelectorAll:()=>[],getBoundingClientRect:()=>({left:0,top:0,width:160,height:160})});return elements.get(id)},
  createElement:()=>({width:0,height:0,getContext:fakeContext})
 };
 const sandbox={document,innerWidth:900,innerHeight:650,devicePixelRatio:1,addEventListener:()=>{},requestAnimationFrame:()=>{},setTimeout:()=>1,clearTimeout:()=>{},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},Uint8Array,Uint8ClampedArray,Math,Date,JSON,Set,Map,Array,Number,String,Object,Math};
