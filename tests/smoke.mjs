@@ -35,7 +35,7 @@ function element(id){
 }
 let saved=0;
 const sandbox={
- document:{getElementById:element,createElement:()=>({width:148,height:76,getContext:()=>context2d})},
+ document:{getElementById:element,createElement:()=>({width:148,height:76,getContext:()=>context2d}),addEventListener(){}},
  localStorage:{getItem:()=>null,setItem:()=>saved++},
  innerWidth:390,innerHeight:844,devicePixelRatio:2,
  addEventListener(){},requestAnimationFrame:fn=>frames.push(fn),
