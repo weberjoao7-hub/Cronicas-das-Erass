@@ -5,7 +5,7 @@ const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Script principal não encontrado');
 new vm.Script(match[1]);
-assert.match(html,/else if\(obj\.t==='Cabana'\)\{drawCottage\(/);
+assert.match(html,/else if\(obj\.t==='Cabana'\)(?:\{)?drawCottage\(/);
 assert.match(html,/cronicas-v04/);
 const source=match[1].replace(/\}\)\(\);\s*$/,'globalThis.__test={drawCottage};})();');
 const calls={fill:0,stroke:0};
@@ -27,7 +27,7 @@ function el(id){
  return elements.get(id);
 }
 const sandbox={
- document:{getElementById:el,createElement:()=>({getContext:()=>ctx})},
+ document:{getElementById:el,createElement:()=>({getContext:()=>ctx}),addEventListener(){}},
  localStorage:{getItem:()=>null,setItem(){}},innerWidth:390,innerHeight:844,
  devicePixelRatio:2,addEventListener(){},requestAnimationFrame(){},
  setTimeout:()=>1,clearTimeout(){}
