@@ -1508,7 +1508,7 @@ addEventListener('keydown',e=>{
  else if(k==='h'){showTutorial()}else if(k===' '){e.preventDefault();cx=80;cy=80;dirty=true}
 });
 let minimapTick=0,lightLabelTick=0,renderTick=0;
-const frameInterval=(matchMedia('(pointer:coarse)').matches||innerWidth<700)?50:34;
+const frameInterval=((typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches)||innerWidth<700)?50:34;
 addEventListener('pagehide',save);
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden)save();
