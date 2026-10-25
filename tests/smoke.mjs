@@ -5,13 +5,13 @@ import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Script principal não encontrado');
-const source=match[1].replace(/\}\)\(\);\s*$/, 'globalThis.__test={biome,routeFor,game,point,tileAt,drawBarracks,drawTownHall};})();');
+const source=match[1].replace(/\}\)\(\);\s*$/, 'globalThis.__test={biome,routeFor,game,point,tileAt,drawBarracks,drawTownHall,visibleTileBounds,lightLevels,drawAtmosphere,resize};})();');
 assert.notEqual(source,match[1],'Não foi possível instrumentar o jogo');
 
 const context2d=new Proxy({},{
  get(obj,key){
   if(key==='createImageData')return (w,h)=>({data:new Uint8ClampedArray(w*h*4)});
-  if(key==='createLinearGradient')return ()=>({addColorStop(){}});
+  if(key==='createLinearGradient'||key==='createRadialGradient')return ()=>({addColorStop(){}});
   if(key==='measureText')return ()=>({width:12});
   return obj[key]??(()=>{});
  },
@@ -47,6 +47,19 @@ assert.ok(t,'Inicialização do jogo falhou');
 assert.doesNotThrow(()=>t.drawBarracks(180,200,74,38),'Quartel deve renderizar no Canvas simulado');
 assert.doesNotThrow(()=>t.drawTownHall(180,200,74,38,false),'Centro do jogador deve renderizar');
 assert.doesNotThrow(()=>t.drawTownHall(180,200,74,38,true),'Base rival deve renderizar');
+assert.equal(t.lightLevels(.25).night,0,'Dia deve permanecer iluminado');
+assert.ok(t.lightLevels(.84).night>.9,'Ciclo deve produzir noite');
+assert.doesNotThrow(()=>t.drawAtmosphere(.84),'Iluminação noturna deve funcionar em Canvas simulado');
+function checkVisibleBounds(){
+ const b=t.visibleTileBounds();
+ for(const [sx,sy] of [[0,0],[sandbox.innerWidth,0],[0,sandbox.innerHeight],[sandbox.innerWidth,sandbox.innerHeight]]){
+  const p=t.tileAt(sx,sy);
+  if(p.x>=0&&p.x<160&&p.y>=0&&p.y<160)
+   assert.ok(p.x>=b.minX&&p.x<=b.maxX&&p.y>=b.minY&&p.y<=b.maxY,'Cantos visíveis não podem ser descartados');
+ }
+}
+checkVisibleBounds();
+sandbox.innerWidth=1366;sandbox.innerHeight=768;t.resize();checkVisibleBounds();
 assert.equal(t.biome(80,80),2,'Capital precisa nascer em terra firme');
 assert.equal(t.biome(91,86),2,'Acampamento rival precisa nascer em terra firme');
 const path=t.routeFor(t.game.units[0],91,86);
