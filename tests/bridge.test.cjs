@@ -45,6 +45,7 @@ test('bridge construction requires claimed water connected to a shore or bridge'
  const {game,bridgeAxis,buildValidation}=setup();
  assert.equal(buildValidation('Ponte',2,2),null);
  assert.equal(buildValidation('Ponte',3,2), 'Construa a ponte a partir de uma margem ou de outra ponte pronta');
+ game.claim.push('1,2');
  assert.equal(buildValidation('Ponte',1,2),'Pontes precisam de água');
  assert.equal(bridgeAxis(2,2),'x');
  game.claim=[];
