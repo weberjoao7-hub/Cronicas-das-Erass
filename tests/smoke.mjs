@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Script principal não encontrado');
-const source=match[1].replace(/\}\)\(\);\s*$/, 'globalThis.__test={biome,routeFor,game,point,tileAt};})();');
+const source=match[1].replace(/\}\)\(\);\s*$/, 'globalThis.__test={biome,routeFor,game,point,tileAt,drawBarracks};})();');
 assert.notEqual(source,match[1],'Não foi possível instrumentar o jogo');
 
 const context2d=new Proxy({},{
@@ -44,6 +44,7 @@ const sandbox={
 vm.runInNewContext(source,sandbox,{timeout:10000});
 const t=sandbox.__test;
 assert.ok(t,'Inicialização do jogo falhou');
+assert.doesNotThrow(()=>t.drawBarracks(180,200,74,38),'Quartel deve renderizar no Canvas simulado');
 assert.equal(t.biome(80,80),2,'Capital precisa nascer em terra firme');
 assert.equal(t.biome(91,86),2,'Acampamento rival precisa nascer em terra firme');
 const path=t.routeFor(t.game.units[0],91,86);
