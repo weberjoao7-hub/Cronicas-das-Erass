@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v5.0</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v5.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:84px;z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:manipulation;cursor:pointer}#mapLabel{position:fixed;right:18px;top:204px;z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:91px}#mapLabel{top:190px}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Tropas → Mover</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -633,6 +633,9 @@ function drawUnitSprite(u,px,py,z,enemy=false){
  const direction=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):1;
  const striking=now-(u.attackAt||0)<340,hit=now-(u.hitAt||0)<190;
  const warrior=enemy||u.kind==='warrior',building=!!u.buildTarget,hunting=!!u.huntTarget;
+ const harvesting=!warrior&&!building&&!hunting&&!moving&&!!u.job&&
+  Math.hypot(u.x-(Number.isFinite(u.tx)?u.tx:u.x),u.y-(Number.isFinite(u.ty)?u.ty:u.y))<.35;
+ const harvestBiome=harvesting?biome(Math.floor(u.x),Math.floor(u.y)):-1;
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
  ctx.fillStyle='#0b201b83';ctx.beginPath();ctx.ellipse(0,r*.65,r*.9,r*.28,0,0,Math.PI*2);ctx.fill();
  if(moving){ctx.fillStyle='#d6c39c48';ctx.beginPath();ctx.ellipse(-r*.58,r*.55,r*.19,r*.11,0,0,7);ctx.fill()}
@@ -670,13 +673,32 @@ function drawUnitSprite(u,px,py,z,enemy=false){
   ctx.strokeStyle='#d6dbd4';ctx.lineWidth=Math.max(1.2,r*.11);
   ctx.beginPath();ctx.moveTo(r*.49,-r*.12);ctx.lineTo(r*(striking?1.18:.98),-r*(striking?1.18:.98));ctx.stroke();
   ctx.strokeStyle='#765c40';ctx.lineWidth=Math.max(1,r*.13);ctx.beginPath();ctx.moveTo(r*.35,-r*.22);ctx.lineTo(r*.65,-r*.05);ctx.stroke();
- }else if(building||hunting){
-  const swing=(building?Math.sin(now*.016):Math.sin(now*.009))*.35;
+ }else if(building||hunting||harvesting){
+  const swing=(building?Math.sin(now*.016):Math.sin(now*.010+u.x*2+u.y))*.45;
   ctx.save();ctx.translate(r*.5,-r*.08);ctx.rotate(swing);
-  ctx.strokeStyle='#765335';ctx.lineWidth=Math.max(1.1,r*.12);ctx.beginPath();ctx.moveTo(0,r*.22);ctx.lineTo(r*.35,-r*.7);ctx.stroke();
-  if(building){ctx.fillStyle='#aab5b4';ctx.fillRect(r*.14,-r*.78,r*.46,r*.17)}
-  else{ctx.strokeStyle='#e6d9b1';ctx.lineWidth=Math.max(1,r*.08);ctx.beginPath();ctx.arc(r*.26,-r*.32,r*.37,-1.3,1.2);ctx.stroke()}
+  ctx.strokeStyle='#765335';ctx.lineWidth=Math.max(1.1,r*.12);
+  ctx.beginPath();ctx.moveTo(0,r*.22);ctx.lineTo(r*.35,-r*.7);ctx.stroke();
+  if(building||harvestBiome===3){
+   // Martelo do construtor ou machado do lenhador.
+   ctx.fillStyle=building?'#aab5b4':'#c5c4a8';
+   ctx.fillRect(r*.14,-r*.78,r*.46,r*.17);
+  }else if(harvestBiome===4){
+   // Picareta inclinada, com duas pontas.
+   ctx.strokeStyle='#c1c9c7';ctx.lineWidth=Math.max(1,r*.14);
+   ctx.beginPath();ctx.moveTo(-r*.08,-r*.75);ctx.quadraticCurveTo(r*.33,-r*1.02,r*.7,-r*.70);ctx.stroke();
+  }else if(hunting){
+   ctx.strokeStyle='#e6d9b1';ctx.lineWidth=Math.max(1,r*.08);
+   ctx.beginPath();ctx.arc(r*.26,-r*.32,r*.37,-1.3,1.2);ctx.stroke();
+  }else{
+   // Foice de colheita nos campos e pradarias.
+   ctx.strokeStyle='#d8d8b5';ctx.lineWidth=Math.max(1,r*.12);
+   ctx.beginPath();ctx.arc(r*.32,-r*.68,r*.34,-2.9,.5);ctx.stroke();
+  }
   ctx.restore();
+  if(harvesting&&r>=7.5&&Math.sin(now*.012+u.x*3+u.y)>.82){
+   ctx.fillStyle=harvestBiome===3?'#d8b57c':harvestBiome===4?'#bdc7bf':'#e3d27e';
+   for(let n=0;n<3;n++)ctx.fillRect(r*(.75+n*.18),-r*(.2+n*.2),Math.max(1,r*.08),Math.max(1,r*.08));
+  }
  }else{ctx.fillStyle='#755436';ctx.fillRect(r*.4,-r*.16,r*.16,r*.31)}
  // Detalhes de equipamento em camadas, preservando a silhueta a zoom baixo.
  if(r>=7){
@@ -1041,7 +1063,40 @@ function assignBuilders(){
   }
  }
 }
-function assignWorkers(){let targets=[];for(let radius=1;radius<=12&&targets.length<12;radius++)for(let y=80-radius;y<=80+radius;y++)for(let x=80-radius;x<=80+radius;x++){if(x<0||y<0||x>=W||y>=H||Math.max(Math.abs(x-80),Math.abs(y-80))!==radius)continue;let b=biome(x,y);if(b===3||b===4||b===1||b===2)targets.push({x,y,b});}let workers=game.units.filter(u=>u.kind==='worker');for(let i=0;i<workers.length;i++){let u=workers[i];if(u.buildTarget||u.huntTarget)continue;if(u.path&&u.path.length)continue;let b=biome(Math.floor(u.x),Math.floor(u.y));if(u.job&&Math.hypot(u.x-u.tx,u.y-u.ty)<.2&&(b===3||b===4||b===1||b===2))continue;let preferred=i%3===0?3:i%3===1?4:2;let dest=targets.find(t=>t.b===preferred)||targets.find(t=>t.b===1||t.b===2)||targets[0];if(dest&&assignRoute(u,dest.x,dest.y)){u.job=true;dirty=true}}}
+function assignWorkers(){
+ // Trabalhadores escolhem postos locais, sem retornar obrigatoriamente ao ponto (80,80).
+ const workers=game.units.filter(u=>u.kind==='worker'),reserved=new Set();
+ const resource=b=>b===1||b===2||b===3||b===4;
+ for(const u of workers){
+  if(u.buildTarget||u.huntTarget)continue;
+  const tx=Math.floor(Number.isFinite(u.tx)?u.tx:u.x),ty=Math.floor(Number.isFinite(u.ty)?u.ty:u.y);
+  if(u.job&&passable(tx,ty)&&!at(tx,ty)&&resource(biome(tx,ty)))reserved.add(key(tx,ty));
+ }
+ for(let i=0;i<workers.length;i++){
+  const u=workers[i];
+  if(u.buildTarget||u.huntTarget||(u.path&&u.path.length))continue;
+  const tx=Math.floor(Number.isFinite(u.tx)?u.tx:u.x),ty=Math.floor(Number.isFinite(u.ty)?u.ty:u.y);
+  if(u.job&&reserved.has(key(tx,ty))&&Math.hypot(u.x-(tx+.5),u.y-(ty+.5))<.28)continue;
+  const preferred=i%3===0?3:i%3===1?4:2;
+  const ox=Math.floor(u.x),oy=Math.floor(u.y),candidates=[];
+  for(let radius=0;radius<=12;radius++){
+   for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+    const x=ox+dx,y=oy+dy,k=key(x,y);
+    if(!passable(x,y)||at(x,y)||reserved.has(k))continue;
+    const b=biome(x,y);if(!resource(b))continue;
+    const score=radius+(b===preferred?0:5)+(b===1?1:0);
+    candidates.push({x,y,score});
+   }
+  }
+  candidates.sort((a,b)=>a.score-b.score);
+  for(const p of candidates.slice(0,8)){
+   if(assignRoute(u,p.x,p.y)){
+    u.job=true;reserved.add(key(p.x,p.y));dirty=true;break;
+   }
+  }
+ }
+}
 document.getElementById('home').onclick=()=>{cx=80;cy=80;scale=1.3;selected={x:80,y:80};dirty=true;tileMenu()};
 document.getElementById('build').onclick=buildMenu;document.getElementById('army').onclick=armyMenu;document.getElementById('help').onclick=showTutorial;document.getElementById('zoom').onclick=()=>zoomAt(scale>=2?.65/scale:(scale+.35)/scale,w/2,h*.47);
 function passable(x,y){return x>=0&&y>=0&&x<W&&y<H&&biome(x,y)!==0&&biome(x,y)!==5}
@@ -1165,6 +1220,6 @@ function loop(t){
  if(document.hidden){lastFrame=t;requestAnimationFrame(loop);return}
  let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*(u.kind==='warrior'?2.3:1.5));u.x+=dx/len*step;u.y+=dy/len*step;dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}enemyTurn(dt);combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=25){dayClock-=25;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;draw();renderTick=t}
 if(t-minimapTick>400){redrawMinimap();drawMinimap();minimapTick=t}if(t-lightLabelTick>1200){lightLabelTick=t;const phase=(dayClock%25)/25,light=lightLevels(phase);eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+(light.night>.28?'🌙 Noite':phase>.48?'🌇 Crepúsculo':'☀️ Dia')}
-requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v4.9: tropas surgem nos quartéis e impactos de combate estão visíveis!');
+requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v5.1: aldeões trabalham em postos distribuídos e usam ferramentas animadas!');
 })();
 </script></body></html>
