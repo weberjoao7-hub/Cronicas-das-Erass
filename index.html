@@ -1070,7 +1070,11 @@ function assignWorkers(){
  for(const u of workers){
   if(u.buildTarget||u.huntTarget)continue;
   const tx=Math.floor(Number.isFinite(u.tx)?u.tx:u.x),ty=Math.floor(Number.isFinite(u.ty)?u.ty:u.y);
-  if(u.job&&passable(tx,ty)&&!at(tx,ty)&&resource(biome(tx,ty)))reserved.add(key(tx,ty));
+  if(u.job&&passable(tx,ty)&&!at(tx,ty)&&resource(biome(tx,ty))){
+   const k=key(tx,ty);
+   if(reserved.has(k)){u.job=false;u.path=[]} // Corrige saves antigos com aldeões empilhados.
+   else reserved.add(k);
+  }
  }
  for(let i=0;i<workers.length;i++){
   const u=workers[i];
