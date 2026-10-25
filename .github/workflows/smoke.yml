@@ -15,3 +15,5 @@ jobs:
         run: |
           node --check tests/smoke.mjs
           node tests/smoke.mjs
+          node --check tests/cottage-v43.mjs
+          node tests/cottage-v43.mjs
