@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v5.4</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v5.5</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:84px;z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:manipulation;cursor:pointer}#mapLabel{position:fixed;right:18px;top:204px;z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:91px}#mapLabel{top:190px}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Tropas → Mover</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -760,9 +760,43 @@ function drawWatchtower(px,py,ww,hh,level=1){
  }
  ctx.restore();
 }
+
+ // Ponte isométrica: direção salva na construção, tábuas progressivas e pilares.
+ function drawBridge(px,py,ww,hh,axis='x',progress=1){
+  const a=axis==='y'?[-ww*.30,hh*.30]:[ww*.30,hh*.30],s=axis==='y'?[ww*.17,hh*.17]:[ww*.17,-hh*.17];
+  const v=(t,q,r=0)=>[px+a[0]*t+s[0]*q,py+a[1]*t+s[1]*q-hh*.11-r];
+  ctx.save();ctx.fillStyle='#102b3870';ctx.beginPath();ctx.ellipse(px+ww*.07,py+hh*.18,ww*.34,hh*.20,-.12,0,Math.PI*2);ctx.fill();
+  for(const q of [-.79,.79]){
+   ctx.strokeStyle='#4c3222';ctx.lineWidth=Math.max(2,ww*.085);ctx.beginPath();ctx.moveTo(...v(-1,q));ctx.lineTo(...v(1,q));ctx.stroke();
+  }
+  for(const t of [-.72,.72])for(const q of [-.8,.8]){
+   ctx.strokeStyle='#513a26';ctx.lineWidth=Math.max(2,ww*.055);ctx.beginPath();ctx.moveTo(...v(t,q,-hh*.18));ctx.lineTo(...v(t,q,hh*.04));ctx.stroke();
+  }
+  const count=9,laid=Math.floor(Math.max(0,Math.min(1,progress))*count);
+  for(let i=0;i<laid;i++){
+   const t0=-1+i*2/count+.014,t1=-1+(i+1)*2/count-.014;
+   ctx.beginPath();ctx.moveTo(...v(t0,-.83));ctx.lineTo(...v(t1,-.83));ctx.lineTo(...v(t1,.83));ctx.lineTo(...v(t0,.83));ctx.closePath();
+   ctx.fillStyle=i%3===0?'#a97b4c':i%3===1?'#bc925f':'#987047';ctx.fill();
+   ctx.strokeStyle='#523c29';ctx.lineWidth=Math.max(.7,scale*.9);ctx.beginPath();ctx.moveTo(...v(t1,-.81));ctx.lineTo(...v(t1,.81));ctx.stroke();
+   if(ww>36){ctx.fillStyle='#dfbd82';for(const q of [-.64,.64]){ctx.beginPath();ctx.arc(...v((t0+t1)*.5,q),Math.max(.6,scale*.75),0,Math.PI*2);ctx.fill()}}
+  }
+  if(progress>.80)for(const q of [-.89,.89]){
+   const rise=hh*.34*Math.min(1,(progress-.8)*5);
+   for(const t of [-.86,0,.86]){ctx.strokeStyle='#583a27';ctx.lineWidth=Math.max(1.7,ww*.038);ctx.beginPath();ctx.moveTo(...v(t,q));ctx.lineTo(...v(t,q,rise));ctx.stroke()}
+   ctx.strokeStyle='#d0a06a';ctx.lineWidth=Math.max(1.6,ww*.038);ctx.beginPath();ctx.moveTo(...v(-.88,q,rise));ctx.lineTo(...v(.88,q,rise));ctx.stroke();
+  }
+  ctx.restore();
+ }
 function drawConstructionSite(b,px,py,ww,hh){
  const total=Math.max(1,b.buildTotal||18);
  const progress=Math.max(0,Math.min(1,1-b.buildLeft/total));
+ if(b.t==='Ponte'){
+  drawBridge(px,py,ww,hh,b.axis||'x',progress);
+  const barW=Math.max(22,ww*.60),barY=py-hh*.96;
+  ctx.fillStyle='#10251ddc';ctx.fillRect(px-barW*.5-2,barY-2,barW+4,Math.max(4,scale*3)+4);
+  ctx.fillStyle='#d7a96c';ctx.fillRect(px-barW*.5,barY,barW*progress,Math.max(3,scale*3));
+  return;
+ }
  const p=(x,y)=>[px+x*ww,py+y*hh];
  const poly=(pts,color)=>{
   ctx.beginPath();ctx.moveTo(...p(...pts[0]));
@@ -1119,7 +1153,8 @@ if(selected&&selected.x===x&&selected.y===y)diamond(px,py,ww-3,hh-3,null,'#fff4b
 let obj=structures.get(key(x,y));
 if(obj&&obj.buildLeft){drawConstructionSite(obj,px,py,ww,hh)}
 else if(obj){
- if(obj.t==='Torre')drawWatchtower(px,py,ww,hh,obj.level);
+ if(obj.t==='Ponte')drawBridge(px,py,ww,hh,obj.axis||'x');
+ else if(obj.t==='Torre')drawWatchtower(px,py,ww,hh,obj.level);
  else if(obj.t==='Quartel')drawBarracks(px,py,ww,hh);
  else if(obj.t==='Pesqueiro')drawDock(px,py,ww,hh,obj.level);
  else if(obj.t==='Fazenda')drawFarm(px,py,ww,hh,obj.level);
@@ -1175,7 +1210,7 @@ let command=null,selectedUnit=0,live=0,lastFrame=0,autosave=0,dayClock=0,workerC
 function menu(title,html){panel.classList.add('show');panel.innerHTML='<h3>'+title+'</h3>'+html+'<p><button id="close">Fechar</button></p>';document.getElementById('close').onclick=()=>panel.classList.remove('show')}
 function spend(wood,food,stone,ore=0){if(game.wood<wood||game.food<food||game.stone<stone||game.ore<ore){toast('Recursos insuficientes');return false}game.wood-=wood;game.food-=food;game.stone-=stone;game.ore-=ore;return true}
 const adjacent=(x,y)=>game.claim.some(s=>{let [a,b]=s.split(',').map(Number);return Math.abs(x-a)+Math.abs(y-b)===1});
-function productionText(b){const lv=Math.max(1,Math.min(3,b.level||1));switch(b.t){case 'Aldeia':return 'Centro da civilização · recruta aldeões';case 'Cabana':return 'Capacidade +2 habitantes · madeira +'+(2*lv)+'/dia';case 'Fazenda':return 'Alimentos +'+(15*lv)+'/dia';case 'Mina':return 'Pedra +'+(8*lv)+'/dia · minério +'+(4*lv)+'/dia';case 'Pesqueiro':return 'Peixes e alimentos +'+(18*lv)+'/dia';case 'Quartel':return 'Recrutamento de guerreiros';case 'Torre':return 'Defesa automática · alcance 5 terrenos · 14 de dano por disparo';default:return 'Construção da sua civilização'}}
+function productionText(b){const lv=Math.max(1,Math.min(3,b.level||1));switch(b.t){case 'Aldeia':return 'Centro da civilização · recruta aldeões';case 'Cabana':return 'Capacidade +2 habitantes · madeira +'+(2*lv)+'/dia';case 'Fazenda':return 'Alimentos +'+(15*lv)+'/dia';case 'Mina':return 'Pedra +'+(8*lv)+'/dia · minério +'+(4*lv)+'/dia';case 'Pesqueiro':return 'Peixes e alimentos +'+(18*lv)+'/dia';case 'Quartel':return 'Recrutamento de guerreiros';case 'Torre':return 'Defesa automática · alcance 5 terrenos · 14 de dano por disparo';case 'Ponte':return 'Passagem terrestre sobre a água · permite travessia de aldeões e tropas';default:return 'Construção da sua civilização'}}
 function spawnUnit(kind){
  const sourceType=kind==='warrior'?'Quartel':'Aldeia';
  const source=game.buildings.find(b=>b.t===sourceType&&!b.buildLeft)||game.buildings.find(b=>b.t==='Aldeia')||{x:80,y:80};
@@ -1204,17 +1239,31 @@ function upgradeBuilding(b){if(!b||!['Cabana','Fazenda','Mina','Pesqueiro'].incl
 function tileMenu(){if(!selected)return;let{x,y}=selected;if(!exploredFog[y*W+x]){menu('Região desconhecida','<p>🌫️ Esta área ainda não foi explorada. Envie um aldeão ou guerreiro para revelar o terreno antes de investigar ou conquistar.</p>');return}let b=biome(x,y),owned=game.claim.includes(key(x,y)),existing=at(x,y),terrain=['Lago','Campina','Pradaria','Floresta','Colina','Montanha'][b];let html='<p>🌍 <strong>'+terrain+'</strong> · '+(owned?'🟢 Seu território':'⚪ Território não dominado')+'</p>';const landmark=!existing?landmarkAt(x,y,b):null;if(landmark){const info={berries:'🍓 Arbustos de frutos · área de coleta de alimentos',timber:'🪵 Troncos caídos · área de coleta de madeira',ore:'⛏️ Veio mineral · área de coleta de pedra e minério'};html+='<p>Recurso no terreno: '+info[landmark]+'</p>'}const fauna=wildlifeAt(x,y),availableFauna=fauna&&!game.hunted.includes(key(x,y))&&!existing;if(availableFauna){html+='<p>🌱 Recurso natural: '+({fish:'Peixes (construa um pesqueiro)',deer:'Cervos · +30 alimentos',rabbit:'Coelhos · +12 alimentos'}[fauna])+'</p>';if(fauna!=='fish')html+='<button id="huntHere">🏹 Enviar aldeão para caçar</button>'}if(existing){let lv=existing.level||1;html+='<p>🏠 <strong>'+existing.t+'</strong> · Nível '+lv+'</p><p>'+(existing.buildLeft?'🚧 Em construção · '+Math.ceil(existing.buildLeft)+' segundos restantes':productionText(existing))+'</p>';if(existing.buildLeft)html+='<p>Os aldeões estão trabalhando na obra.</p>';if(existing.t==='Aldeia')html+='<button id="recruitWorker">👷 Recrutar aldeão · 🍎 20</button>';if(existing.t==='Quartel'&&!existing.buildLeft)html+='<button id="recruitWarrior">⚔️ Treinar guerreiro · 🍎 30 🪵 15</button>';if(!existing.buildLeft&&['Cabana','Fazenda','Mina','Pesqueiro'].includes(existing.t))html+='<button id="upgrade">'+(lv>=3?'⭐ Nível máximo':'⬆️ Melhorar · 🪵 '+(25*lv)+' 🪨 '+(15*lv))+'</button>'}else if(owned){html+='<p>Terreno disponível para uma nova construção.</p><button id="buildHere">🔨 Construir aqui</button>'}else if(game.enemy&&game.enemy.hp>0&&game.enemy.x===x&&game.enemy.y===y){html+='<p>🔴 <strong>Base inimiga</strong> · Vida: '+game.enemy.hp+'/100</p><p>Envie guerreiros para derrotar a tribo antes de dominar esta região.</p>'}else{html+='<button id="claim">🏳️ Dominar · 🍎 12 🪵 5</button>'}menu('Região '+x+', '+y,html);const claimButton=document.getElementById('claim');if(claimButton)claimButton.onclick=()=>{if(b===5)return toast('Montanhas não podem ser ocupadas');if(b===0&&![[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>game.claim.includes(key(x+dx,y+dy))))return toast('Domine primeiro uma margem vizinha');if(!adjacent(x,y))return toast('Conquiste primeiro uma região vizinha');if(!spend(5,12,0))return;game.claim.push(key(x,y));refresh();tileMenu();toast('Território conquistado!')};const huntButton=document.getElementById('huntHere');if(huntButton)huntButton.onclick=()=>{const targetKey=key(x,y);if(game.hunted.includes(targetKey))return toast('Animal já foi caçado');if(game.units.some(u=>u.huntTarget===targetKey))return toast('Um aldeão já está caçando aqui');const candidates=game.units.filter(u=>u.kind==='worker'&&!u.buildTarget&&!u.huntTarget).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y));let chosen=null;for(const u of candidates){if(assignRoute(u,x,y)){chosen=u;break}}if(!chosen)return toast('Nenhum aldeão disponível consegue chegar à caça');chosen.huntTarget=targetKey;chosen.huntProgress=0;chosen.job=true;save();tileMenu();toast('🏹 Aldeão enviado para caçar')};const buildButton=document.getElementById('buildHere');if(buildButton)buildButton.onclick=buildMenu;const workerButton=document.getElementById('recruitWorker');if(workerButton)workerButton.onclick=()=>{recruitUnit('worker');tileMenu()};const warriorButton=document.getElementById('recruitWarrior');if(warriorButton)warriorButton.onclick=()=>{recruitUnit('warrior');tileMenu()};const upgradeButton=document.getElementById('upgrade');if(upgradeButton){upgradeButton.disabled=(existing.level||1)>=3;upgradeButton.onclick=()=>upgradeBuilding(existing)}}
 
 
-const buildPrices={Cabana:[35,15,0],Fazenda:[30,0,15],Mina:[25,0,25],Quartel:[70,0,50],Torre:[55,0,65],Pesqueiro:[45,0,10]};
+const buildPrices={Cabana:[35,15,0],Fazenda:[30,0,15],Mina:[25,0,25],Quartel:[70,0,50],Torre:[55,0,65],Pesqueiro:[45,0,10],Ponte:[45,0,25]};
 let placing=null,hoverTile=null;
 const cancelPlacementButton=document.getElementById('cancelPlacement');
 function stopPlacement(){placing=null;hoverTile=null;cancelPlacementButton.classList.remove('active');dirty=true}
 cancelPlacementButton.onclick=()=>{stopPlacement();toast('Construção cancelada')};
+function bridgeAxis(x,y){
+ const scores=[0,0];
+ for(const [dx,dy,axis] of [[1,0,0],[-1,0,0],[0,1,1],[0,-1,1]]){
+  const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;
+  const neighbor=at(nx,ny);
+  if(neighbor&&neighbor.t==='Ponte')scores[axis]+=(neighbor.axis===(axis?'y':'x')?6:1);
+  else if(biome(nx,ny)!==0&&biome(nx,ny)!==5)scores[axis]++;
+ }
+ return scores[0]>=scores[1]?'x':'y';
+}
 function buildValidation(t,x,y){
  if(x<0||y<0||x>=W||y>=H)return 'Fora dos limites do mapa';
  if(!game.claim.includes(key(x,y)))return 'Domine este terreno antes de construir';
  if(at(x,y))return 'Já existe uma construção aqui';
  const b=biome(x,y);
  if(t==='Pesqueiro')return b===0?null:'Pesqueiros precisam de um lago';
+ if(t==='Ponte'){
+  if(b!==0)return 'Pontes precisam de água';
+  return [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>passable(x+dx,y+dy))?null:'Construa a ponte a partir de uma margem ou de outra ponte pronta';
+ }
  if(b===0||b===5)return 'Este edifício precisa de terra firme';
  if(t==='Mina'&&b!==4)return 'Minas precisam de colinas';
  if(t==='Fazenda'&&b!==1&&b!==2)return 'Fazendas precisam de campos ou pradarias';
@@ -1230,7 +1279,7 @@ function placeBuilding(t,x,y){
  const error=buildValidation(t,x,y);if(error){toast(error);return false}
  if(!spend(...buildPrices[t]))return false;
  const duration=t==='Quartel'?30:t==='Torre'?26:18;
- game.buildings.push({x,y,t,buildLeft:duration,buildTotal:duration});
+ game.buildings.push({x,y,t,buildLeft:duration,buildTotal:duration,...(t==='Ponte'?{axis:bridgeAxis(x,y)}:{})});
  selected={x,y};stopPlacement();assignBuilders();refresh();save();
  toast('🏗️ Obra iniciada: '+t+'! Aldeões enviados para construir.');
  return true;
@@ -1244,7 +1293,8 @@ function drawPlacementOverlay(){
  ctx.save();
  diamond(px,py,ww*.98,hh*.98,valid?'#64e5a75c':'#ef69665c',valid?'#7fffc0':'#ff7777');
  ctx.globalAlpha=.66;
- if(placing==='Torre')drawWatchtower(px,py,ww,hh,1);
+ if(placing==='Ponte')drawBridge(px,py,ww,hh,bridgeAxis(p.x,p.y));
+ else if(placing==='Torre')drawWatchtower(px,py,ww,hh,1);
  else if(placing==='Quartel')drawBarracks(px,py,ww,hh);
   else if(placing==='Pesqueiro')drawDock(px,py,ww,hh,1);
  else if(placing==='Fazenda')drawFarm(px,py,ww,hh,1);
@@ -1262,7 +1312,7 @@ function drawPlacementOverlay(){
  ctx.restore();
 }
 function buildMenu(){
- menu('Construir','<p>Selecione o edifício. Depois toque em um terreno do seu território para posicioná-lo.</p><button data-t="Cabana">🛖 Cabana · 🪵 35 🍎 15</button><button data-t="Fazenda">🌾 Fazenda · 🪵 30 🪨 15</button><button data-t="Mina">⛏️ Mina · 🪵 25 🪨 25</button><button data-t="Quartel">🏰 Quartel · 🪵 70 🪨 50</button><button data-t="Torre">🏹 Torre de vigia · 🪵 55 🪨 65</button><button data-t="Pesqueiro">🎣 Pesqueiro (lago) · 🪵 45 🪨 10</button>');
+ menu('Construir','<p>Selecione o edifício. Depois toque em um terreno do seu território para posicioná-lo.</p><button data-t="Cabana">🛖 Cabana · 🪵 35 🍎 15</button><button data-t="Fazenda">🌾 Fazenda · 🪵 30 🪨 15</button><button data-t="Mina">⛏️ Mina · 🪵 25 🪨 25</button><button data-t="Quartel">🏰 Quartel · 🪵 70 🪨 50</button><button data-t="Torre">🏹 Torre de vigia · 🪵 55 🪨 65</button><button data-t="Pesqueiro">🎣 Pesqueiro (lago) · 🪵 45 🪨 10</button><button data-t="Ponte">🌉 Ponte (lago) · 🪵 45 🪨 25</button>');
  panel.querySelectorAll('[data-t]').forEach(el=>el.onclick=()=>{
   const t=el.dataset.t;
   if(selected&&!buildValidation(t,selected.x,selected.y)){placeBuilding(t,selected.x,selected.y);return}
@@ -1280,7 +1330,7 @@ function armyMenu(){game.army=game.units.filter(u=>u.kind==='warrior').length;me
 
 function nextDay(){game.day++;const total=(type)=>game.buildings.filter(b=>b.t===type&&!b.buildLeft).reduce((n,b)=>n+Math.max(1,Math.min(3,b.level||1)),0);game.food+=15+total('Fazenda')*15+total('Pesqueiro')*18;if(game.enemy&&game.enemy.hp>0&&game.day%3===0)spawnEnemyGuard();game.wood+=12+total('Cabana')*2;game.stone+=4+total('Mina')*8;game.ore+=2+total('Mina')*4;refresh();toast('Dia '+game.day+' · produção das construções recebida')}
 
-function showTutorial(){menu('🌄 Bem-vindo a Crônicas das Eras','<p><strong>1.</strong> Seus aldeões trabalham automaticamente: procuram florestas para madeira, campos para alimento e colinas para pedra.</p><p><strong>2.</strong> Os dias avançam sozinhos a cada 25 segundos, gerando recursos.</p><p><strong>3.</strong> Toque em uma região próxima à aldeia e use <strong>Dominar</strong> para ampliar seu território.</p><p><strong>4.</strong> Em <strong>Construir</strong>, crie fazendas, minas, cabanas, quartéis e pesqueiros nos lagos.</p><p><strong>5.</strong> Toque em cervos ou coelhos no mapa para enviar aldeões à caça. Em <strong>Tropas</strong>, treine guerreiros e ataque a tribo rival.</p><button id="begin">▶ Começar a jogar</button>');document.getElementById('begin').onclick=()=>{panel.classList.remove('show');localStorage.setItem('cronicas-tutorial-v15','1');toast('Boa sorte! Sua aldeia já está trabalhando.')}}
+function showTutorial(){menu('🌄 Bem-vindo a Crônicas das Eras','<p><strong>1.</strong> Seus aldeões trabalham automaticamente: procuram florestas para madeira, campos para alimento e colinas para pedra.</p><p><strong>2.</strong> Os dias avançam sozinhos a cada 25 segundos, gerando recursos.</p><p><strong>3.</strong> Toque em uma região próxima à aldeia e use <strong>Dominar</strong> para ampliar seu território.</p><p><strong>4.</strong> Em <strong>Construir</strong>, crie fazendas, minas, cabanas, quartéis, pesqueiros e pontes para atravessar lagos.</p><p><strong>5.</strong> Toque em cervos ou coelhos no mapa para enviar aldeões à caça. Em <strong>Tropas</strong>, treine guerreiros e ataque a tribo rival.</p><button id="begin">▶ Começar a jogar</button>');document.getElementById('begin').onclick=()=>{panel.classList.remove('show');localStorage.setItem('cronicas-tutorial-v15','1');toast('Boa sorte! Sua aldeia já está trabalhando.')}}
 function constructionStand(b,u){
  let options=[];for(let r=0;r<=2;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
   if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
@@ -1347,7 +1397,7 @@ function assignWorkers(){
 }
 document.getElementById('home').onclick=()=>{cx=80;cy=80;scale=1.3;selected={x:80,y:80};dirty=true;tileMenu()};
 document.getElementById('build').onclick=buildMenu;document.getElementById('army').onclick=armyMenu;document.getElementById('help').onclick=showTutorial;document.getElementById('zoom').onclick=()=>zoomAt(scale>=2?.65/scale:(scale+.35)/scale,w/2,h*.47);
-function passable(x,y){return x>=0&&y>=0&&x<W&&y<H&&biome(x,y)!==0&&biome(x,y)!==5}
+function passable(x,y){if(x<0||y<0||x>=W||y>=H)return false;const b=biome(x,y);return b!==5&&(b!==0||!!game.buildings.find(v=>v.x===x&&v.y===y&&v.t==='Ponte'&&!v.buildLeft))}
 // A* octil: rotas longas sem varrer metade do mapa a cada ordem.
 // Diagonais somente quando as duas casas laterais são transitáveis.
 function routeFor(u,x,y){
@@ -1428,7 +1478,7 @@ function zoomAt(factor,px,py){
 
 C.addEventListener('pointerdown',e=>{C.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){down={x:e.clientX,y:e.clientY};dragged=false}if(pointers.size===2){lastDist=0;dragged=true;down=null}});
 C.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;let p=pointers.get(e.pointerId);let dx=e.clientX-p.x,dy=e.clientY-p.y;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){if(!down)down={x:e.clientX,y:e.clientY};if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)dragged=true;cx=Math.max(0,Math.min(W-1,cx-(dx/(TW*scale)+dy/(TH*scale))));cy=Math.max(0,Math.min(H-1,cy-(-dx/(TW*scale)+dy/(TH*scale))))}else if(pointers.size===2){let a=[...pointers.values()],dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastDist)zoomAt(dist/lastDist,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2);lastDist=dist;dragged=true}dirty=true});
-C.addEventListener('pointerup',e=>{if(!dragged&&pointers.size===1&&down){let {x,y}=tileAt(e.clientX,e.clientY);if(x>=0&&x<W&&y>=0&&y<H){if(placing){placeBuilding(placing,x,y)}else if(command==='moveArmy'){moveArmyTo(x,y);command=null}else if(command==='move'){let u=game.units[selectedUnit];if(biome(x,y)===0||biome(x,y)===5){toast('Unidade não atravessa lagos ou montanhas')}else{if(assignRoute(u,x,y)){toast('Caminho calculado: unidade enviada');save()}else toast('Não há caminho terrestre até o destino')}command=null}else{selected={x,y};let unitIndex=pickUnitAtScreen(e.clientX,e.clientY);if(unitIndex<0)unitIndex=game.units.findIndex(u=>Math.floor(u.x)===x&&Math.floor(u.y)===y);if(unitIndex>=0){selectedUnit=unitIndex;unitMenu()}else tileMenu()}dirty=true}}pointers.delete(e.pointerId);if(pointers.size<2){lastDist=0;const remaining=[...pointers.values()][0];down=remaining?{x:remaining.x,y:remaining.y}:null}});C.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);lastDist=0;down=null;dragged=true});C.addEventListener('pointermove',e=>{if(placing&&pointers.size===0){hoverTile=tileAt(e.clientX,e.clientY);dirty=true}});C.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY>0?.88:1.12,e.clientX,e.clientY)},{passive:false});
+C.addEventListener('pointerup',e=>{if(!dragged&&pointers.size===1&&down){let {x,y}=tileAt(e.clientX,e.clientY);if(x>=0&&x<W&&y>=0&&y<H){if(placing){placeBuilding(placing,x,y)}else if(command==='moveArmy'){moveArmyTo(x,y);command=null}else if(command==='move'){let u=game.units[selectedUnit];if(!passable(x,y)){toast('Unidade precisa de uma ponte para atravessar lagos; montanhas são bloqueadas')}else{if(assignRoute(u,x,y)){toast('Caminho calculado: unidade enviada');save()}else toast('Não há caminho terrestre até o destino')}command=null}else{selected={x,y};let unitIndex=pickUnitAtScreen(e.clientX,e.clientY);if(unitIndex<0)unitIndex=game.units.findIndex(u=>Math.floor(u.x)===x&&Math.floor(u.y)===y);if(unitIndex>=0){selectedUnit=unitIndex;unitMenu()}else tileMenu()}dirty=true}}pointers.delete(e.pointerId);if(pointers.size<2){lastDist=0;const remaining=[...pointers.values()][0];down=remaining?{x:remaining.x,y:remaining.y}:null}});C.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);lastDist=0;down=null;dragged=true});C.addEventListener('pointermove',e=>{if(placing&&pointers.size===0){hoverTile=tileAt(e.clientX,e.clientY);dirty=true}});C.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY>0?.88:1.12,e.clientX,e.clientY)},{passive:false});
 // Comandos de RTS no desktop; o controle por toque permanece inalterado no iPhone.
 C.addEventListener('contextmenu',e=>{
  e.preventDefault();
@@ -1468,6 +1518,6 @@ function loop(t){
  if(document.hidden){lastFrame=t;requestAnimationFrame(loop);return}
  let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*(u.kind==='warrior'?2.3:1.5));u.x+=dx/len*step;u.y+=dy/len*step;dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}enemyTurn(dt);combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=25){dayClock-=25;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;draw();renderTick=t}
 if(t-minimapTick>400){redrawMinimap();drawMinimap();minimapTick=t}if(t-lightLabelTick>1200){lightLabelTick=t;const phase=(dayClock%25)/25,light=lightLevels(phase);eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+(light.night>.28?'🌙 Noite':phase>.48?'🌇 Crepúsculo':'☀️ Dia')}
-requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v5.4: novos recursos visuais nos biomas!');
+requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v5.5: pontes isométricas e travessia de lagos!');
 })();
 </script></body></html>
