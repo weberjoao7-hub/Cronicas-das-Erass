@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Script principal não encontrado');
-const source=match[1].replace(/\}\)\(\);\s*$/, 'globalThis.__test={biome,routeFor,game,point,tileAt,drawBarracks};})();');
+const source=match[1].replace(/\}\)\(\);\s*$/, 'globalThis.__test={biome,routeFor,game,point,tileAt,drawBarracks,drawTownHall};})();');
 assert.notEqual(source,match[1],'Não foi possível instrumentar o jogo');
 
 const context2d=new Proxy({},{
@@ -45,6 +45,8 @@ vm.runInNewContext(source,sandbox,{timeout:10000});
 const t=sandbox.__test;
 assert.ok(t,'Inicialização do jogo falhou');
 assert.doesNotThrow(()=>t.drawBarracks(180,200,74,38),'Quartel deve renderizar no Canvas simulado');
+assert.doesNotThrow(()=>t.drawTownHall(180,200,74,38,false),'Centro do jogador deve renderizar');
+assert.doesNotThrow(()=>t.drawTownHall(180,200,74,38,true),'Base rival deve renderizar');
 assert.equal(t.biome(80,80),2,'Capital precisa nascer em terra firme');
 assert.equal(t.biome(91,86),2,'Acampamento rival precisa nascer em terra firme');
 const path=t.routeFor(t.game.units[0],91,86);
@@ -58,4 +60,4 @@ assert.ok(saved>0,'Salvamento local não iniciou');
 const before=t.point(80,80);
 listeners.get('minimap').get('pointerdown')({clientX:95,clientY:40});
 assert.notDeepEqual(t.point(80,80),before,'Minimapa não moveu a câmera');
-console.log('Smoke OK: inicialização, render, mapa, rota, minimapa e salvamento');
+console.log('Smoke OK: sedes de ambas faccoes, quartel, mapa, rota, minimapa e salvamento');
