@@ -998,7 +998,7 @@ function drawUnitSprite(u,px,py,z,enemy=false){
  const target=moving?u.path[0]:null;
  const direction=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):1;
  const striking=now-(u.attackAt||0)<340,hit=now-(u.hitAt||0)<190;
- const warrior=enemy||u.kind==='warrior',building=!!u.buildTarget,hunting=!!u.huntTarget;
+ const archer=!enemy&&u.kind==='archer',warrior=enemy||u.kind==='warrior',building=!!u.buildTarget,hunting=!!u.huntTarget;
  const harvesting=!warrior&&!building&&!hunting&&!moving&&!!u.job&&
   Math.hypot(u.x-(Number.isFinite(u.tx)?u.tx:u.x),u.y-(Number.isFinite(u.ty)?u.ty:u.y))<.35;
  const harvestBiome=harvesting?biome(Math.floor(u.x),Math.floor(u.y)):-1;
@@ -1013,7 +1013,7 @@ function drawUnitSprite(u,px,py,z,enemy=false){
   ctx.moveTo(side*r*.19+swing,r*.53);ctx.lineTo(side*r*.19+swing+r*.13,r*.61);ctx.stroke();
  }
  // Silhueta e túnica com borda escura, cinto e gola.
- const cloth=hit?'#ffd0b2':enemy?'#a94843':warrior?'#6d879a':'#a98453';
+ const cloth=hit?'#ffd0b2':enemy?'#a94843':warrior?'#6d879a':archer?'#52745a':'#a98453';
  ctx.fillStyle='#25352f';ctx.beginPath();ctx.moveTo(-r*.48,-r*.77);ctx.lineTo(r*.42,-r*.77);ctx.lineTo(r*.52,r*.19);ctx.lineTo(-r*.50,r*.19);ctx.closePath();ctx.fill();
  ctx.fillStyle=cloth;ctx.beginPath();ctx.moveTo(-r*.36,-r*.68);ctx.lineTo(r*.34,-r*.68);ctx.lineTo(r*.42,r*.13);ctx.lineTo(-r*.41,r*.13);ctx.closePath();ctx.fill();
  ctx.fillStyle=enemy?'#d0a77a':warrior?'#c1c4ae':'#e4c183';ctx.fillRect(-r*.38,-r*.11,r*.78,r*.13);
@@ -1028,12 +1028,20 @@ function drawUnitSprite(u,px,py,z,enemy=false){
  if(warrior){ctx.fillStyle=enemy?'#6f3033':'#4d6677';ctx.beginPath();ctx.moveTo(-r*.39,-r*1.02);ctx.lineTo(-r*.28,-r*1.38);ctx.lineTo(r*.23,-r*1.39);ctx.lineTo(r*.40,-r*1.01);ctx.closePath();ctx.fill();
   ctx.fillStyle=enemy?'#c77b64':'#c8d3cf';ctx.fillRect(-r*.43,-r*1.08,r*.89,r*.11);
   ctx.fillStyle=enemy?'#bb554e':'#e0c47b';ctx.fillRect(-r*.065,-r*1.60,r*.14,r*.24);
- }else{ctx.fillStyle='#503b2b';ctx.beginPath();ctx.ellipse(-r*.10,-r*1.22,r*.33,r*.16,-.1,0,7);ctx.fill();
+ }else if(archer){ctx.fillStyle='#38523f';ctx.beginPath();ctx.moveTo(-r*.41,-r*1.01);ctx.lineTo(-r*.29,-r*1.45);ctx.lineTo(r*.12,-r*1.43);ctx.lineTo(r*.40,-r*.97);ctx.closePath();ctx.fill();ctx.strokeStyle='#9b8a55';ctx.lineWidth=Math.max(.8,r*.08);ctx.beginPath();ctx.moveTo(-r*.36,-r*1.06);ctx.lineTo(r*.36,-r*1.06);ctx.stroke();
+  }else{ctx.fillStyle='#503b2b';ctx.beginPath();ctx.ellipse(-r*.10,-r*1.22,r*.33,r*.16,-.1,0,7);ctx.fill();
   ctx.fillStyle='#9a6d42';ctx.fillRect(-r*.35,-r*.68,r*.18,r*.38)}
  // Braço dianteiro, ferramenta de trabalho ou escudo.
  ctx.strokeStyle=enemy?'#bd9072':'#ddb08a';ctx.lineWidth=Math.max(1.6,r*.21);
  ctx.beginPath();ctx.moveTo(r*.31,-r*.54);ctx.lineTo(r*.49+phase*r*.14,-r*.12);ctx.stroke();
- if(warrior){
+ if(archer){
+  // Arco curvo, corda, aljava e flechas distinguem o arqueiro do espadachim.
+  ctx.strokeStyle='#77502c';ctx.lineWidth=Math.max(1.2,r*.17);ctx.beginPath();ctx.moveTo(r*.58,-r*.91);ctx.quadraticCurveTo(r*1.17,-r*.38,r*.57,r*.31);ctx.stroke();
+  ctx.strokeStyle='#e6d3a6';ctx.lineWidth=Math.max(.7,r*.065);ctx.beginPath();ctx.moveTo(r*.58,-r*.91);ctx.lineTo(r*.57,r*.31);ctx.stroke();
+  ctx.fillStyle='#765038';ctx.fillRect(-r*.56,-r*.56,r*.20,r*.65);
+  for(let i=0;i<3;i++){ctx.strokeStyle='#d4b77a';ctx.lineWidth=Math.max(.7,r*.07);ctx.beginPath();ctx.moveTo(-r*(.52+i*.05),-r*.52);ctx.lineTo(-r*(.60+i*.05),-r*.86);ctx.stroke()}
+  if(striking){ctx.strokeStyle='#fff0c4';ctx.lineWidth=Math.max(1,r*.09);ctx.beginPath();ctx.moveTo(r*.54,-r*.35);ctx.lineTo(r*1.13,-r*.36);ctx.stroke()}
+ }else if(warrior){
   ctx.fillStyle=enemy?'#6d2c2a':'#657b86';ctx.strokeStyle=enemy?'#db8b6c':'#c4c8b6';ctx.lineWidth=Math.max(1,r*.11);
   ctx.beginPath();ctx.moveTo(-r*.60,-r*.45);ctx.lineTo(-r*.17,-r*.53);ctx.lineTo(-r*.12,r*.08);ctx.lineTo(-r*.37,r*.33);ctx.lineTo(-r*.61,r*.08);ctx.closePath();ctx.fill();ctx.stroke();
   ctx.strokeStyle='#d6dbd4';ctx.lineWidth=Math.max(1.2,r*.11);
@@ -1088,6 +1096,9 @@ function drawUnitSprite(u,px,py,z,enemy=false){
    ctx.beginPath();ctx.moveTo(r*(striking?1.14:.93),-r*(striking?1.13:.93));
    ctx.lineTo(r*.54,-r*.20);ctx.stroke();
    if(variant===1){ctx.fillStyle='#c9b579';ctx.fillRect(-r*.15,-r*1.43,r*.24,r*.07)}
+  }else if(archer){
+   ctx.fillStyle='#344b39';ctx.beginPath();ctx.moveTo(-r*.31,-r*.58);ctx.lineTo(-r*.53,r*.07);ctx.lineTo(-r*.13,r*.15);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#c5aa73';ctx.lineWidth=Math.max(.8,r*.07);ctx.beginPath();ctx.moveTo(-r*.34,-r*.49);ctx.lineTo(-r*.20,r*.03);ctx.stroke();
   }else{
    // Bolsa de suprimentos, fivela e gola de tecido do aldeão.
    ctx.fillStyle=variant===0?'#6b4930':'#805f39';
