@@ -1857,6 +1857,7 @@ function drawRallyMarkers(now){
   ctx.restore();
  }
 }
+// Ordens de movimento renderizadas sobre o terreno, inclusive no Safari móvel.
 // Rotas táticas da seleção: animadas, limitadas por LOD e sem revelar a névoa.
 function drawOrderOverlay(now=Date.now()){
  const highlighted=selectedGroup.size
@@ -1899,7 +1900,7 @@ function drawOrderOverlay(now=Date.now()){
  let shown=0;
  for(const u of game.units){
   if(shown>=16)break;
-  if(!isMilitary(u.kind)||u.hp<=0||active.has(u)||!Array.isArray(u.path)||!u.path.length)continue;
+  if(!isMilitary(u.kind)||!Array.isArray(u.path)||!u.path.length||u.hp<=0||active.has(u))continue;
   const target=u.path[u.path.length-1];
   if(!visibleAt(target.x,target.y))continue;
   const [px,py]=point(target.x,target.y);
