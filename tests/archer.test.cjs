@@ -49,7 +49,7 @@ test('warrior cannot hit a distant target',()=>{
  assert.equal(shots.length,0);
 });
 test('archer can be recruited from a completed barracks and spends correct resources',()=>{
- const code=section('function spawnUnit(kind){','function upgradeBuilding(');
+ const code=section('function spawnUnit(','function upgradeBuilding(');
  const game={wood:100,food:100,stone:10,ore:20,people:6,army:0,units:[],buildings:[{x:80,y:80,t:'Aldeia'},{x:85,y:85,t:'Quartel'}]};
  const notes=[];
  const at=(x,y)=>game.buildings.find(b=>b.x===x&&b.y===y);
