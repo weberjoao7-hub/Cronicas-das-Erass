@@ -1,6 +1,6 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.4** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.5** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
@@ -12,6 +12,7 @@ Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Er
 - Aldeões com coleta, construção e caça; guerreiros corpo a corpo, **arqueiros com arco, aljava e flechas animadas**, inimigos e combate. Arqueiros agora procuram posições de disparo a 2,5–4,4 terrenos do alvo, evitando avançar desnecessariamente até o combate corpo a corpo. **Pontos de reunião** configuráveis na Aldeia e nos Quartéis: unidades recém-recrutadas seguem automaticamente até o destino por caminhos válidos, com bandeiras isométricas animadas no mapa (sem revelar áreas cobertas pela névoa). Arqueiros são treinados no quartel por 25 madeira, 25 alimento e 5 minério, atacam à distância e integram a formação de tropas.
 - Cabanas, fazendas, **moinhos isométricos com velas animadas e produção de alimentos**, minas, quartéis, pesqueiros, **pontes de madeira sobre lagos** e **torres de vigia**. Torres concluídas atacam automaticamente guardas inimigos a até aproximadamente cinco terrenos, com flechas animadas.
 - Pontes construídas sobre água dominada e conectada a uma margem ou a outra ponte concluída. As pontes permitem travessia real de aldeões e tropas pelo algoritmo A*, com tábuas e guarda-corpos em perspectiva isométrica.
+- Sombras projetadas conforme o horário do dia em edifícios isométricos, com simplificação no zoom distante, e fogueiras animadas junto à Aldeia e aos Quartéis, com brasas visíveis em zoom próximo.
 - Construção progressiva, evolução de edifícios, ciclo de iluminação e **chuvas com vento, gotas animadas e ondulações na água** em dias determinados pelo calendário do jogo; efeitos meteorológicos puramente visuais, sem alterar os dados salvos. Controles por toque e mouse.
 - Salvamento local no navegador usando a chave legada `cronicas-v04`, preservada por compatibilidade.
 
@@ -24,6 +25,9 @@ Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, f
 
 ## Publicação
 Em **Settings → Pages → Build and deployment**, selecione **Deploy from a branch**, branch **main**, pasta **/(root)**. O arquivo de entrada é `index.html` e não exige build.
+
+## Atualização v6.5 — Sombras direcionais e fogueiras
+As construções concluídas, incluindo o centro rival, recebem sombra de contato e projeção que acompanha a posição simulada do sol. À noite, a projeção longa desaparece; em zoom distante, é omitida para reduzir o custo no Safari. Aldeia e Quartéis agora têm fogueiras com toras cruzadas, duas camadas de chamas e brasas animadas, também com níveis de detalhe. O efeito é somente visual e não modifica a chave de salvamento `cronicas-v04`. Os testes em `tests/lighting-visual.test.cjs` verificam sintaxe, geometria, LOD, alternância dia/noite, determinismo e integração. Não há validação visual em dispositivo físico.
 
 ## Atualização v6.4 — Ruínas antigas e expedições
 O mapa contém ruínas de pedra com pilares, inscrições, destroços e iluminação sutil. A primeira fica em **82,81**, próxima à aldeia; outras aparecem deterministicamente em pradarias e colinas. Após dominar o terreno, a investigação custa 15 alimentos e recompensa 30 pedra + 18 minério (obelisco) ou 35 pedra + 25 madeira (colunata). Uma ruína intacta bloqueia a construção no seu terreno. O minimapa revela monumentos apenas sob visão atual; o zoom distante omite detalhes. O salvamento continua em `cronicas-v04`, inicializando `ruinsExplored` em partidas antigas.
