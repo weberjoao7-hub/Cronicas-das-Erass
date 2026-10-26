@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.7** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.8** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.8 — Cavalaria
+- Cavaleiros desbloqueados na **Era Antiga** e treinados em quartéis por 30 madeira, 45 alimentos e 15 minério. Movem-se a 3,1 terrenos/s, atacam com 26 de dano e alcance 1,8; usam formações e pontos de reunião existentes.
+- Montaria desenhada em Canvas isométrico: patas com galope, corpo e cabeça em camadas, sela, cavaleiro, lança, bandeirola e sombras de contato. Detalhes reduzidos em zoom distante.
+- Novos comandos de recrutamento no menu Tropas e no quartel, com bloqueio de era; preserva o salvamento `cronicas-v04`.
 
 ## Recursos atuais
 - Mapa procedural de 160 × 160 terrenos com água, campos, pradarias, florestas, colinas e montanhas. Encostas têm rochas facetadas, cascalho e vegetação alpina com LOD. Lagos com reflexos animados, juncos, vitórias-régias e peixes decorativos, com níveis de detalhe para o zoom móvel.
