@@ -38,10 +38,11 @@ test('classical era upgrades road surface to stone without altering saves',()=>{
 test('roads are deterministic and LOD reduces geometry on iPhone zoom',()=>{
  const s=scene();s.drawRoad(180,220,74,38,80,80);
  const full=JSON.stringify(s.ops),fullCount=s.ops.length;
- s.ops.length=0;s.drawRoad(180,220,74,38,80,80);
- assert.equal(JSON.stringify(s.ops),full);
- s.ops.length=0;s.drawRoad(180,220,20,10,80,80);
- assert.ok(s.ops.length<fullCount*.6,'distant road should skip fine stones');
+ // The Canvas mock does not implement save()/restore() state, so use a fresh context.
+ const repeat=scene();repeat.drawRoad(180,220,74,38,80,80);
+ assert.equal(JSON.stringify(repeat.ops),full);
+ const distant=scene();distant.drawRoad(180,220,20,10,80,80);
+ assert.ok(distant.ops.length<fullCount*.6,'distant road should skip fine stones');
 });
 test('isolated tile does not render disconnected road',()=>{
  const s=scene(1,['80,80']);s.drawRoad(180,220,74,38,80,80);
