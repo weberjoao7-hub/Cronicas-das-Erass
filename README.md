@@ -49,3 +49,7 @@ O comando **Mover todos os guerreiros** no celular agora aceita o toque no mapa 
 
 ## Atualização v6.2 — Moinhos
 Moinhos custam 60 de madeira e 30 de pedra, são construídos em campinas ou pradarias dominadas e produzem 12 alimentos/dia por nível (até nível 3). A construção tem alicerce, faces em perspectiva, telhado, quatro velas animadas e sacos de farinha, com menos detalhes em zoom distante. O sistema de salvamento `cronicas-v04` foi mantido.
+
+
+## Atualização v6.9 — Fazendas isométricas detalhadas
+As fazendas receberam solo em terraços com faces em perspectiva, sulcos e culturas em linhas, irrigação, cercas, celeiro com telhado em duas águas e depósitos. Culturas balançam discretamente ao vento; fazendas de nível 2 têm espigas e as de nível 3, uma carroça de colheita. O nível de detalhe depende do zoom, preservando a chave de salvamento `cronicas-v04`. A atualização é exclusivamente gráfica; não altera custos, produção ou colisões. Os testes estão em `tests/farm-visual.test.cjs`. Testes de FPS e Safari iPhone físico continuam pendentes.
