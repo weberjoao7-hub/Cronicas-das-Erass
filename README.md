@@ -1,12 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.6** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.7** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
 
 ## Recursos atuais
-- Mapa procedural de 160 × 160 terrenos com água, campos, pradarias, florestas, colinas e montanhas. Lagos com reflexos animados, juncos, vitórias-régias e peixes decorativos, com níveis de detalhe para o zoom móvel.
+- Mapa procedural de 160 × 160 terrenos com água, campos, pradarias, florestas, colinas e montanhas. Encostas têm rochas facetadas, cascalho e vegetação alpina com LOD. Lagos com reflexos animados, juncos, vitórias-régias e peixes decorativos, com níveis de detalhe para o zoom móvel.
 - Câmera isométrica com zoom, minimapa, exploração e névoa de guerra persistente. Ruínas antigas isométricas (obeliscos e colunatas), marcadas no minimapa somente quando visíveis e exploráveis uma única vez.
 - Estradas isométricas conectando construções concluídas ao centro da aldeia: trilhas de terra com pedras e marcas de desgaste, substituídas por calçamento na era Clássica. Uma praça pavimentada destaca o centro da aldeia. Detalhes finos são omitidos em zoom distante para reduzir o custo de renderização.
 - Aldeões com coleta, construção e caça; guerreiros corpo a corpo, **arqueiros com arco, aljava e flechas animadas**, inimigos e combate. Arqueiros agora procuram posições de disparo a 2,5–4,4 terrenos do alvo, evitando avançar desnecessariamente até o combate corpo a corpo. **Pontos de reunião** configuráveis na Aldeia e nos Quartéis: unidades recém-recrutadas seguem automaticamente até o destino por caminhos válidos, com bandeiras isométricas animadas no mapa (sem revelar áreas cobertas pela névoa). Arqueiros são treinados no quartel por 25 madeira, 25 alimento e 5 minério, atacam à distância e integram a formação de tropas.
@@ -26,6 +26,9 @@ Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, f
 
 ## Publicação
 Em **Settings → Pages → Build and deployment**, selecione **Deploy from a branch**, branch **main**, pasta **/(root)**. O arquivo de entrada é `index.html` e não exige build.
+
+## Atualização v6.7 — Relevo rochoso e otimização da névoa
+Colinas e sopés de montanhas agora recebem afloramentos de pedra com faces iluminadas e sombreadas, sombras de contato, seixos e vegetação seca. Nas montanhas, o cascalho e manchas de neve complementam os picos existentes. A quantidade de rochas e os microdetalhes diminuem com o zoom; elementos não são desenhados sobre estradas, construções ou ruínas. Terrenos ainda não explorados desenham apenas a base antes da névoa, evitando processar árvores, animais e construções invisíveis e reduzindo vazamento visual. Os detalhes usam coordenadas e ruído determinístico, sem novos campos de salvamento; a chave `cronicas-v04` foi preservada. Testes em `tests/highlands-visual.test.cjs` cobrem sintaxe, determinismo, LOD, ocupação e integração. Testes de FPS e Safari iPhone físico ainda são necessários.
 
 ## Atualização v6.6 — Arquitetura progressiva da sede
 O centro da aldeia ganhou uma camada arquitetônica em perspectiva isométrica que muda com o avanço das eras: carga e toldo desde a Era Primordial, alvenaria e brasão a partir da Era Antiga (índice 2), torres com ameias e estandartes animados a partir da Era Medieval (índice 4), e torre central de relógio com ponteiros animados a partir da Era Industrial (índice 6). A decoração da base inimiga não é modificada. Há LOD: a camada é omitida quando a largura projetada do terreno fica abaixo de 24 pixels e os detalhes finos são reduzidos em zoom médio. O salvamento segue em `cronicas-v04`. Os testes em `tests/townhall-era.test.cjs` verificam sintaxe, progressão, LOD e animação determinística. Ainda faltam testes visuais e de desempenho no Safari iPhone físico.
