@@ -49,13 +49,13 @@ test('archer tries alternate stand-off tiles when direct approach is blocked',()
 });
 test('touching a map destination actually executes the army command',()=>{
  const listenerCode=between("C.addEventListener('pointerup',e=>{","C.addEventListener('pointercancel',");
- const listeners={};const C={addEventListener:(name,fn)=>listeners[name]=fn};
+ const C={addEventListener(name,fn){if(name==='pointerup')this.__tap=fn;}};
  const pointers=new Map([[1,{x:50,y:50}]]);const moves=[];
  const run=new Function('C','pointers','moveArmyTo','panel','tileAt',
   "let command='moveArmy',rallySource=null,down={x:50,y:50},dragged=false,placing=null,lastDist=0,dirty=false;"+
   "const W=160,H=160;"+listenerCode+
   ";return ()=>{C.__tap({clientX:50,clientY:50,pointerId:1});return {command,dirty};};")(
-  {addEventListener:(name,fn)=>{if(name==='pointerup')C.__tap=fn;}},
+  C,
   pointers,(x,y)=>moves.push([x,y]),{classList:{remove(){}}},()=>({x:92,y:86})
  );
  const result=run();
