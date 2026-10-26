@@ -19,7 +19,7 @@ Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Er
 - **Desktop:** arraste o mapa; roda do mouse para zoom; clique direito para ordenar movimentação; Shift + clique direito para mover o exército; teclas WASD/setas para câmera, B para construir e G para comandar o exército.
 
 ## Testes
-Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, florestas, lagos, arqueiros e clima; `node --test tests/watchtower.test.js` para as torres; `node tests/smoke.mjs` para o teste de inicialização simulado. Os testes automatizados **não substituem** testes de interação e desempenho no Safari iPhone ou em navegadores reais. As chuvas surgem nos dias 3, 4 e 7 de cada ciclo de oito dias, com transições graduais.
+Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, florestas, lagos, arqueiros e clima; `node --test tests/watchtower.test.js` para as torres; `node tests/smoke.mjs` para o teste de inicialização simulado. Os testes automatizados **não substituem** testes de interação e desempenho no Safari iPhone ou em navegadores reais. As chuvas surgem nos dias 3, 4 e 7 de cada ciclo de oito dias, com transições graduais. Para visualizar o efeito imediatamente, abra **Ajuda → Testar chuva no mapa**; a prévia não modifica o salvamento.
 
 ## Publicação
 Em **Settings → Pages → Build and deployment**, selecione **Deploy from a branch**, branch **main**, pasta **/(root)**. O arquivo de entrada é `index.html` e não exige build.
