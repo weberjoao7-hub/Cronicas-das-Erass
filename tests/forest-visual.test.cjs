@@ -13,7 +13,7 @@ const art=html.slice(a,b);
 const rnd=(x,y,z=0)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
 function setup(biome=()=>3){
  const calls={oak:0,pine:0,geometry:0};
- const methods=new Set(['save','restore','beginPath','ellipse','fill','stroke','moveTo','lineTo','closePath']);
+ const methods=new Set(['save','restore','beginPath','ellipse','fill','stroke','moveTo','lineTo','closePath','fillRect','arc']);
  const ctx=new Proxy({}, {get:(o,k)=>methods.has(k)?()=>{calls.geometry++}:o[k],set:(o,k,v)=>(o[k]=v,true)});
  const f=new Function('ctx','scale','rnd','biome','oak','tree',art+';return {drawForestGrove,drawBirch};');
  const api=f(ctx,1,rnd,biome,()=>calls.oak++,()=>calls.pine++);
