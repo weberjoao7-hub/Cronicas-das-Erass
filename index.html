@@ -344,13 +344,13 @@ function drawLakeDetails(px,py,ww,hh,x,y,q,mask,occupied,now){
    ctx.ellipse(sx,sy-hh*.27,Math.max(.9,ww*.011),Math.max(2,hh*.045),-.12,0,Math.PI*2);ctx.fill();
   }
  }
- if(!occupied&&!mask&&q>.935&&ww>52){
+ if(!occupied&&!mask&&q>.972&&ww>64){
   const swim=Math.sin(phase*.9)*ww*.075;
   const fx=px+swim,fy=py+hh*.065;
   ctx.fillStyle='#173f5280';ctx.beginPath();
-  ctx.ellipse(fx,fy,ww*.068,hh*.043,-.18,0,Math.PI*2);ctx.fill();
+  ctx.ellipse(fx,fy,ww*.044,hh*.027,-.18,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.moveTo(fx-ww*.065,fy);
-  ctx.lineTo(fx-ww*.105,fy-hh*.065);ctx.lineTo(fx-ww*.104,fy+hh*.065);ctx.closePath();ctx.fill();
+  ctx.lineTo(fx-ww*.077,fy-hh*.040);ctx.lineTo(fx-ww*.077,fy+hh*.040);ctx.closePath();ctx.fill();
   ctx.strokeStyle='#c2e5dc6b';ctx.lineWidth=Math.max(.7,scale*.75);
   ctx.beginPath();ctx.ellipse(fx,fy,ww*.13,hh*.10,0,.18,Math.PI*.92);ctx.stroke();
  }
@@ -1087,12 +1087,18 @@ function drawWildlife(px,py,ww,hh,kind,x,y){
  const time=Date.now()*.001,pace=Math.sin(time*3.7+x*2+y),size=Math.max(5,ww*.16);
  ctx.save();ctx.translate(px,py-hh*.12);
  if(kind==='fish'){
-  ctx.translate(Math.sin(time*.9+x+y)*ww*.12,Math.cos(time*1.2+x)*hh*.08);
-  ctx.fillStyle='#9ddbd7';ctx.globalAlpha=.88;
-  ctx.beginPath();ctx.ellipse(0,0,size*.75,size*.32,-.14,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.moveTo(-size*.6,0);ctx.lineTo(-size*1.1,-size*.48);ctx.lineTo(-size*1.1,size*.48);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#143d51';ctx.beginPath();ctx.arc(size*.42,-size*.1,Math.max(.9,size*.065),0,7);ctx.fill();
-  ctx.strokeStyle='#c4eef0';ctx.lineWidth=Math.max(.7,size*.09);ctx.beginPath();ctx.arc(size*.2,size*.05,size*.98,.1,2.6);ctx.stroke();
+  // Peixes são vistos sob a água: silhuetas pequenas, sem cores fluorescentes.
+  if(ww<43){ctx.restore();return}
+  const heading=Math.sin(time*.27+x*.7+y*.3)>0?1:-1;
+  ctx.translate(Math.sin(time*.38+x+y)*ww*.13,Math.cos(time*.49+x)*hh*.06);
+  ctx.scale(heading,1);
+  ctx.globalAlpha=.42;
+  ctx.fillStyle='#214650';
+  ctx.beginPath();ctx.ellipse(0,0,size*.70,size*.20,-.12,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.moveTo(-size*.60,0);ctx.lineTo(-size*.96,-size*.31);ctx.lineTo(-size*.90,size*.28);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#557c79';ctx.beginPath();ctx.moveTo(-size*.08,-size*.14);ctx.lineTo(-size*.30,-size*.36);ctx.lineTo(size*.18,-size*.12);ctx.fill();
+  ctx.strokeStyle='#b2d6cc';ctx.globalAlpha=.22;ctx.lineWidth=Math.max(.6,scale*.6);
+  ctx.beginPath();ctx.ellipse(0,size*.10,size*.91,size*.40,0,.08,Math.PI*.94);ctx.stroke();
  }else{
   ctx.translate(Math.sin(time*.48+x)*ww*.055,Math.abs(pace)*hh*.035);
   ctx.fillStyle='#142d2370';ctx.beginPath();ctx.ellipse(0,size*.45,size*.8,size*.18,0,0,7);ctx.fill();
@@ -1114,10 +1120,21 @@ function drawWildlife(px,py,ww,hh,kind,x,y){
  }
  ctx.restore();
 }
+// Silhueta distante e discreta: nenhuma ave gigante em forma de 'M'.
 function drawBird(px,py,ww,hh,x,y){
- const t=Date.now()*.0015,wing=Math.sin(t*7+x)*hh*.13;
- ctx.strokeStyle='#f3e9d5';ctx.lineWidth=Math.max(1,scale);
- ctx.beginPath();ctx.moveTo(px-ww*.17,py-hh*.9);ctx.quadraticCurveTo(px-ww*.07,py-hh*1.02-wing,px,py-hh*.89);ctx.quadraticCurveTo(px+ww*.08,py-hh*1.02-wing,px+ww*.18,py-hh*.9);ctx.stroke();
+ if(ww<54||scale<1.05)return;
+ const t=Date.now()*.00023,drift=Math.sin(t+x*.37+y*.23);
+ const bx=px+drift*ww*.18,by=py-hh*(1.55+Math.cos(t*.7+y)*.13);
+ const r=Math.min(ww*.065,4.2),flap=Math.sin(t*13+x+y)*r*.30;
+ ctx.save();ctx.translate(bx,by);ctx.rotate(-.12+drift*.12);
+ ctx.fillStyle='#4d5550';ctx.globalAlpha=.72;
+ ctx.beginPath();ctx.ellipse(0,0,r*.52,r*.21,0,0,Math.PI*2);ctx.fill();
+ ctx.beginPath();ctx.moveTo(-r*.2,0);ctx.quadraticCurveTo(-r*.95,-r*.65-flap,-r*1.9,-r*.3-flap);
+ ctx.quadraticCurveTo(-r*.95,r*.06,-r*.18,r*.12);ctx.fill();
+ ctx.beginPath();ctx.moveTo(r*.18,0);ctx.quadraticCurveTo(r*.95,-r*.65-flap,r*1.9,-r*.3-flap);
+ ctx.quadraticCurveTo(r*.95,r*.06,r*.18,r*.12);ctx.fill();
+ ctx.fillStyle='#a39c77';ctx.beginPath();ctx.moveTo(r*.45,-r*.06);ctx.lineTo(r*.9,r*.05);ctx.lineTo(r*.45,r*.12);ctx.fill();
+ ctx.restore();
 }
 
 // Fazenda isométrica: lavoura em perspectiva, celeiro 3D, canais e culturas animadas.
@@ -2220,7 +2237,7 @@ ctx.drawImage(tileArt[b][Math.floor(q*5)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!e
 if(b===0&&shoreMask[y*W+x]&&ww>20)drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);
 
 if(b===0)drawLakeDetails(px,py,ww,hh,x,y,q,shoreMask[y*W+x],structures.has(key(x,y)),frameTime);
-if(q>.972&&ww>26)drawBird(px,py+Math.sin(frameTime*.001+x)*hh*.28,ww,hh,x,y);
+if(q>.994&&ww>54)drawBird(px,py+Math.sin(frameTime*.001+x)*hh*.28,ww,hh,x,y);
 if(b===3&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))drawForestGrove(px,py,ww,hh,x,y,q);
 if((b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))meadowDetails(px,py,ww,hh,x,y,b);
 if(b===4&&!ruinKind)drawHighlandGround(px,py,ww,hh,x,y,4,structures.has(key(x,y))||roadTiles.has(key(x,y)));
