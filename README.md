@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.11** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.12** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.12 — Seleção múltipla e formações RTS
+- No desktop, **Shift + arrastar** desenha um retângulo de seleção sobre as tropas visíveis; **Ctrl + Shift + arrastar** acrescenta unidades à seleção. Trabalhadores, unidades derrotadas e inimigos não são incluídos.
+- O clique direito move as tropas selecionadas em formação, distribuindo os destinos por terrenos transitáveis; **Shift + clique direito** continua movimentando todo o exército. A tecla **M** permite escolher um destino para o grupo.
+- No iPhone e desktop, o menu **Tropas → Selecionar tropas visíveis** permite formar um grupo sem arrastar; **Mover seleção** aguarda um toque no destino. A seleção apresenta anéis turquesa e, no desktop, um retângulo translúcido.
+- A seleção é transitória e não modifica o salvamento `cronicas-v04`. Testes de regressão em `tests/group-selection.test.cjs`. Interação real no Safari iPhone e FPS continuam pendentes de validação.
 
 ## Atualização v6.11 — Cobertura do terreno e flechas animadas
 - Arqueiros e torres não podem disparar através de montanhas: a linha de tiro amostra o trajeto no mapa e bloqueia ataques quando há relevo intransponível. Arqueiros tentam se reposicionar para encontrar um ângulo de disparo válido.
@@ -35,8 +41,8 @@ Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Er
 - Salvamento local no navegador usando a chave legada `cronicas-v04`, preservada por compatibilidade.
 
 ## Controles
-- **Celular:** arraste o mapa com um dedo; use dois dedos para ampliar ou reduzir; toque em terrenos ou unidades para abrir ações. Em **Tropas → Mover todos os guerreiros**, toque no destino para ordenar a formação (corrigido na v6.3). Toque na Aldeia ou em um Quartel concluído e escolha **Definir ponto de reunião**; toque no destino explorado para enviar automaticamente os próximos recrutas.
-- **Desktop:** arraste o mapa; roda do mouse para zoom; clique direito para ordenar movimentação; Shift + clique direito para mover o exército; teclas WASD/setas para câmera, B para construir e G para comandar o exército.
+- **Celular:** arraste o mapa com um dedo; use dois dedos para ampliar ou reduzir; toque em terrenos ou unidades para abrir ações. Em **Tropas → Selecionar tropas visíveis → Mover seleção**, toque no destino para mover o grupo; **Mover todos os guerreiros** continua disponível (corrigido na v6.3). Toque na Aldeia ou em um Quartel concluído e escolha **Definir ponto de reunião**; toque no destino explorado para enviar automaticamente os próximos recrutas.
+- **Desktop:** arraste o mapa; roda do mouse para zoom; clique direito para ordenar movimentação; Shift + arrastar para selecionar tropas; Ctrl + Shift + arrastar para somar à seleção; clique direito para mover a seleção; Shift + clique direito para mover todo o exército; teclas WASD/setas para câmera, B para construir, G para comandar todo o exército e M para mover a seleção.
 
 ## Testes
 Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, florestas, lagos, arqueiros, clima, moinhos, pontos de reunião e caminhos isométricos; `node --test tests/watchtower.test.js` para as torres; `node tests/smoke.mjs` para o teste de inicialização simulado. Os testes automatizados **não substituem** testes de interação e desempenho no Safari iPhone ou em navegadores reais. As chuvas surgem nos dias 3, 4 e 7 de cada ciclo de oito dias, com transições graduais. Para visualizar o efeito imediatamente, abra **Ajuda → Testar chuva no mapa**; a prévia não modifica o salvamento.
