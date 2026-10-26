@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.15** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.16** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.16 — Quartéis evolutivos isométricos
+- Primordial e Tribal: paliçada, barraca de madeira/couro, pátio, manequim de treino, escudo, lança e estandarte animado; a era Tribal acrescenta um pórtico reforçado.
+- Era Antiga: quartel de pedra existente; eras Medieval e seguintes: coberturas volumétricas, brasão e bandeira; era Industrial: telhados metálicos e lanternas.
+- Níveis de detalhe e relógio de quadro unificado, sem modificar recrutamento, economia, colisões, mapa ou salvamento `cronicas-v04`. Regressões em `tests/barracks-era.test.cjs`. Safari físico e FPS real ainda não medidos.
 
 ## Atualização v6.15 — Florestas vivas e sub-bosque isométrico
 - Pinheiros, carvalhos e bétulas agora possuem copas com oscilação procedural ao vento, mantendo os troncos e as sombras de contato imóveis. O movimento depende do tempo e de uma semente local, sem introduzir estados persistentes.
