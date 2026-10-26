@@ -16,7 +16,7 @@ const helpers=between('function smoothstep(','function drawAmbientParticles(')+
 const weatherForDay=new Function(helpers+';return weatherForDay;')();
 const renderer=between('function drawWeather(','function drawAtmosphere(');
 const rnd=(x,y,z=0)=>{const n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
-function paint({day=3,phase=.5,width=390,visible=true,occupied=false,terrain=0,zoom=1}={}){
+function paint({day=3,phase=.5,width=390,visible=true,occupied=false,terrain=0,zoom=1,preview=false}={}){
  const calls={strokes:0,rings:0,shade:0};
  const ctx=new Proxy({},{
   get:(obj,key)=>key==='stroke'?()=>{calls.strokes++}:
@@ -25,8 +25,8 @@ function paint({day=3,phase=.5,width=390,visible=true,occupied=false,terrain=0,z
    obj[key]||(()=>{}),
   set:(obj,key,value)=>{obj[key]=value;return true}
  });
- const render=new Function('ctx','game','dayClock','w','h','rnd','scale','tileAt','W','H','biome','visibleAt','at','weatherForDay',renderer+';return drawWeather;')(
-  ctx,{day},phase*25,width,844,rnd,zoom,()=>({x:15,y:15}),160,160,()=>terrain,()=>visible,()=>occupied?{t:'Ponte'}:null,weatherForDay);
+ const render=new Function('ctx','game','dayClock','w','h','rnd','scale','tileAt','W','H','biome','visibleAt','at','weatherForDay','weatherPreview',renderer+';return drawWeather;')(
+  ctx,{day},phase*25,width,844,rnd,zoom,()=>({x:15,y:15}),160,160,()=>terrain,()=>visible,()=>occupied?{t:'Ponte'}:null,weatherForDay,preview);
  render(15000);
  return calls;
 }
@@ -34,6 +34,7 @@ test('script syntax and weather renderer integration',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/drawAmbientParticles\(frameTime\);drawWeather\(frameTime\)/);
  assert.match(html,/cronicas-v04/);
+ assert.match(script,/id="previewWeather"/);
 });
 test('rain is deterministic and restricted to scheduled days',()=>{
  assert.equal(weatherForDay(1,.5),0);
@@ -52,6 +53,7 @@ test('mobile rain draws visible streaks and desktop can draw more',()=>{
  assert.ok(desktop.strokes>mobile.strokes);
  assert.ok(mobile.shade>0);
  assert.equal(paint({day:1}).strokes,0);
+ assert.ok(paint({day:1,preview:true}).strokes>30,'Help preview should display rain immediately');
 });
 test('lake rings respect fog, occupancy, terrain and zoom LOD',()=>{
  assert.ok(paint().rings>0);
