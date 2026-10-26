@@ -1,6 +1,6 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.5** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.6** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
@@ -13,6 +13,7 @@ Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Er
 - Cabanas, fazendas, **moinhos isométricos com velas animadas e produção de alimentos**, minas, quartéis, pesqueiros, **pontes de madeira sobre lagos** e **torres de vigia**. Torres concluídas atacam automaticamente guardas inimigos a até aproximadamente cinco terrenos, com flechas animadas.
 - Pontes construídas sobre água dominada e conectada a uma margem ou a outra ponte concluída. As pontes permitem travessia real de aldeões e tropas pelo algoritmo A*, com tábuas e guarda-corpos em perspectiva isométrica.
 - Sombras projetadas conforme o horário do dia em edifícios isométricos, com simplificação no zoom distante, e fogueiras animadas junto à Aldeia e aos Quartéis, com brasas visíveis em zoom próximo.
+- **Evolução visual da sede por era:** suprimentos e banca no pátio inicial, contrafortes e brasão a partir da Era Antiga, torres de pedra e bandeiras na Era Medieval e torre de relógio na Era Industrial. Os detalhes são simplificados conforme o zoom.
 - Construção progressiva, evolução de edifícios, ciclo de iluminação e **chuvas com vento, gotas animadas e ondulações na água** em dias determinados pelo calendário do jogo; efeitos meteorológicos puramente visuais, sem alterar os dados salvos. Controles por toque e mouse.
 - Salvamento local no navegador usando a chave legada `cronicas-v04`, preservada por compatibilidade.
 
@@ -25,6 +26,9 @@ Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, f
 
 ## Publicação
 Em **Settings → Pages → Build and deployment**, selecione **Deploy from a branch**, branch **main**, pasta **/(root)**. O arquivo de entrada é `index.html` e não exige build.
+
+## Atualização v6.6 — Arquitetura progressiva da sede
+O centro da aldeia ganhou uma camada arquitetônica em perspectiva isométrica que muda com o avanço das eras: carga e toldo desde a Era Primordial, alvenaria e brasão a partir da Era Antiga (índice 2), torres com ameias e estandartes animados a partir da Era Medieval (índice 4), e torre central de relógio com ponteiros animados a partir da Era Industrial (índice 6). A decoração da base inimiga não é modificada. Há LOD: a camada é omitida quando a largura projetada do terreno fica abaixo de 24 pixels e os detalhes finos são reduzidos em zoom médio. O salvamento segue em `cronicas-v04`. Os testes em `tests/townhall-era.test.cjs` verificam sintaxe, progressão, LOD e animação determinística. Ainda faltam testes visuais e de desempenho no Safari iPhone físico.
 
 ## Atualização v6.5 — Sombras direcionais e fogueiras
 As construções concluídas, incluindo o centro rival, recebem sombra de contato e projeção que acompanha a posição simulada do sol. À noite, a projeção longa desaparece; em zoom distante, é omitida para reduzir o custo no Safari. Aldeia e Quartéis agora têm fogueiras com toras cruzadas, duas camadas de chamas e brasas animadas, também com níveis de detalhe. O efeito é somente visual e não modifica a chave de salvamento `cronicas-v04`. Os testes em `tests/lighting-visual.test.cjs` verificam sintaxe, geometria, LOD, alternância dia/noite, determinismo e integração. Não há validação visual em dispositivo físico.
