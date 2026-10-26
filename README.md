@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.10** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.11** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.11 — Cobertura do terreno e flechas animadas
+- Arqueiros e torres não podem disparar através de montanhas: a linha de tiro amostra o trajeto no mapa e bloqueia ataques quando há relevo intransponível. Arqueiros tentam se reposicionar para encontrar um ângulo de disparo válido.
+- Flechas agora giram acompanhando a direção de voo, com haste, ponta metálica, penas e trilha discreta; ao chegar ao alvo, exibem anel de impacto e pequenas partículas, reduzidas em zoom distante.
+- Novos testes de obstrução, reposicionamento, projéteis e névoa de guerra em `tests/line-of-sight-projectiles.test.cjs`. Preservado o salvamento `cronicas-v04`.
+- A compatibilidade real com Safari físico e a taxa de quadros em iPhone ainda precisam de validação.
 
 ## Atualização v6.10 — Equipamento militar por era e combate direcional
 - Guerreiros, arqueiros e cavalaria recebem detalhes de equipamento por era: bronze a partir da Antiga, armaduras e heráldica na Medieval e acabamentos metálicos adicionais na Industrial. Os elementos são desenhados sobre os sprites existentes em Canvas isométrico.
