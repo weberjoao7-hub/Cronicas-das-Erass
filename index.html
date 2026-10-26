@@ -364,12 +364,6 @@ function oak(x,y,s,seed,now=Date.now()){
  ctx.restore();
 }
 // Floresta isométrica: bétulas, carvalhos e pinheiros com LOD no Safari.
-// Vento procedural nas copas; LOD mantém o desenho leve no Safari móvel.
-function canopySway(seed,size,now=Date.now(),zoom=scale){
- if(zoom<.72||size<7)return 0;
- const breeze=Math.sin(now*.0012+seed*.73)*.65+Math.sin(now*.00205+seed*1.17)*.35;
- return breeze*size*.13;
-}
 function drawBirch(x,y,s,seed,now=Date.now()){
  ctx.save();
  ctx.fillStyle='#112a1d75';ctx.beginPath();ctx.ellipse(x+s*.13,y+s*.13,s*.63,s*.20,-.14,0,Math.PI*2);ctx.fill();
@@ -384,6 +378,12 @@ function drawBirch(x,y,s,seed,now=Date.now()){
  ctx.fillStyle='#d6e2a25c';
  for(let i=0;i<6;i++){const xx=x+wind+s*(rnd(seed,i,47)-.5)*.94,yy=y-s*(1.20+rnd(i,seed,48)*.65);ctx.beginPath();ctx.ellipse(xx,yy,Math.max(.6,s*.05),Math.max(.5,s*.022),-.25,0,Math.PI*2);ctx.fill()}
  ctx.restore();
+}
+// Vento procedural nas copas; LOD mantém o desenho leve no Safari móvel.
+function canopySway(seed,size,now=Date.now(),zoom=scale){
+ if(zoom<.72||size<7)return 0;
+ const breeze=Math.sin(now*.0012+seed*.73)*.65+Math.sin(now*.00205+seed*1.17)*.35;
+ return breeze*size*.13;
 }
 function drawForestGrove(px,py,ww,hh,x,y,q,now=Date.now()){
  if(ww<18)return;
