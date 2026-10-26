@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.14** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.15** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.15 — Florestas vivas e sub-bosque isométrico
+- Pinheiros, carvalhos e bétulas agora possuem copas com oscilação procedural ao vento, mantendo os troncos e as sombras de contato imóveis. O movimento depende do tempo e de uma semente local, sem introduzir estados persistentes.
+- Bosques em zoom próximo recebem serapilheira e cogumelos sob as árvores; os detalhes são omitidos no zoom distante e a oscilação é desativada abaixo de 0,72× para reduzir o custo de renderização no Safari móvel.
+- Nenhuma alteração de terreno, colisão, IA, economia ou chave de salvamento `cronicas-v04`. Testes em `tests/forest-motion.test.cjs`; compatibilidade visual e FPS em Safari físico ainda não medidos.
 
 ## Atualização v6.14 — Seleção por toque e profundidade das tropas
 - No iPhone, em **Tropas → Selecionar área (arrastar)**, desenhe um retângulo sobre unidades militares vivas e visíveis. Fora desse modo, o arrasto continua movendo o mapa; a pinça continua controlando o zoom.
