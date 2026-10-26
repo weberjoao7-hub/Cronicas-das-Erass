@@ -1,13 +1,13 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.3** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.4** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
 
 ## Recursos atuais
 - Mapa procedural de 160 × 160 terrenos com água, campos, pradarias, florestas, colinas e montanhas. Lagos com reflexos animados, juncos, vitórias-régias e peixes decorativos, com níveis de detalhe para o zoom móvel.
-- Câmera isométrica com zoom, minimapa, exploração e névoa de guerra persistente.
+- Câmera isométrica com zoom, minimapa, exploração e névoa de guerra persistente. Ruínas antigas isométricas (obeliscos e colunatas), marcadas no minimapa somente quando visíveis e exploráveis uma única vez.
 - Estradas isométricas conectando construções concluídas ao centro da aldeia: trilhas de terra com pedras e marcas de desgaste, substituídas por calçamento na era Clássica. Uma praça pavimentada destaca o centro da aldeia. Detalhes finos são omitidos em zoom distante para reduzir o custo de renderização.
 - Aldeões com coleta, construção e caça; guerreiros corpo a corpo, **arqueiros com arco, aljava e flechas animadas**, inimigos e combate. Arqueiros agora procuram posições de disparo a 2,5–4,4 terrenos do alvo, evitando avançar desnecessariamente até o combate corpo a corpo. **Pontos de reunião** configuráveis na Aldeia e nos Quartéis: unidades recém-recrutadas seguem automaticamente até o destino por caminhos válidos, com bandeiras isométricas animadas no mapa (sem revelar áreas cobertas pela névoa). Arqueiros são treinados no quartel por 25 madeira, 25 alimento e 5 minério, atacam à distância e integram a formação de tropas.
 - Cabanas, fazendas, **moinhos isométricos com velas animadas e produção de alimentos**, minas, quartéis, pesqueiros, **pontes de madeira sobre lagos** e **torres de vigia**. Torres concluídas atacam automaticamente guardas inimigos a até aproximadamente cinco terrenos, com flechas animadas.
@@ -24,6 +24,9 @@ Execute `node --test tests/*.test.cjs` para validar sintaxe, aldeões, pontes, f
 
 ## Publicação
 Em **Settings → Pages → Build and deployment**, selecione **Deploy from a branch**, branch **main**, pasta **/(root)**. O arquivo de entrada é `index.html` e não exige build.
+
+## Atualização v6.4 — Ruínas antigas e expedições
+O mapa contém ruínas de pedra com pilares, inscrições, destroços e iluminação sutil. A primeira fica em **82,81**, próxima à aldeia; outras aparecem deterministicamente em pradarias e colinas. Após dominar o terreno, a investigação custa 15 alimentos e recompensa 30 pedra + 18 minério (obelisco) ou 35 pedra + 25 madeira (colunata). Uma ruína intacta bloqueia a construção no seu terreno. O minimapa revela monumentos apenas sob visão atual; o zoom distante omite detalhes. O salvamento continua em `cronicas-v04`, inicializando `ruinsExplored` em partidas antigas.
 
 ## Atualização v6.3 — Comandos de tropas e movimentação
 O comando **Mover todos os guerreiros** no celular agora aceita o toque no mapa e despacha a formação. Arqueiros procuram posições de tiro fora do alcance corpo a corpo, mantendo o combate à distância; quando não existe rota, a ordem não cria caminhos inválidos. Passos de unidades em movimento levantam poeira discreta em zoom próximo (LOD desativa o efeito no zoom distante ou sobre a água). Indicadores de destino da formação agora incluem arqueiros. Testes novos em `tests/archer-orders.test.cjs` verificam aproximação, combate à distância e toque no destino.
