@@ -20,7 +20,7 @@ function battle(kind,x=80.5,y=80.5,moving=false){
  return {game,shots};
 }
 test('full browser script has valid JavaScript syntax',()=>{
- const source=section('<script>','</script>');
+ const source=html.match(/<script>([\\s\\S]*?)<\\/script>/)[1];
  assert.doesNotThrow(()=>new Function(source));
 });
 test('archer and warrior are military with different attack profiles',()=>{
