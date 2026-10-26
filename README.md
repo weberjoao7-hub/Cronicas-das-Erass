@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.12** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.13** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.13 — Rotas táticas e névoa de guerra
+- O mapa agora desenha rotas tracejadas animadas para **até oito unidades selecionadas**, com cores por classe e marcador pulsante no destino. Funciona também na seleção múltipla feita pelo menu do iPhone.
+- Cada nó do caminho é verificado contra a visão atual **antes** da simplificação por zoom: o traçado para ao entrar na névoa. Bandeiras de ordens de tropas não selecionadas também ficam ocultas em destinos invisíveis.
+- Zoom distante omite trajetórias para preservar legibilidade e desempenho. Não há alteração de economia, movimentação, IA ou chave de salvamento `cronicas-v04`.
+- Regressões em `tests/order-overlay.test.cjs`. Ainda faltam inspeção visual e medição de FPS no Safari iPhone físico.
 
 ## Atualização v6.12 — Seleção múltipla e formações RTS
 - No desktop, **Shift + arrastar** desenha um retângulo de seleção sobre as tropas visíveis; **Ctrl + Shift + arrastar** acrescenta unidades à seleção. Trabalhadores, unidades derrotadas e inimigos não são incluídos.
