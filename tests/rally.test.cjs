@@ -52,6 +52,15 @@ test('new warriors and archers follow barracks rally, workers follow town hall r
  assert.deepEqual(s.game.units.map(u=>u.path[0].x),[88.5,88.5,82.5]);
  assert.deepEqual(s.game.units.map(u=>u.path[0].y),[85.5,85.5,80.5]);
 });
+test('recruiting from a specific barracks respects that barracks rally',()=>{
+ const s=setup(),first=s.game.buildings[1],second={x:94,y:94,t:'Quartel'};
+ s.game.buildings.push(second);
+ assert.equal(s.setRallyPoint(first,88,85),true);
+ assert.equal(s.setRallyPoint(second,95,94),true);
+ s.recruitUnit('archer',second);
+ assert.ok(Math.hypot(s.game.units[0].x-94.5,s.game.units[0].y-94.5)<8);
+ assert.deepEqual(s.game.units[0].path,[{x:95.5,y:94.5}]);
+});
 test('training without rally remains valid for legacy saves',()=>{
  const s=setup();s.recruitUnit('archer');
  assert.equal(s.game.units.length,1);
