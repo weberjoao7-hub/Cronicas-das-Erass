@@ -16,7 +16,7 @@ function scene(zoom=1){
 test('script v6.15 preserva sintaxe e salvamento legado',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.ok(html.includes('cronicas-v04'));
- assert.match(html,/florestas vivas/);
+ assert.match(script,/function drawForestGrove\(/);
 });
 test('vento determinístico varia com o tempo e cessa no zoom distante',()=>{
  const {api}=scene();
