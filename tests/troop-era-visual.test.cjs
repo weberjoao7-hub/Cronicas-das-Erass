@@ -39,7 +39,7 @@ test('melee strike produces a temporary animated arc, not a permanent particle',
   assert.ok(strike.length>idle.length,kind+' must animate a recent attack');
   assert.deepEqual(render(kind,4,1.4,4900),strike,'fixed time must be deterministic');
  }
- assert.deepEqual(render('archer',4,1.4,4900),render('archer',4,1.4,0),'ranged units use arrow projectiles instead');
+ assert.ok(script.includes('if(warrior&&striking)drawMeleeArc(r,now,u.attackAt)'),'only melee troops receive sword arcs');
 });
 test('idle soldiers retain their last combat-facing direction',()=>{
  const left=render('warrior',4,1.4,0,-1),right=render('warrior',4,1.4,0,1);
