@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.21</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.22</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:84px;z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:manipulation;cursor:pointer}#mapLabel{position:fixed;right:18px;top:204px;z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:91px}#mapLabel{top:190px}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -1682,6 +1682,19 @@ function villagerSprite(job,frame){
  const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
  villagerFrames.set(k,img);return img;
 }
+// Atlas ilustrado opcional: usa os quadros PNG quando o arquivo estiver publicado.
+// Mantém fallback vetorial para conexões lentas e navegadores sem o recurso.
+const paintedVillagers=new Image();paintedVillagers.src='assets/cronicas_aldeoes_atlas.png';
+function drawPaintedVillager(u,px,py,z,job,moving,now){
+ if(!paintedVillagers.complete||!paintedVillagers.naturalWidth||z<.65)return false;
+ const frame=Math.floor(now/(moving?150:240))%6;
+ const target=moving&&u.path&&u.path.length?u.path[0]:null;
+ const dir=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
+ const w=24*z,h=w*104/56;
+ ctx.save();ctx.translate(px,py);ctx.scale(dir,1);
+ ctx.drawImage(paintedVillagers,frame*56,0,56,104,-w*.5,-h*.89,w,h);
+ ctx.restore();return true;
+}
 function drawVillagerAtlas(u,px,py,z,job,moving,now){
  if(z<.65)return false;
  const frame=Math.floor(now/(moving?160:220))%4,img=villagerSprite(job,frame);
@@ -1706,7 +1719,7 @@ function drawUnitSprite(u,px,py,z,enemy=false){
  const harvestBiome=harvesting?biome(Math.floor(u.x),Math.floor(u.y)):-1;
  if(!enemy&&!warrior&&!archer){
   const job=moving?'walk':building?'build':harvesting?(harvestBiome===3?'wood':harvestBiome===4?'stone':'farm'):'idle';
-  if(drawVillagerAtlas(u,px,py,z,job,moving,now))return;
+  if(drawPaintedVillager(u,px,py,z,job,moving,now)||drawVillagerAtlas(u,px,py,z,job,moving,now))return;
  }
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
  ctx.fillStyle='#0b201b83';ctx.beginPath();ctx.ellipse(0,r*.65,r*.9,r*.28,0,0,Math.PI*2);ctx.fill();
