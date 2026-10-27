@@ -35,6 +35,7 @@ function element(id){
 }
 let saved=0;
 const sandbox={
+ Image:class {constructor(){this.complete=true;this.naturalWidth=0;this.src='';}},
  document:{getElementById:element,createElement:()=>({width:148,height:76,getContext:()=>context2d}),addEventListener(){}},
  localStorage:{getItem:()=>null,setItem:()=>saved++},
  innerWidth:390,innerHeight:844,devicePixelRatio:2,
