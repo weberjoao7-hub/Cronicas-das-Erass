@@ -17,9 +17,10 @@ function setup(){
  const biome=(x,y)=>x>=2&&x<=4?0:2;
  const at=(x,y)=>game.buildings.find(b=>b.x===x&&b.y===y);
  const key=(x,y)=>x+','+y;
- const api=new Function('game','biome','W','H','at','key',
+ const ownedTile=(x,y)=>game.claim.includes(key(x,y));
+ const api=new Function('game','biome','W','H','at','key','ownedTile',
   navigation+validation+';return {passable,routeFor,bridgeAxis,buildValidation};'
- )(game,biome,7,5,at,key);
+ )(game,biome,7,5,at,key,ownedTile);
  return {game,...api};
 }
 test('lake blocks A* until a complete bridge spans the water',()=>{
@@ -49,7 +50,7 @@ test('bridge construction requires claimed water connected to a shore or bridge'
  assert.equal(buildValidation('Ponte',1,2),'Pontes precisam de água');
  assert.equal(bridgeAxis(2,2),'x');
  game.claim=[];
- assert.equal(buildValidation('Ponte',2,2),'Domine este terreno antes de construir');
+ assert.equal(buildValidation('Ponte',2,2),'Construa dentro de uma região dominada');
 });
 test('bridge preview, price, menu and old saves remain integrated',()=>{
  assert.match(html,/Ponte:\[45,0,25\]/);
