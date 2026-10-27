@@ -27,6 +27,7 @@ function el(id){
  return elements.get(id);
 }
 const sandbox={
+ Image:class {constructor(){this.complete=true;this.naturalWidth=0;this.src='';}},
  document:{getElementById:el,createElement:()=>({getContext:()=>ctx}),addEventListener(){}},
  localStorage:{getItem:()=>null,setItem(){}},innerWidth:390,innerHeight:844,
  devicePixelRatio:2,addEventListener(){},requestAnimationFrame(){},
