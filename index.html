@@ -1861,36 +1861,92 @@ function drawWatchtower(px,py,ww,hh,level=1){
 }
 
  // Ponte isométrica: direção salva na construção, tábuas progressivas e pilares.
- function drawBridge(px,py,ww,hh,axis='x',progress=1){
-  const a=axis==='y'?[-ww*.30,hh*.30]:[ww*.30,hh*.30],s=axis==='y'?[ww*.17,hh*.17]:[ww*.17,-hh*.17];
-  const v=(t,q,r=0)=>[px+a[0]*t+s[0]*q,py+a[1]*t+s[1]*q-hh*.11-r];
-  ctx.save();ctx.fillStyle='#102b3870';ctx.beginPath();ctx.ellipse(px+ww*.07,py+hh*.18,ww*.34,hh*.20,-.12,0,Math.PI*2);ctx.fill();
-  for(const q of [-.79,.79]){
-   ctx.strokeStyle='#4c3222';ctx.lineWidth=Math.max(2,ww*.085);ctx.beginPath();ctx.moveTo(...v(-1,q));ctx.lineTo(...v(1,q));ctx.stroke();
-  }
-  for(const t of [-.72,.72])for(const q of [-.8,.8]){
-   ctx.strokeStyle='#513a26';ctx.lineWidth=Math.max(2,ww*.055);ctx.beginPath();ctx.moveTo(...v(t,q,-hh*.18));ctx.lineTo(...v(t,q,hh*.04));ctx.stroke();
-  }
-  const count=9,laid=Math.floor(Math.max(0,Math.min(1,progress))*count);
-  for(let i=0;i<laid;i++){
-   const t0=-1+i*2/count+.014,t1=-1+(i+1)*2/count-.014;
-   ctx.beginPath();ctx.moveTo(...v(t0,-.83));ctx.lineTo(...v(t1,-.83));ctx.lineTo(...v(t1,.83));ctx.lineTo(...v(t0,.83));ctx.closePath();
-   ctx.fillStyle=i%3===0?'#a97b4c':i%3===1?'#bc925f':'#987047';ctx.fill();
-   ctx.strokeStyle='#523c29';ctx.lineWidth=Math.max(.7,scale*.9);ctx.beginPath();ctx.moveTo(...v(t1,-.81));ctx.lineTo(...v(t1,.81));ctx.stroke();
-   if(ww>36){ctx.fillStyle='#dfbd82';for(const q of [-.64,.64]){ctx.beginPath();ctx.arc(...v((t0+t1)*.5,q),Math.max(.6,scale*.75),0,Math.PI*2);ctx.fill()}}
-  }
-  if(progress>.80)for(const q of [-.89,.89]){
-   const rise=hh*.34*Math.min(1,(progress-.8)*5);
-   for(const t of [-.86,0,.86]){ctx.strokeStyle='#583a27';ctx.lineWidth=Math.max(1.7,ww*.038);ctx.beginPath();ctx.moveTo(...v(t,q));ctx.lineTo(...v(t,q,rise));ctx.stroke()}
-   ctx.strokeStyle='#d0a06a';ctx.lineWidth=Math.max(1.6,ww*.038);ctx.beginPath();ctx.moveTo(...v(-.88,q,rise));ctx.lineTo(...v(.88,q,rise));ctx.stroke();
-  }
-  ctx.restore();
+ function drawBridge(px,py,ww,hh,axis='x',progress=1,era=0){
+ const stage=Math.max(0,Math.min(7,era|0)),stone=stage>=3,iron=stage>=5,asphalt=stage>=7;
+ const complete=Math.max(0,Math.min(1,progress));
+ const a=axis==='y'?[-ww*.30,hh*.30]:[ww*.30,hh*.30],s=axis==='y'?[ww*.17,hh*.17]:[ww*.17,-hh*.17];
+ const v=(t,q,r=0)=>[px+a[0]*t+s[0]*q,py+a[1]*t+s[1]*q-hh*.11-r];
+ const poly=(points,color)=>{ctx.beginPath();ctx.moveTo(...points[0]);for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);ctx.closePath();ctx.fillStyle=color;ctx.fill()};
+ ctx.save();
+ // Sombras e apoios ficam abaixo do tabuleiro; a ponte permanece ancorada à água.
+ ctx.fillStyle='#102b3870';ctx.beginPath();ctx.ellipse(px+ww*.07,py+hh*.18,ww*.34,hh*.20,-.12,0,Math.PI*2);ctx.fill();
+ for(const q of [-.79,.79]){
+  ctx.strokeStyle=stone?'#505b58':'#4c3222';ctx.lineWidth=Math.max(2,ww*.085);
+  ctx.beginPath();ctx.moveTo(...v(-1,q));ctx.lineTo(...v(1,q));ctx.stroke();
  }
+ for(const t of [-.72,.72])for(const q of [-.8,.8]){
+  ctx.strokeStyle=stone?'#69726c':'#513a26';ctx.lineWidth=Math.max(2,ww*.055);
+  ctx.beginPath();ctx.moveTo(...v(t,q,-hh*.18));ctx.lineTo(...v(t,q,hh*.04));ctx.stroke();
+ }
+ // Arcos de alvenaria e pilares surgem a partir da era Clássica.
+ if(stone&&complete>.32&&ww>=27){
+  const visible=Math.min(1,(complete-.32)/.68);
+  for(const q of [-.80,.80]){
+   const base=v(0,q,-hh*.12),left=v(-.78,q,-hh*.12),right=v(.78,q,-hh*.12);
+   ctx.strokeStyle=iron?'#52656b':'#8f968a';ctx.lineWidth=Math.max(1.8,ww*.065*visible);
+   ctx.beginPath();ctx.moveTo(...left);
+   for(let i=1;i<=8;i++){
+    const t=i/8;
+    const p=v(-.78+1.56*t,q,-hh*.12-hh*.25*Math.sin(t*Math.PI));
+    ctx.lineTo(...p);
+   }
+   ctx.stroke();
+   if(ww>=48){
+    ctx.strokeStyle=iron?'#9aa9a9':'#c2c2ae';ctx.lineWidth=Math.max(.7,scale*.8);
+    ctx.beginPath();ctx.moveTo(...left);ctx.lineTo(...base);ctx.lineTo(...right);ctx.stroke();
+   }
+  }
+ }
+ const count=9,laid=Math.floor(complete*count);
+ for(let i=0;i<laid;i++){
+  const t0=-1+i*2/count+.014,t1=-1+(i+1)*2/count-.014;
+  const color=asphalt?'#4c585d':iron?(i%2?'#777f7d':'#89928e'):stone?(i%2?'#a7a89a':'#bfc0b0'):i%3===0?'#a97b4c':i%3===1?'#bc925f':'#987047';
+  poly([v(t0,-.83),v(t1,-.83),v(t1,.83),v(t0,.83)],color);
+  ctx.strokeStyle=stone?'#626b65':'#523c29';ctx.lineWidth=Math.max(.7,scale*.9);
+  ctx.beginPath();ctx.moveTo(...v(t1,-.81));ctx.lineTo(...v(t1,.81));ctx.stroke();
+  if(ww>36){
+   ctx.fillStyle=iron?'#c3c8bc':stone?'#e2deca':'#dfbd82';
+   for(const q of [-.64,.64]){ctx.beginPath();ctx.arc(...v((t0+t1)*.5,q),Math.max(.6,scale*.75),0,Math.PI*2);ctx.fill()}
+  }
+ }
+ // Longarinas metálicas, rebites e faixa viária preservam a direção isométrica.
+ if(iron&&complete>.80&&ww>=30){
+  for(const q of [-.64,.64]){
+   ctx.strokeStyle='#455d64';ctx.lineWidth=Math.max(1,ww*.026);
+   ctx.beginPath();ctx.moveTo(...v(-.94,q,hh*.018));ctx.lineTo(...v(.94,q,hh*.018));ctx.stroke();
+  }
+ }
+ if(asphalt&&complete>=1&&ww>=43){
+  ctx.strokeStyle='#dfd5b2';ctx.lineWidth=Math.max(.8,scale*1.1);
+  for(let i=0;i<4;i++){
+   const t=-.76+i*.44;
+   ctx.beginPath();ctx.moveTo(...v(t,0,hh*.024));ctx.lineTo(...v(t+.20,0,hh*.024));ctx.stroke();
+  }
+ }
+ if(complete>.80){
+  const rise=hh*.34*Math.min(1,(complete-.8)*5);
+  for(const q of [-.89,.89]){
+   for(const t of [-.86,0,.86]){
+    ctx.strokeStyle=iron?'#475b60':stone?'#8b948c':'#583a27';
+    ctx.lineWidth=Math.max(1.7,ww*(stone?.048:.038));
+    ctx.beginPath();ctx.moveTo(...v(t,q));ctx.lineTo(...v(t,q,rise));ctx.stroke();
+    if(stone&&ww>=46){
+     ctx.fillStyle=iron?'#b1bcb8':'#d3d0bd';
+     ctx.beginPath();ctx.arc(...v(t,q,rise),Math.max(.8,scale*1.2),0,Math.PI*2);ctx.fill();
+    }
+   }
+   ctx.strokeStyle=iron?'#a4b9b8':stone?'#c3c5b6':'#d0a06a';
+   ctx.lineWidth=Math.max(1.6,ww*(stone?.048:.038));
+   ctx.beginPath();ctx.moveTo(...v(-.88,q,rise));ctx.lineTo(...v(.88,q,rise));ctx.stroke();
+  }
+ }
+ ctx.restore();
+}
 function drawConstructionSite(b,px,py,ww,hh){
  const total=Math.max(1,b.buildTotal||18);
  const progress=Math.max(0,Math.min(1,1-b.buildLeft/total));
  if(b.t==='Ponte'){
-  drawBridge(px,py,ww,hh,b.axis||'x',progress);
+  drawBridge(px,py,ww,hh,b.axis||'x',progress,game.era);
   const barW=Math.max(22,ww*.60),barY=py-hh*.96;
   ctx.fillStyle='#10251ddc';ctx.fillRect(px-barW*.5-2,barY-2,barW+4,Math.max(4,scale*3)+4);
   ctx.fillStyle='#d7a96c';ctx.fillRect(px-barW*.5,barY,barW*progress,Math.max(3,scale*3));
@@ -2956,7 +3012,7 @@ let obj=structures.get(key(x,y));
 if(obj&&!obj.buildLeft&&obj.t!=='Ponte')drawStructureShadow(px,py,ww,hh,obj.t,frameTime);
 if(obj&&obj.buildLeft){drawConstructionSite(obj,px,py,ww,hh)}
 else if(obj){
- if(obj.t==='Ponte')drawBridge(px,py,ww,hh,obj.axis||'x');
+ if(obj.t==='Ponte')drawBridge(px,py,ww,hh,obj.axis||'x',1,game.era);
  else if(obj.t==='Torre')drawEraWatchtower(px,py,ww,hh,obj.level,game.era,frameTime);
  else if(obj.t==='Quartel')drawBarracks(px,py,ww,hh,game.era,frameTime);
  else if(obj.t==='Pesqueiro')drawDock(px,py,ww,hh,obj.level,!!obj.boat);
@@ -3133,7 +3189,7 @@ function drawPlacementOverlay(){
  }
  diamond(px,py,ww*.98,hh*.98,valid?'#64e5a75c':'#ef69665c',valid?'#7fffc0':'#ff7777');
  ctx.globalAlpha=.66;
- if(placing==='Ponte')drawBridge(px,py,ww,hh,bridgeAxis(p.x,p.y));
+ if(placing==='Ponte')drawBridge(px,py,ww,hh,bridgeAxis(p.x,p.y),1,game.era);
  else if(placing==='Torre')drawWatchtower(px,py,ww,hh,1);
  else if(placing==='Quartel')drawBarracks(px,py,ww,hh);
   else if(placing==='Pesqueiro')drawDock(px,py,ww,hh,1);
