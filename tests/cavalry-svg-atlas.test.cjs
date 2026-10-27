@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const svg=fs.readFileSync(path.join(root,'assets/cronicas_cavalaria_atlas.svg'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'main script');
 const begin=script.indexOf('function drawPaintedCavalry(');
 const end=script.indexOf('function drawCavalrySprite(',begin);
@@ -19,15 +19,15 @@ function render(era,{zoom=1.2,loaded=true,moving=false,attackAt=0,hitAt=0,now=10
 }
 test('main script parses and legacy save remains unchanged',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(script,/paintedCavalry\\.src='assets\\/cronicas_cavalaria_atlas\\.svg'/);
+ assert.match(script,/paintedCavalry\.src='assets\/cronicas_cavalaria_atlas\.svg'/);
  assert.match(script,/typeof drawPaintedCavalry==='function'/);
- assert.match(script,/localStorage\\.setItem\\('cronicas-v04'/);
+ assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
 test('16 transparent cavalry frames, with distinct period palettes and poses',()=>{
  assert.match(svg,/<svg[^>]*width="448"[^>]*height="448"/);
- assert.equal([...svg.matchAll(/data-frame="\\d-\\d"/g)].length,16);
+ assert.equal([...svg.matchAll(/data-frame="\d-\d"/g)].length,16);
  for(let era=0;era<4;era++)for(let pose=0;pose<4;pose++)assert.ok(svg.includes('data-frame="'+era+'-'+pose+'"'));
- assert.ok(!/<(?:image|foreignObject|script)\\b/i.test(svg));
+ assert.ok(!/<(?:image|foreignObject|script)\b/i.test(svg));
  assert.ok(svg.includes('#a43e39')&&svg.includes('#345c70'));
 });
 test('eight eras select correct rows and idle pose',()=>{
