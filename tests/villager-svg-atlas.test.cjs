@@ -61,6 +61,6 @@ test('desenho do atlas ancora o personagem no terreno',()=>{
  assert.equal(calls[0][2],0);
  assert.equal(calls[0][3],56);
  assert.equal(calls[0][4],104);
- assert.ok(calls[0][7]<0);
- assert.ok(calls[0][7]+calls[0][9]>0);
+ assert.ok(calls[0][6]<0);
+ assert.ok(calls[0][6]+calls[0][8]>0);
 });
