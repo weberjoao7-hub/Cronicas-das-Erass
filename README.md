@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.40** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.43** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.43 — Obras históricas e investigação por região
+- Cabanas, torres e quartéis em construção exibem a silhueta arquitetônica da era atual, em vez da versão genérica antiga. Andaimes e fundações usam madeira nas eras iniciais, pedra nas intermediárias e metal com contraventamentos nas eras Industrial e Contemporânea.
+- O detalhamento de andaimes respeita o zoom; a silhueta só aparece depois de 30% da obra, sem antecipar a construção pronta.
+- Corrigida a investigação de ruínas: o jogador pode investigar qualquer ruína explorada dentro de uma **região dominada**, mesmo que a célula exata não conste em `game.claim`. A investigação continua exigindo alimento, terreno livre e recompensa única.
+- Regressões em `tests/construction-era-visual.test.cjs` e `tests/ruins.test.cjs`. Nenhuma mudança no formato de save `cronicas-v04`; desempenho e aparência em Safari físico permanecem pendentes.
 
 ## Atualização v6.40 — Iluminação viária e navegação pelo minimapa
 - Estradas concluídas recebem luminárias isométricas espaçadas e ancoradas ao solo a partir da Era Medieval: tochas, lampiões renascentistas, luminárias a gás e postes elétricos contemporâneos. Os estilos e materiais variam por era.
