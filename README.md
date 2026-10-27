@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.30** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.31** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.31 — Redes de pesca e limite de memória Retina
+- Barcos pescando exibem rede trapezoidal ancorada no casco, malha com fios cruzados, boias, pequenos peixes e ondulações; o material da rede acompanha as eras, com oscilação calculada a partir do relógio do quadro.
+- LOD omite completamente a rede abaixo de 24 px de largura projetada, simplifica abaixo de 38 px e reserva boias e peixes para zoom próximo (55 px ou mais). Não altera rotas, produção, IA ou dados persistidos.
+- O canvas usa um orçamento de pixels: 2,6 milhões em dispositivos de toque/viewport estreito e 6 milhões em desktop, com DPR máximo de 2. Um iPhone de 390 × 634 mantém DPR 2; tablets Retina reduzem a escala de backing store para limitar uso de memória.
+- Regressões em `tests/fishing-net-retina.test.cjs` cobrem sintaxe, malha, LOD, animação e dimensões de canvas. Testes reais de Safari e FPS em hardware permanecem pendentes.
 
 ## Atualização v6.30 — Fauna isométrica por bioma
 - Raposas raras nas pradarias, javalis nas florestas e lobos nas colinas; cervos, coelhos e peixes continuam presentes. Silhuetas individuais com patas, caudas, orelhas, focinhos e movimento procedural leve, ancoradas no terreno.
