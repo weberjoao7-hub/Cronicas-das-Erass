@@ -8,8 +8,9 @@ Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Er
 ## Atualização v6.50 — Marcha em formação por classes
 - Ordens de grupo distribuem tropas em fileiras orientadas pela direção da marcha: guerreiros à frente, cavalaria no meio e arqueiros na retaguarda.
 - A ordem lateral dos soldados na mesma classe é estável, reduzindo cruzamentos de trajetórias. Cada tropa recebe uma célula de destino distinta, com busca de alternativas passáveis e até oito tentativas de rota A* quando uma posição está bloqueada.
+- O overlay tático mostra guias tracejadas para as fileiras (dourado para linha de frente e verde para arqueiros), apenas com seleção de grupo, zoom suficiente e trechos integralmente visíveis, sem atravessar a névoa.
 - O comando continua respeitando seleção de tropas, unidades vivas, limites do mapa, lagos, pontes e montanhas. Não altera combate, produção nem o formato do salvamento `cronicas-v04`.
-- Regressões em `tests/formation-march.test.cjs`. O comportamento foi simulado e a sintaxe JavaScript validada; inspeção visual e FPS em Safari iPhone físico permanecem pendentes.
+- Regressões em `tests/formation-march.test.cjs` e `tests/formation-rank-visual.test.cjs`. O comportamento foi simulado e a sintaxe JavaScript validada; inspeção visual e FPS em Safari iPhone físico permanecem pendentes.
 
 ## Atualização v6.49 — Cais históricos isométricos
 - Os cais dos pesqueiros evoluem em oito eras: madeira primitiva, madeira trabalhada, alvenaria antiga e clássica, pedra medieval e renascentista, aço industrial e concreto contemporâneo.
