@@ -31,7 +31,7 @@ function render(era,archer,{zoom=1.25,moving=false,striking=false,now=0,loaded=t
 test('main JavaScript compiles, asset is loaded and legacy saves remain',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/paintedTroops\.src='assets\/cronicas_tropas_atlas\.svg'/);
- assert.match(script,/drawPaintedTroop\(u,px,py,z,archer,moving,striking,now,direction,enemy\)/);
+ assert.match(script,/drawPaintedTroop\(u,px,py,z,archer,moving,striking,visualNow,direction,enemy\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
 test('transparent atlas contains 32 distinct historical troop frames',()=>{
