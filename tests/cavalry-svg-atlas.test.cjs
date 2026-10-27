@@ -29,6 +29,7 @@ test('16 transparent cavalry frames, with distinct period palettes and poses',()
  for(let era=0;era<4;era++)for(let pose=0;pose<4;pose++)assert.ok(svg.includes('data-frame="'+era+'-'+pose+'"'));
  assert.ok(!/<(?:image|foreignObject|script)\b/i.test(svg));
  assert.ok(svg.includes('#a43e39')&&svg.includes('#345c70'));
+ assert.equal([...svg.matchAll(/clip-path="url\(#frameClip\)"/g)].length,16,'frames are isolated to avoid neighboring-row bleed');
 });
 test('eight eras select correct rows and idle pose',()=>{
  for(let era=0;era<8;era++){
