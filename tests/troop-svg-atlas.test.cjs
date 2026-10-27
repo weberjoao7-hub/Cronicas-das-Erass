@@ -31,7 +31,7 @@ function render(era,archer,{zoom=1.25,moving=false,striking=false,now=0,loaded=t
 test('main JavaScript compiles, asset is loaded and legacy saves remain',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/paintedTroops\.src='assets\/cronicas_tropas_atlas\.svg'/);
- assert.match(script,/drawPaintedTroop\(u,px,py,z,archer,moving,striking,now,direction\)/);
+ assert.match(script,/drawPaintedTroop\(u,px,py,z,archer,moving,striking,now,direction,enemy\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
 test('transparent atlas contains 32 distinct historical troop frames',()=>{
@@ -43,6 +43,7 @@ test('transparent atlas contains 32 distinct historical troop frames',()=>{
   assert.ok(frames.some(m=>m[1]==era&&m[2]==kind&&m[3]==pose),'frame '+era+'-'+kind+'-'+pose);
  assert.match(svg,/url\(#steel\)/);
  assert.match(svg,/url\(#bronze\)/);
+ assert.equal([...svg.matchAll(/clip-path="url\(#troopFrameClip\)"/g)].length,32,'every frame clips its own cell');
 });
 test('all eight eras and both troop types map to the correct atlas row',()=>{
  for(let era=0;era<8;era++)for(const archer of [false,true]){
@@ -64,7 +65,7 @@ test('mobile LOD and loading fallback keep existing vector rendering available',
  assert.equal(render(4,false,{loaded:false}).drawn,false);
  assert.equal(render(4,false,{zoom:.72}).drawn,true);
  assert.ok(script.includes("typeof paintedTroops!=='undefined'"),'isolated troop renderers can use fallback');
- assert.match(script,/!enemy&&\(archer\|\|warrior\)&&!hit/);
+ assert.match(script,/\(archer\|\|warrior\)&&!hit/);
 });
 test('sprites are grounded, mirrored and isolated by save/restore',()=>{
  const r=render(6,true,{direction:-1,zoom:1});

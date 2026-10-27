@@ -1,9 +1,19 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.35** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.37** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.37 — Guardas rivais históricos e isolamento do atlas
+- Guardas inimigos agora utilizam o atlas animado de guerreiros já existente, com armaduras e equipamentos correspondentes às oito eras, poses de marcha e ataque, orientação e pés ancorados ao terreno.
+- Uma faixa carmesim com broche e anel discreto no solo identificam o time rival sem duplicar a textura. O renderizador Canvas anterior continua disponível durante impactos, zoom distante ou falha no carregamento.
+- Cada um dos 32 quadros do atlas de tropas possui uma área de recorte SVG independente, evitando vazamento visual entre quadros adjacentes.
+- Testes de regressão em `tests/enemy-atlas.test.cjs` e `tests/troop-svg-atlas.test.cjs`. Nenhuma alteração na economia, combate, rotas ou chave de salvamento `cronicas-v04`. Safari iPhone físico e FPS continuam pendentes.
+
+## Atualização v6.36 — Cavalaria histórica
+- Integrado atlas de 16 quadros para cavaleiros, com quatro períodos históricos, poses de repouso, galope e ataque, espelhamento e ancoragem dos cascos.
+- O renderizador procedural permanece como alternativa em zoom distante, impactos ou falha de carregamento. Testes em `tests/cavalry-svg-atlas.test.cjs`.
 
 ## Atualização v6.35 — Atlas de guerreiros e arqueiros por era
 - Criado `assets/cronicas_tropas_atlas.svg` (256 × 896 px): **32 quadros transparentes** de 64 × 112, distribuídos por quatro períodos visuais (Primordial/Tribal, Antiga/Clássica, Medieval/Renascentista, Industrial/Moderna), duas classes e quatro poses por classe.

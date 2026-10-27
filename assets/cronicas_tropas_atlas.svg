@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="896" viewBox="0 0 256 896" role="img" aria-label="Atlas isométrico de tropas de quatro períodos históricos"><defs>
 <linearGradient id="steel" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e3ebe5"/><stop offset=".45" stop-color="#879ca3"/><stop offset="1" stop-color="#435b64"/></linearGradient>
 <linearGradient id="bronze" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f6d38e"/><stop offset=".5" stop-color="#b3874c"/><stop offset="1" stop-color="#704a2d"/></linearGradient>
-</defs>
-<g data-frame="0-0-0" transform="translate(0 0)">
+<clipPath id="troopFrameClip"><rect x="0" y="0" width="64" height="112"/></clipPath></defs>
+<g data-frame="0-0-0" transform="translate(0 0)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / guerreiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -41,7 +41,7 @@
  <path d="M49 31 L61 32" stroke="#d2b78a" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#8d7e68" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#7e6246"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#d2b78a" stroke-width="1.4"/>
  </g></g>
-<g data-frame="0-0-1" transform="translate(64 0)">
+<g data-frame="0-0-1" transform="translate(64 0)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / guerreiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -80,7 +80,7 @@
  <path d="M49 31 L61 32" stroke="#d2b78a" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#8d7e68" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#7e6246"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#d2b78a" stroke-width="1.4"/>
  </g></g>
-<g data-frame="0-0-2" transform="translate(128 0)">
+<g data-frame="0-0-2" transform="translate(128 0)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / guerreiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -119,7 +119,7 @@
  <path d="M49 31 L61 32" stroke="#d2b78a" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#8d7e68" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#7e6246"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#d2b78a" stroke-width="1.4"/>
  </g></g>
-<g data-frame="0-0-3" transform="translate(192 0)">
+<g data-frame="0-0-3" transform="translate(192 0)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / guerreiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -158,7 +158,7 @@
  <path d="M49 31 L61 32" stroke="#d2b78a" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#8d7e68" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#7e6246"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#d2b78a" stroke-width="1.4"/>
  </g></g>
-<g data-frame="0-1-0" transform="translate(0 112)">
+<g data-frame="0-1-0" transform="translate(0 112)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / arqueiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -200,7 +200,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="0-1-1" transform="translate(64 112)">
+<g data-frame="0-1-1" transform="translate(64 112)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / arqueiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -242,7 +242,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="0-1-2" transform="translate(128 112)">
+<g data-frame="0-1-2" transform="translate(128 112)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / arqueiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -284,7 +284,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="0-1-3" transform="translate(192 112)">
+<g data-frame="0-1-3" transform="translate(192 112)" clip-path="url(#troopFrameClip)">
  <!-- Primordial / arqueiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -326,7 +326,7 @@
  <path d="M38 61 L63 60" stroke="#f7e9c9" stroke-width="2"/><path d="M60 56 L65 60 L60 64Z" fill="#dbe3d8"/><path d="M51 58 L38 61 L52 65" fill="none" stroke="#f5e9c7" stroke-width="1.3"/>
  </g>
  </g></g>
-<g data-frame="1-0-0" transform="translate(0 224)">
+<g data-frame="1-0-0" transform="translate(0 224)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / guerreiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -365,7 +365,7 @@
  <path d="M49 31 L61 32" stroke="#e0bd6d" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#bc955b" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#a04f3d"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e0bd6d" stroke-width="1.4"/>
  </g></g>
-<g data-frame="1-0-1" transform="translate(64 224)">
+<g data-frame="1-0-1" transform="translate(64 224)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / guerreiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -404,7 +404,7 @@
  <path d="M49 31 L61 32" stroke="#e0bd6d" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#bc955b" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#a04f3d"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e0bd6d" stroke-width="1.4"/>
  </g></g>
-<g data-frame="1-0-2" transform="translate(128 224)">
+<g data-frame="1-0-2" transform="translate(128 224)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / guerreiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -443,7 +443,7 @@
  <path d="M49 31 L61 32" stroke="#e0bd6d" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#bc955b" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#a04f3d"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e0bd6d" stroke-width="1.4"/>
  </g></g>
-<g data-frame="1-0-3" transform="translate(192 224)">
+<g data-frame="1-0-3" transform="translate(192 224)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / guerreiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -482,7 +482,7 @@
  <path d="M49 31 L61 32" stroke="#e0bd6d" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#bc955b" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#a04f3d"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e0bd6d" stroke-width="1.4"/>
  </g></g>
-<g data-frame="1-1-0" transform="translate(0 336)">
+<g data-frame="1-1-0" transform="translate(0 336)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / arqueiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -524,7 +524,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="1-1-1" transform="translate(64 336)">
+<g data-frame="1-1-1" transform="translate(64 336)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / arqueiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -566,7 +566,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="1-1-2" transform="translate(128 336)">
+<g data-frame="1-1-2" transform="translate(128 336)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / arqueiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -608,7 +608,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="1-1-3" transform="translate(192 336)">
+<g data-frame="1-1-3" transform="translate(192 336)" clip-path="url(#troopFrameClip)">
  <!-- Antiga / arqueiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -650,7 +650,7 @@
  <path d="M38 61 L63 60" stroke="#f7e9c9" stroke-width="2"/><path d="M60 56 L65 60 L60 64Z" fill="#dbe3d8"/><path d="M51 58 L38 61 L52 65" fill="none" stroke="#f5e9c7" stroke-width="1.3"/>
  </g>
  </g></g>
-<g data-frame="2-0-0" transform="translate(0 448)">
+<g data-frame="2-0-0" transform="translate(0 448)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / guerreiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -689,7 +689,7 @@
  <path d="M49 31 L61 32" stroke="#e4d39c" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#a8bdc2" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#476982"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e4d39c" stroke-width="1.4"/>
  </g></g>
-<g data-frame="2-0-1" transform="translate(64 448)">
+<g data-frame="2-0-1" transform="translate(64 448)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / guerreiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -728,7 +728,7 @@
  <path d="M49 31 L61 32" stroke="#e4d39c" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#a8bdc2" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#476982"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e4d39c" stroke-width="1.4"/>
  </g></g>
-<g data-frame="2-0-2" transform="translate(128 448)">
+<g data-frame="2-0-2" transform="translate(128 448)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / guerreiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -767,7 +767,7 @@
  <path d="M49 31 L61 32" stroke="#e4d39c" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#a8bdc2" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#476982"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e4d39c" stroke-width="1.4"/>
  </g></g>
-<g data-frame="2-0-3" transform="translate(192 448)">
+<g data-frame="2-0-3" transform="translate(192 448)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / guerreiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -806,7 +806,7 @@
  <path d="M49 31 L61 32" stroke="#e4d39c" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#a8bdc2" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#476982"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#e4d39c" stroke-width="1.4"/>
  </g></g>
-<g data-frame="2-1-0" transform="translate(0 560)">
+<g data-frame="2-1-0" transform="translate(0 560)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / arqueiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -848,7 +848,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="2-1-1" transform="translate(64 560)">
+<g data-frame="2-1-1" transform="translate(64 560)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / arqueiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -890,7 +890,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="2-1-2" transform="translate(128 560)">
+<g data-frame="2-1-2" transform="translate(128 560)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / arqueiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -932,7 +932,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="2-1-3" transform="translate(192 560)">
+<g data-frame="2-1-3" transform="translate(192 560)" clip-path="url(#troopFrameClip)">
  <!-- Medieval / arqueiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -974,7 +974,7 @@
  <path d="M38 61 L63 60" stroke="#f7e9c9" stroke-width="2"/><path d="M60 56 L65 60 L60 64Z" fill="#dbe3d8"/><path d="M51 58 L38 61 L52 65" fill="none" stroke="#f5e9c7" stroke-width="1.3"/>
  </g>
  </g></g>
-<g data-frame="3-0-0" transform="translate(0 672)">
+<g data-frame="3-0-0" transform="translate(0 672)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / guerreiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -1013,7 +1013,7 @@
  <path d="M49 31 L61 32" stroke="#c6d1d1" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#7b98a5" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#354d61"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#c6d1d1" stroke-width="1.4"/>
  </g></g>
-<g data-frame="3-0-1" transform="translate(64 672)">
+<g data-frame="3-0-1" transform="translate(64 672)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / guerreiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -1052,7 +1052,7 @@
  <path d="M49 31 L61 32" stroke="#c6d1d1" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#7b98a5" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#354d61"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#c6d1d1" stroke-width="1.4"/>
  </g></g>
-<g data-frame="3-0-2" transform="translate(128 672)">
+<g data-frame="3-0-2" transform="translate(128 672)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / guerreiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -1091,7 +1091,7 @@
  <path d="M49 31 L61 32" stroke="#c6d1d1" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#7b98a5" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#354d61"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#c6d1d1" stroke-width="1.4"/>
  </g></g>
-<g data-frame="3-0-3" transform="translate(192 672)">
+<g data-frame="3-0-3" transform="translate(192 672)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / guerreiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -1130,7 +1130,7 @@
  <path d="M49 31 L61 32" stroke="#c6d1d1" stroke-width="3.2"/><circle cx="55" cy="31" r="1.8" fill="#d6b76e"/>
  </g><path d="M16 56 Q10 59 11 69 Q13 79 24 79 L27 62Z" fill="#7b98a5" stroke="#2c3334" stroke-width="2"/><path d="M16 62 L23 63 L22 72 L16 71Z" fill="#354d61"/><path d="M19 63 L19 73 M14 68 L25 68" stroke="#c6d1d1" stroke-width="1.4"/>
  </g></g>
-<g data-frame="3-1-0" transform="translate(0 784)">
+<g data-frame="3-1-0" transform="translate(0 784)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / arqueiro / pose 0 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
@@ -1172,7 +1172,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="3-1-1" transform="translate(64 784)">
+<g data-frame="3-1-1" transform="translate(64 784)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / arqueiro / pose 1 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -2)">
@@ -1214,7 +1214,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="3-1-2" transform="translate(128 784)">
+<g data-frame="3-1-2" transform="translate(128 784)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / arqueiro / pose 2 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 -1)">
@@ -1256,7 +1256,7 @@
  <path d="M46 60 L54 60" stroke="#d7ba8b" stroke-width="1.4"/>
  </g>
  </g></g>
-<g data-frame="3-1-3" transform="translate(192 784)">
+<g data-frame="3-1-3" transform="translate(192 784)" clip-path="url(#troopFrameClip)">
  <!-- Industrial / arqueiro / pose 3 -->
  <ellipse cx="31" cy="98" rx="17" ry="5" fill="#0a1c1a" opacity=".35"/>
  <g transform="translate(0 0)">
