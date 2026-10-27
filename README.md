@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.43** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.44** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.44 — Cordilheiras isométricas com relevo conectado
+- Montanhas agora formam maciços de cumes e ombros facetados que variam de altura conforme os quatro vizinhos rochosos; a silhueta deixa de repetir o mesmo pico isolado em cada célula.
+- Sombras de contato, faces com iluminação diferenciada, neve nos cumes altos, fissuras e cascalho nos sopés. Nível de detalhe por zoom: neve acima de 27 px, fissuras a partir de 43 px e cascalho a partir de 62 px.
+- A decoração é determinística e usa o bioma pré-calculado. Rotas, bloqueios de terreno, recursos, economia e formato de salvamento `cronicas-v04` permanecem intactos.
+- Regressões em `tests/mountain-ridge-visual.test.cjs`. Ainda faltam avaliação visual em Safari iPhone físico, FPS real e arte final de nível profissional.
 
 ## Atualização v6.43 — Obras históricas e investigação por região
 - Cabanas, torres e quartéis em construção exibem a silhueta arquitetônica da era atual, em vez da versão genérica antiga. Andaimes e fundações usam madeira nas eras iniciais, pedra nas intermediárias e metal com contraventamentos nas eras Industrial e Contemporânea.

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.43</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.44</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:84px;z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:204px;z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:91px}#mapLabel{top:190px}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -684,18 +684,62 @@ function drawRiparianVegetation(px,py,ww,hh,x,y,mask,now){
 }
 function rock(x,y,s){ctx.fillStyle='#27322b66';ctx.beginPath();ctx.ellipse(x+s*.1,y+s*.16,s*.87,s*.27,0,0,7);ctx.fill();ctx.fillStyle='#5d6763';ctx.beginPath();ctx.moveTo(x-s*.78,y+s*.14);ctx.lineTo(x-s*.26,y-s*.87);ctx.lineTo(x+s*.22,y-s*.78);ctx.lineTo(x+s*.8,y-s*.1);ctx.lineTo(x+s*.5,y+s*.27);ctx.closePath();ctx.fill();ctx.fillStyle='#a9ada4';ctx.beginPath();ctx.moveTo(x-s*.26,y-s*.87);ctx.lineTo(x+s*.22,y-s*.78);ctx.lineTo(x+s*.03,y-s*.22);ctx.lineTo(x-s*.48,y-s*.12);ctx.closePath();ctx.fill();ctx.fillStyle='#e1ddd044';ctx.beginPath();ctx.moveTo(x-s*.26,y-s*.87);ctx.lineTo(x-s*.05,y-s*.68);ctx.lineTo(x-s*.18,y-s*.43);ctx.closePath();ctx.fill()}
 // Maciços rochosos com facetas e neve, desenhados na própria perspectiva do mapa.
+// Cordilheiras facetadas: cumes e ombros conectados aos biomas vizinhos.
+// A silhueta depende apenas do terreno, sem alterar colisões, rotas ou saves.
 function drawMountain(px,py,ww,hh,x,y){
- const variation=rnd(x,y,37),height=hh*(1.45+variation*.65),base=py+hh*.23;
+ const n=biome(x,y-1)===5,e=biome(x+1,y)===5,s=biome(x,y+1)===5,wst=biome(x-1,y)===5;
+ const joined=Number(n)+Number(e)+Number(s)+Number(wst);
+ const variation=rnd(x,y,37),crest=rnd(x,y,39)>.48||joined<2;
+ const height=hh*(crest?1.36+variation*.57+joined*.10:.72+variation*.35);
+ const base=py+hh*.28,peakX=px+ww*(variation-.5)*.24,peakY=base-height;
+ const left=px-ww*.49,right=px+ww*.49;
+ const leftY=base-hh*(wst?.42:.10),rightY=base-hh*(e?.42:.10);
  ctx.save();
- ctx.fillStyle='#172a2a6b';ctx.beginPath();ctx.ellipse(px,base+hh*.04,ww*.43,hh*.20,0,0,Math.PI*2);ctx.fill();
- const peaks=[{x:px+ww*.18,y:py-hh*(.82+variation*.2),width:ww*.29},{x:px-ww*.07,y:py-height,width:ww*.43}];
- for(const p of peaks){
-  ctx.fillStyle='#52636b';ctx.beginPath();ctx.moveTo(p.x-p.width,base);ctx.lineTo(p.x,p.y);ctx.lineTo(p.x+p.width,base);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#89939a';ctx.beginPath();ctx.moveTo(p.x-p.width,base);ctx.lineTo(p.x,p.y);ctx.lineTo(p.x-p.width*.06,base-hh*.12);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#3d4d55';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.width,base);ctx.lineTo(p.x-p.width*.06,base-hh*.12);ctx.closePath();ctx.fill();
-  const snow=hh*.31;
-  ctx.fillStyle='#e0e5de';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.width*.24,p.y+snow);ctx.lineTo(p.x-p.width*.07,p.y+snow*.72);ctx.lineTo(p.x+p.width*.08,p.y+snow*1.06);ctx.lineTo(p.x+p.width*.29,p.y+snow);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#b8c8c9';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.width*.29,p.y+snow);ctx.lineTo(p.x+p.width*.08,p.y+snow*1.06);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#15252b70';ctx.beginPath();
+ ctx.ellipse(px+ww*.09,base+hh*.06,ww*.46,hh*.17,-.08,0,Math.PI*2);ctx.fill();
+ // Ombros prolongam a montanha até as bordas, evitando torres isoladas.
+ ctx.fillStyle='#59686d';ctx.beginPath();
+ ctx.moveTo(left,base);ctx.lineTo(left,leftY);ctx.lineTo(peakX,peakY);
+ ctx.lineTo(right,rightY);ctx.lineTo(right,base);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#929e9f';ctx.beginPath();
+ ctx.moveTo(left,base);ctx.lineTo(left,leftY);ctx.lineTo(peakX,peakY);
+ ctx.lineTo(px-ww*.08,base-hh*.20);ctx.lineTo(px-ww*.18,base);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#3a4b54';ctx.beginPath();
+ ctx.moveTo(peakX,peakY);ctx.lineTo(right,rightY);ctx.lineTo(right,base);
+ ctx.lineTo(px-ww*.18,base);ctx.lineTo(px-ww*.08,base-hh*.20);ctx.closePath();ctx.fill();
+ // Facetas secundárias acompanham a orientação do maciço.
+ ctx.fillStyle='#70818a';ctx.beginPath();
+ ctx.moveTo(peakX,peakY);ctx.lineTo(px+ww*.12,base-hh*.54);
+ ctx.lineTo(px+ww*.22,base-hh*.18);ctx.lineTo(px-ww*.08,base-hh*.20);
+ ctx.closePath();ctx.fill();
+ if(crest&&ww>=27){
+  const snow=height*(.23+variation*.045);
+  ctx.fillStyle='#e5e9e2';ctx.beginPath();
+  ctx.moveTo(peakX,peakY);
+  ctx.lineTo(peakX-ww*.14,peakY+snow);
+  ctx.lineTo(peakX-ww*.045,peakY+snow*.68);
+  ctx.lineTo(peakX+ww*.035,peakY+snow*.96);
+  ctx.lineTo(peakX+ww*.14,peakY+snow*.83);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='#aebec1';ctx.beginPath();
+  ctx.moveTo(peakX,peakY);ctx.lineTo(peakX+ww*.14,peakY+snow*.83);
+  ctx.lineTo(peakX+ww*.035,peakY+snow*.96);ctx.closePath();ctx.fill();
+ }
+ if(ww>=43){
+  ctx.strokeStyle='#d5d5c35c';ctx.lineWidth=Math.max(.7,ww*.012);
+  ctx.beginPath();ctx.moveTo(peakX-ww*.055,peakY+height*.45);
+  ctx.lineTo(px-ww*.22,base-hh*.21);ctx.lineTo(px-ww*.29,base-hh*.08);
+  ctx.moveTo(peakX+ww*.10,peakY+height*.38);
+  ctx.lineTo(px+ww*.18,base-hh*.28);ctx.stroke();
+ }
+ if(ww>=62){
+  // Cascalho no sopé: detalhes de primeiro plano apenas no zoom próximo.
+  for(let i=0;i<6;i++){
+   const sx=px+ww*(rnd(x+i*5,y,173)-.5)*.72;
+   const sy=base-hh*(.03+rnd(x,y+i*7,174)*.16);
+   ctx.fillStyle=i%2?'#a6a9a0':'#4a5859';
+   ctx.beginPath();ctx.ellipse(sx,sy,ww*.013,hh*.018,-.2,0,Math.PI*2);ctx.fill();
+  }
  }
  ctx.restore();
 }
