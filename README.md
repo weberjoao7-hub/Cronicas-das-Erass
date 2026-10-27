@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.44** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.45** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.45 — Minas históricas e extração animada
+- Minas ganharam estrutura de extração coerente com cada período: armação de madeira e cesto nas eras Primordial/Tribal; portal de pedra e roldana nas eras Antiga/Clássica; guincho com contrapeso nas eras Medieval/Renascença; torre metálica, trilhos e chaminé na Industrial; guincho elétrico, cabine e iluminação na Contemporânea.
+- Cabos, cestos, roldanas, rodas de vagões e fumaça industrial possuem animações determinísticas; minérios e materiais de apoio crescem com o nível do edifício.
+- O renderizador reduz geometria conforme o zoom e mantém a mina ancorada no terreno. A mesma arquitetura histórica aparece na construção, na prévia de posicionamento e na mina concluída.
+- A atualização é exclusivamente visual: custos, produção, rotas e salvamento `cronicas-v04` não foram alterados. Regressões em `tests/mine-era-visual.test.cjs`; validação visual e FPS no Safari iPhone físico continuam pendentes.
 
 ## Atualização v6.44 — Cordilheiras isométricas com relevo conectado
 - Montanhas agora formam maciços de cumes e ombros facetados que variam de altura conforme os quatro vizinhos rochosos; a silhueta deixa de repetir o mesmo pico isolado em cada célula.
