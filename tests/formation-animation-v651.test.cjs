@@ -48,7 +48,7 @@ test('as poses SVG e o galope procedural usam o relógio visual',()=>{
  assert.match(script,/drawPaintedWorkerAction\(u,px,py,z,job,moving,visualNow\)/);
  assert.match(script,/drawVillagerAtlas\(u,px,py,z,job,moving,visualNow\)/);
  assert.match(script,/Math\.floor\(visualNow\/155\)%2/);
- assert.match(script,/Math\.sin\(unitAnimationClock\(u,now\)\*\.017/);
+ assert.match(script,/Math\.sin\(\(typeof unitAnimationClock==='function'\?unitAnimationClock\(u,now\):now\)\*\.017/);
 });
 test('três classes, mesmo com apenas uma unidade cada, ocupam fileiras distintas',()=>{
  const units=[soldier('archer',8,8),soldier('warrior',9,8),soldier('cavalry',10,8)];
