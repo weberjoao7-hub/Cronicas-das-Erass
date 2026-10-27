@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 const start=html.indexOf('function drawMountain('),end=html.indexOf('// Encostas e colinas:',start);
 assert.ok(start>0&&end>start,'renderizador da cordilheira presente');
 const source=html.slice(start,end);
@@ -30,7 +30,7 @@ test('cordilheiras mantêm facetas determinísticas e ombros ligados ao terreno'
  assert.equal(a.at(-1)[0],'restore');
 });
 test('LOD reduz custo no zoom distante e permite mais detalhes de perto',()=>{
- const far=render(42,32,20,10),mid=render(42,32,40,20),near=render(42,32,74,38);
+ const far=render(44,32,20,10),mid=render(44,32,40,20),near=render(44,32,74,38);
  assert.ok(near.length>mid.length);
  assert.ok(mid.length>far.length);
 });
