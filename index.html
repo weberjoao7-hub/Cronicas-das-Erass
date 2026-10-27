@@ -1963,7 +1963,8 @@ function villagerSprite(job,frame,era=game.era){
 }
 // Atlas ilustrado opcional: usa os quadros PNG quando o arquivo estiver publicado.
 // Mantém fallback vetorial para conexões lentas e navegadores sem o recurso.
-const paintedVillagers=new Image();paintedVillagers.src='assets/cronicas_aldeoes_atlas.png';
+const paintedVillagers=typeof Image==='function'?new Image():{complete:false,naturalWidth:0};
+if(typeof Image==='function')paintedVillagers.src='assets/cronicas_aldeoes_atlas.png';
 function drawPaintedVillager(u,px,py,z,job,moving,now){
  if((job!=='idle'&&job!=='walk')||game.era>=2||!paintedVillagers.complete||!paintedVillagers.naturalWidth||z<.65)return false;
  const frame=Math.floor(now/(moving?150:240))%6;
