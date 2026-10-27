@@ -3810,23 +3810,60 @@ function drawSelectionMarquee(){
  ctx.strokeStyle='#9bf8d2';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
  ctx.strokeRect(x,y,width,height);ctx.restore();
 }
+// Formação tática orientada à marcha: linha de frente, cavalaria e arqueiros na retaguarda.
+// Atribuição lateral estável reduz cruzamentos; terreno e A* continuam sendo autoridade.
 function moveArmyTo(x,y,chosen=null){
- if(!passable(x,y))return toast('Destino inacessível');
- const troops=game.units.filter(u=>isMilitary(u.kind)&&u.hp>0&&(!chosen||chosen.has(u)));
- if(!troops.length)return toast('Nenhum guerreiro disponível');
- const spots=[];const used=new Set();
- for(let radius=0;radius<=Math.max(5,Math.ceil(Math.sqrt(troops.length))*2)&&spots.length<troops.length;radius++){
-  for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
-   if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
-   const xx=x+dx,yy=y+dy,k=key(xx,yy);
-   if(passable(xx,yy)&&!used.has(k)){spots.push({x:xx,y:yy});used.add(k)}
+  if(!passable(x,y))return toast('Destino inacessível');
+  const troops=game.units.filter(u=>isMilitary(u.kind)&&u.hp>0&&(!chosen||chosen.has(u)));
+  if(!troops.length)return toast('Nenhum guerreiro disponível');
+  const center=troops.reduce((p,u)=>{
+    p.x+=Number.isFinite(u.x)?u.x:x;p.y+=Number.isFinite(u.y)?u.y:y;return p;
+  },{x:0,y:0});
+  let forwardX=x-center.x/troops.length,forwardY=y-center.y/troops.length;
+  const length=Math.hypot(forwardX,forwardY);
+  if(length<.01){forwardX=Math.SQRT1_2;forwardY=Math.SQRT1_2}
+  else{forwardX/=length;forwardY/=length}
+  const sideX=-forwardY,sideY=forwardX;
+  const width=Math.ceil(Math.sqrt(troops.length)),desired=new Map();
+  const ordered=troops.map((u,i)=>({
+    u,i,role:u.kind==='archer'?2:u.kind==='cavalry'?1:0,
+    lateral:(Number.isFinite(u.x)?u.x:x)*sideX+(Number.isFinite(u.y)?u.y:y)*sideY
+  })).sort((a,b)=>a.role-b.role||a.lateral-b.lateral||a.i-b.i);
+  for(let i=0;i<ordered.length;i++){
+    const row=Math.floor(i/width),count=Math.min(width,ordered.length-row*width);
+    const column=i%width-(count-1)/2;
+    desired.set(ordered[i].u,{
+      x:x+sideX*column*1.45-forwardX*row*1.65,
+      y:y+sideY*column*1.45-forwardY*row*1.65
+    });
   }
- }
- let moved=0;for(let i=0;i<troops.length;i++){
-  const spot=spots[i]||{x,y};if(assignRoute(troops[i],spot.x,spot.y))moved++;
- }
- if(moved){dirty=true;save();toast('🛡️ '+moved+'/'+troops.length+' guerreiros em deslocamento')}
- else toast('Não existe caminho até o destino');
+  const used=new Set();let moved=0;
+  const maxRadius=Math.max(5,Math.ceil(Math.sqrt(troops.length))*2);
+  // Mantém a ordem das unidades selecionadas e limita buscas A* no celular.
+  for(const u of troops){
+    const goal=desired.get(u);let assigned=false,attempts=0;
+    for(let radius=0;radius<=maxRadius&&!assigned&&attempts<8;radius++){
+      const candidates=[];
+      for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+        if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+        const xx=Math.round(goal.x)+dx,yy=Math.round(goal.y)+dy,id=key(xx,yy);
+        if(used.has(id)||!passable(xx,yy))continue;
+        const distance=(xx-goal.x)**2+(yy-goal.y)**2;
+        const travel=Math.hypot(xx-(Number.isFinite(u.x)?u.x:x),yy-(Number.isFinite(u.y)?u.y:y));
+        candidates.push({x:xx,y:yy,id,score:distance+travel*.025});
+      }
+      candidates.sort((a,b)=>a.score-b.score||a.y-b.y||a.x-b.x);
+      for(const spot of candidates){
+        attempts++;
+        if(assignRoute(u,spot.x,spot.y)){
+          used.add(spot.id);moved++;assigned=true;break;
+        }
+        if(attempts>=8)break;
+      }
+    }
+  }
+  if(moved){dirty=true;save();toast('🛡️ '+moved+'/'+troops.length+' guerreiros em formação')}
+  else toast('Não existe caminho até o destino');
 }
 let pointers=new Map(),pinchState=null,down=null;
 // Zoom anchored to cursor or pinch midpoint.
