@@ -38,7 +38,7 @@ test('botão de seleção por área e comando touch estão conectados',()=>{
  assert.match(script,/id="selectArea"/);
  assert.match(script,/command='selectArea';panel\.classList\.remove/);
  assert.match(script,/command==='selectArea'\|\|\(e\.pointerType==='mouse'/);
- assert.match(script,/if\(pointers\.size===2\)\{lastDist=0;dragged=true;down=null;marquee=null/);
+ assert.match(script,/if\(pointers\.size>=2\)\{pinchState=pinchSnapshot\(\);dragged=true;down=null;marquee=null/);
  assert.match(script,/if\(command==='selectArea'\)command=null/);
 });
 test('chave de salvamento permanece intacta',()=>assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/));
