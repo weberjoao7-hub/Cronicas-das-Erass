@@ -32,9 +32,9 @@ test('produção por nível ignora obras não concluídas',()=>{
 test('construção exige campos ou pradarias dominados',()=>{
  const a=script.indexOf('function buildValidation('),b=script.indexOf('function beginPlacement(',a);
  let ground=2;
- const check=new Function('game','key','at','biome','passable','W','H',script.slice(a,b)+';return buildValidation;')(
-  {claim:['80,80']},(x,y)=>x+','+y,()=>null,()=>ground,()=>true,160,160);
+ const check=new Function('game','key','at','biome','passable','W','H','ownedTile',script.slice(a,b)+';return buildValidation;')(
+  {claim:['80,80'],buildings:[]},(x,y)=>x+','+y,()=>null,()=>ground,()=>true,160,160,(x,y)=>x===80&&y===80);
  assert.equal(check('Moinho',80,80),null);
  ground=3;assert.match(check('Moinho',80,80),/campos ou pradarias/);
- ground=2;assert.match(check('Moinho',81,80),/Domine/);
+ ground=2;assert.match(check('Moinho',81,80),/região dominada/);
 });
