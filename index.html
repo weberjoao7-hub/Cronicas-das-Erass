@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.41</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.42</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:84px;z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:204px;z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:91px}#mapLabel{top:190px}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -1316,18 +1316,7 @@ function drawWildlife(px,py,ww,hh,kind,x,y){
  const time=Date.now()*.001,pace=Math.sin(time*3.7+x*2+y),size=Math.max(5,ww*.16);
  ctx.save();ctx.translate(px,py-hh*.12);
  if(kind==='fish'){
-  // Peixes são vistos sob a água: silhuetas pequenas, sem cores fluorescentes.
-  if(ww<43){ctx.restore();return}
-  const heading=Math.sin(time*.27+x*.7+y*.3)>0?1:-1;
-  ctx.translate(Math.sin(time*.38+x+y)*ww*.13,Math.cos(time*.49+x)*hh*.06);
-  ctx.scale(heading,1);
-  ctx.globalAlpha=.42;
-  ctx.fillStyle='#214650';
-  ctx.beginPath();ctx.ellipse(0,0,size*.70,size*.20,-.12,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.moveTo(-size*.60,0);ctx.lineTo(-size*.96,-size*.31);ctx.lineTo(-size*.90,size*.28);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#557c79';ctx.beginPath();ctx.moveTo(-size*.08,-size*.14);ctx.lineTo(-size*.30,-size*.36);ctx.lineTo(size*.18,-size*.12);ctx.fill();
-  ctx.strokeStyle='#b2d6cc';ctx.globalAlpha=.22;ctx.lineWidth=Math.max(.6,scale*.6);
-  ctx.beginPath();ctx.ellipse(0,size*.10,size*.91,size*.40,0,.08,Math.PI*.94);ctx.stroke();
+  drawFishSchool(ww,hh,x,y,Date.now());
  }else{
   ctx.translate(Math.sin(time*.48+x)*ww*.055,Math.abs(pace)*hh*.035);
   ctx.fillStyle='#142d2370';ctx.beginPath();ctx.ellipse(0,size*.45,size*.8,size*.18,0,0,7);ctx.fill();
@@ -1381,7 +1370,41 @@ function drawWildlife(px,py,ww,hh,kind,x,y){
  }
  ctx.restore();
 }
-// Garças nas margens: pés ancorados na água rasa, corpo articulado e reflexo.
+// Cardumes sob a superfície: recorte no losango, profundidade e movimento discreto.
+ // Apenas desenho; a lógica de pesca e o salvamento permanecem intactos.
+ function drawFishSchool(ww,hh,x,y,now){
+  if(ww<38)return;
+  const time=now*.001,seed=rnd(x,y,214),count=ww>=70?4:ww>=52?3:2;
+  ctx.save();
+  // drawWildlife já deslocou a origem para py-hh*.12.
+  ctx.beginPath();ctx.moveTo(0,-hh*.38);ctx.lineTo(ww*.46,hh*.12);
+  ctx.lineTo(0,hh*.62);ctx.lineTo(-ww*.46,hh*.12);ctx.closePath();ctx.clip();
+  for(let i=0;i<count;i++){
+   const depth=rnd(x+i,y,215),phase=time*.55+i*1.9+seed*7;
+   const fx=(i-(count-1)*.5)*ww*.115+Math.sin(phase*.7)*ww*.048;
+   const fy=hh*.12+(i%2?1:-1)*hh*.095+Math.cos(phase*.8)*hh*.045;
+   const len=ww*(.065+depth*.025),heading=Math.sin(time*.24+seed*6+i*.55)>0?1:-1;
+   ctx.save();ctx.translate(fx,fy);ctx.scale(heading,1);ctx.rotate(Math.sin(phase*.45)*.18);
+   ctx.globalAlpha=.27+depth*.22;
+   ctx.fillStyle=i%3===0?'#244b52':i%3===1?'#335b5c':'#405e5c';
+   ctx.beginPath();ctx.ellipse(0,0,len*.75,len*.23,-.07,0,Math.PI*2);ctx.fill();
+   const tail=Math.sin(phase*2.8)*len*.14;
+   ctx.beginPath();ctx.moveTo(-len*.61,0);
+   ctx.lineTo(-len*1.16,-len*.38+tail);
+   ctx.lineTo(-len*1.08,len*.38+tail);ctx.closePath();ctx.fill();
+   ctx.fillStyle='#7eaaa3';ctx.globalAlpha=.15+depth*.12;
+   ctx.beginPath();ctx.moveTo(-len*.13,-len*.14);
+   ctx.lineTo(-len*.35,-len*.38);ctx.lineTo(len*.20,-len*.15);ctx.closePath();ctx.fill();
+   if(ww>=70){
+    ctx.fillStyle='#a4c5b6';ctx.globalAlpha=.19;
+    ctx.beginPath();ctx.arc(len*.42,-len*.04,Math.max(.55,scale*.45),0,Math.PI*2);ctx.fill();
+   }
+   ctx.restore();
+  }
+  ctx.restore();
+ }
+ 
+ // Garças nas margens: pés ancorados na água rasa, corpo articulado e reflexo.
 // Densidade baixa e LOD: evita aves enormes ou silhuetas flutuantes sobre o mapa.
 function drawWadingBird(px,py,ww,hh,x,y,mask,now=Date.now()){
  if(!mask||ww<43||scale<.65)return;
@@ -3125,7 +3148,7 @@ if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  else drawLandmark(px,py,ww,hh,landmarkAt(x,y,b),x,y);
 }
 if(b===2&&q>.79&&ww>16){ctx.fillStyle='#f3bf55';for(let j=0;j<4;j++){ctx.beginPath();ctx.arc(px+(rnd(x+j,y,3)-.5)*ww*.5,py+(rnd(x,y+j,3)-.5)*hh*.45,Math.max(1,z*1.8),0,7);ctx.fill()}}
-let animal=wildlifeAt(x,y);if(animal&&!ruinKind&&visibleFog[y*W+x]&&!game.hunted.includes(key(x,y))&&!structures.has(key(x,y))){drawWildlife(px,py,ww,hh,animal,x,y);if(activeHunts.has(key(x,y))){ctx.strokeStyle='#f3d17b';ctx.lineWidth=Math.max(1.5,z*1.7);ctx.beginPath();ctx.ellipse(px,py+hh*.12,ww*.23,hh*.18,0,0,7);ctx.stroke()}}
+let animal=wildlifeAt(x,y);if(animal&&!ruinKind&&visibleFog[y*W+x]&&!game.hunted.includes(key(x,y))&&!structures.has(key(x,y))&&!(b===0&&boatTiles.has(key(x,y)))){drawWildlife(px,py,ww,hh,animal,x,y);if(activeHunts.has(key(x,y))){ctx.strokeStyle='#f3d17b';ctx.lineWidth=Math.max(1.5,z*1.7);ctx.beginPath();ctx.ellipse(px,py+hh*.12,ww*.23,hh*.18,0,0,7);ctx.stroke()}}
 if(own.has(key(x,y))){diamond(px,py,ww-1,hh-1,'#3bd88b1d',null);drawTerritoryEdge(px,py,ww,hh,x,y,own)}
 if(selected&&selected.x===x&&selected.y===y)diamond(px,py,ww-3,hh-3,null,'#fff4bd');
 let obj=structures.get(key(x,y));
