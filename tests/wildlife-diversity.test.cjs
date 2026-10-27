@@ -9,7 +9,7 @@ const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal deve existir');
 const from=script.indexOf('function wildlifeAt(');
 const renderFrom=script.indexOf('function drawWildlife(',from);
-const renderTo=script.indexOf('// Silhueta distante',renderFrom);
+const renderTo=script.indexOf('// Garças nas margens:',renderFrom);
 assert.ok(from>=0&&renderFrom>from&&renderTo>renderFrom);
 const wildlifeSource=script.slice(from,renderFrom);
 const renderSource=script.slice(renderFrom,renderTo);
