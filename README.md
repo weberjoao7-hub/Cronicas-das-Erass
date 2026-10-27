@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.16** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.30** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.30 — Fauna isométrica por bioma
+- Raposas raras nas pradarias, javalis nas florestas e lobos nas colinas; cervos, coelhos e peixes continuam presentes. Silhuetas individuais com patas, caudas, orelhas, focinhos e movimento procedural leve, ancoradas no terreno.
+- Javalis podem ser caçados por aldeões e rendem 20 alimentos. Raposas e lobos são fauna ambiental, sem comando de caça; nenhuma nova IA hostil foi introduzida.
+- Desenho omitido no zoom distante (LOD); sem novos campos de salvamento, preservando `cronicas-v04`. Testes de regressão em `tests/wildlife-diversity.test.cjs`. Safari iPhone físico e desempenho real ainda não validados.
 
 ## Atualização v6.16 — Quartéis evolutivos isométricos
 - Primordial e Tribal: paliçada, barraca de madeira/couro, pátio, manequim de treino, escudo, lança e estandarte animado; a era Tribal acrescenta um pórtico reforçado.
