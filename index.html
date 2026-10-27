@@ -217,14 +217,14 @@ function panMinimap(clientX,clientY){
 }
 M.addEventListener('pointerdown',e=>{
  if(minimapPointer!==null)return;
- e.preventDefault();
+ if(typeof e.preventDefault==='function')e.preventDefault();
  minimapPointer=e.pointerId;
  if(typeof M.setPointerCapture==='function')M.setPointerCapture(e.pointerId);
  panMinimap(e.clientX,e.clientY);
 });
 M.addEventListener('pointermove',e=>{
  if(e.pointerId!==minimapPointer)return;
- e.preventDefault();panMinimap(e.clientX,e.clientY);
+ if(typeof e.preventDefault==='function')e.preventDefault();panMinimap(e.clientX,e.clientY);
 });
 for(const type of ['pointerup','pointercancel','lostpointercapture']){
  M.addEventListener(type,e=>{if(e.pointerId===minimapPointer)minimapPointer=null});
