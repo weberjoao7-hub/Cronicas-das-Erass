@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.39** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.40** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.40 — Iluminação viária e navegação pelo minimapa
+- Estradas concluídas recebem luminárias isométricas espaçadas e ancoradas ao solo a partir da Era Medieval: tochas, lampiões renascentistas, luminárias a gás e postes elétricos contemporâneos. Os estilos e materiais variam por era.
+- O brilho noturno respeita o campo de visão, limita o número total de gradientes a 24 e reduz detalhes em zoom distante para preservar o desempenho no Safari.
+- No iPhone e no desktop, é possível arrastar o minimapa continuamente para reposicionar a câmera, com captura de ponteiro e limites de mapa. Toques simples continuam funcionando.
+- Regressões em `tests/road-lantern-minimap.test.cjs`; nenhuma alteração na economia, nas rotas ou na chave de salvamento `cronicas-v04`. FPS e aparência em Safari físico ainda não validados.
 
 ## Atualização v6.39 — Pontes históricas em oito eras
 - As pontes existentes evoluem visualmente conforme a era: tabuleiro e pilares de madeira nas eras iniciais, arcos e guarda-corpos de pedra a partir da Clássica, longarinas e rebites metálicos na Industrial, e pavimento com marcações na Contemporânea.
