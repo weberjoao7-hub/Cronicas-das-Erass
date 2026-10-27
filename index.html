@@ -2469,7 +2469,7 @@ const paintedCavalry=typeof Image==='function'?new Image():{complete:false,natur
 if(typeof Image==='function')paintedCavalry.src='assets/cronicas_cavalaria_atlas.svg';
 function drawPaintedCavalry(u,px,py,z){
  if(z<.82||!paintedCavalry.complete||paintedCavalry.naturalWidth!==448||paintedCavalry.naturalHeight!==448)return false;
- const now=Date.now(),visualNow=unitAnimationClock(u,now);
+ const now=Date.now(),visualNow=typeof unitAnimationClock==='function'?unitAnimationClock(u,now):now;
  if(u.hitAt&&now-u.hitAt>=0&&now-u.hitAt<190)return false;
  const moving=Array.isArray(u.path)&&u.path.length>0;
  const striking=!!u.attackAt&&now-u.attackAt>=0&&now-u.attackAt<340;
@@ -2487,7 +2487,7 @@ function drawPaintedCavalry(u,px,py,z){
 function drawCavalrySprite(u,px,py,z){
  const r=Math.max(5.5,8.2*z),now=Date.now(),moving=Array.isArray(u.path)&&u.path.length>0;
  const next=moving?u.path[0]:null,dir=next?(((next.x-u.x)-(next.y-u.y))<0?-1:1):(u.face===-1?-1:1);
- const gait=moving?Math.sin(unitAnimationClock(u,now)*.017+u.x*1.9+u.y*.7):0;
+ const gait=moving?Math.sin((typeof unitAnimationClock==='function'?unitAnimationClock(u,now):now)*.017+u.x*1.9+u.y*.7):0;
  const hit=now-(u.hitAt||0)<190,striking=now-(u.attackAt||0)<340;
  ctx.save();ctx.translate(px,py);ctx.scale(dir,1);
  ctx.fillStyle='#0c241b86';ctx.beginPath();ctx.ellipse(0,r*.57,r*1.62,r*.32,-.1,0,Math.PI*2);ctx.fill();
@@ -2698,7 +2698,7 @@ function drawPaintedTroop(u,px,py,z,archer,moving,striking,now,direction,enemy=f
 function drawUnitSprite(u,px,py,z,enemy=false){
  if(!enemy&&u.kind==='cavalry'){if(typeof drawPaintedCavalry==='function'&&drawPaintedCavalry(u,px,py,z))return;return drawCavalrySprite(u,px,py,z);}
  const r=Math.max(5.5,8.2*z),moving=Array.isArray(u.path)&&u.path.length>0;
- const now=Date.now(),visualNow=unitAnimationClock(u,now),phase=moving?Math.sin(visualNow*.013+(u.x+u.y)*2):0;
+ const now=Date.now(),visualNow=typeof unitAnimationClock==='function'?unitAnimationClock(u,now):now,phase=moving?Math.sin(visualNow*.013+(u.x+u.y)*2):0;
  const target=moving?u.path[0]:null;
  const direction=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
  const striking=now-(u.attackAt||0)<340,hit=now-(u.hitAt||0)<190;
