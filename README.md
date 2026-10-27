@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.37** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.38** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.38 — Margens vivas dos lagos
+- `riparianMask` pré-calculada em 25.600 células identifica pradarias e campos adjacentes aos lagos, sem repetir buscas por vizinhos em cada quadro.
+- Juncos nas arestas isométricas e salgueiros isolados com tronco, copa em camadas e galhos pendentes animados, todos ancorados ao terreno.
+- LOD: nenhum detalhe abaixo de 28 px; juncos simplificados no zoom intermediário; salgueiros apenas acima de 65 px. Sem vegetação decorativa sobre construções, estradas ou ruínas.
+- Regressões em `tests/riparian-visual.test.cjs`. Sem mudanças em economia, IA, rotas ou salvamento `cronicas-v04`. Safari iPhone físico e FPS reais ainda pendentes.
 
 ## Atualização v6.37 — Guardas rivais históricos e isolamento do atlas
 - Guardas inimigos agora utilizam o atlas animado de guerreiros já existente, com armaduras e equipamentos correspondentes às oito eras, poses de marcha e ataque, orientação e pés ancorados ao terreno.
