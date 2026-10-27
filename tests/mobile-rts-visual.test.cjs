@@ -10,7 +10,7 @@ const a=script.indexOf('function drawMarchDust('),b=script.indexOf('function dra
 assert.ok(a>=0&&b>a,'helpers visuais');
 const source=script.slice(a,b);
 function render(units,enemies,visible=1,zoom=1,ground=2){
- const calls=[],ctx={save(){},restore(){},beginPath(){},ellipse(){calls.push('dust')},fill(){},fillRect(){},stroke(){}};
+ const calls=[],ctx={save(){},restore(){},beginPath(){},ellipse(){if(String(ctx.fillStyle).startsWith('rgba(177,187,147')||String(ctx.fillStyle).startsWith('rgba(205,181,137'))calls.push('dust')},fill(){},fillRect(){},stroke(){}};
  const fog=new Uint8Array(160*160);fog[2*160+3]=visible;
  const draw=new Function('ctx','biome','key','visibleFog','point','drawUnitSprite','selectedGroup','game','selectedUnit','W',source+';return drawTileOccupants;')(
   ctx,()=>ground,(x,y)=>x+','+y,fog,(x,y)=>[x*10,y*10],(u,px,py,z,enemy)=>calls.push(['sprite',u.id,enemy]),new Set(),{units},-1,160);
