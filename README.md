@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.31** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.33** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.33 — Primeiro atlas SVG real de aldeões
+- Adicionado `assets/cronicas_aldeoes_atlas.svg`, com seis quadros transparentes (336 × 104 px, quadros de 56 × 104) e detalhes desenhados em camadas: chapéu, rosto, túnica, cinto, bolsa, machado, braços e pernas.
+- Nas eras Primordial e Tribal, aldeões parados usam dois quadros de repouso e aldeões caminhando usam quatro quadros de marcha. O desenho é ancorado aos pés no terreno, sem retângulo de fundo.
+- O atlas é carregado como imagem local pelo Canvas; se indisponível, em zoom distante ou em eras posteriores, o jogo mantém o renderizador anterior. As ações de trabalho ainda utilizam as animações existentes.
+- Regressões em `tests/villager-svg-atlas.test.cjs` verificam seis quadros, seleção de poses, fallback, sintaxe e preservação do salvamento `cronicas-v04`. O resultado ainda é arte vetorial estilizada; sprites profissionais renderizados no Blender e teste visual no Safari físico continuam pendentes.
 
 ## Atualização v6.31 — Redes de pesca e limite de memória Retina
 - Barcos pescando exibem rede trapezoidal ancorada no casco, malha com fios cruzados, boias, pequenos peixes e ondulações; o material da rede acompanha as eras, com oscilação calculada a partir do relógio do quadro.
