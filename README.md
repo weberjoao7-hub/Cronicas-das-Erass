@@ -1,9 +1,19 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.33** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.35** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.35 — Atlas de guerreiros e arqueiros por era
+- Criado `assets/cronicas_tropas_atlas.svg` (256 × 896 px): **32 quadros transparentes** de 64 × 112, distribuídos por quatro períodos visuais (Primordial/Tribal, Antiga/Clássica, Medieval/Renascentista, Industrial/Moderna), duas classes e quatro poses por classe.
+- Guerreiros exibem espada, escudo, armadura e capacete específicos de cada período; arqueiros exibem arco, aljava, flechas e equipamentos históricos. As poses incluem repouso, dois passos e ataque.
+- O Canvas seleciona a linha conforme a era e a classe, orienta o personagem na direção da marcha, e mantém os pés ancorados ao terreno. O atlas é usado apenas em zoom ≥ 0,72×; em carregamento incompleto, zoom distante ou impacto recente, permanece o desenho Canvas anterior. A cavalaria e os inimigos não foram modificados.
+- Regressões em `tests/troop-svg-atlas.test.cjs` verificam 32 quadros, seleção por oito eras, poses, direção, ancoragem e fallback. Nenhuma alteração na IA, economia, combate ou chave `cronicas-v04`. A arte ainda é SVG vetorial; faltam sprites profissionais e inspeção visual em Safari iPhone físico.
+
+## Atualização v6.34 — Atlas de tarefas dos aldeões
+- Integrado `assets/cronicas_aldeoes_trabalho.svg` com 16 quadros para madeira, mineração, agricultura e construção nas duas primeiras eras, com objetos de trabalho ancorados ao chão e fallback procedural.
+- Regressões em `tests/villager-work-atlas.test.cjs`. O trabalho e o salvamento existentes foram preservados.
 
 ## Atualização v6.33 — Primeiro atlas SVG real de aldeões
 - Adicionado `assets/cronicas_aldeoes_atlas.svg`, com seis quadros transparentes (336 × 104 px, quadros de 56 × 104) e detalhes desenhados em camadas: chapéu, rosto, túnica, cinto, bolsa, machado, braços e pernas.
