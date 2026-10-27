@@ -26,7 +26,7 @@ function paint({day=3,phase=.5,width=390,visible=true,occupied=false,terrain=0,z
   set:(obj,key,value)=>{obj[key]=value;return true}
  });
  const render=new Function('ctx','game','dayClock','w','h','rnd','scale','tileAt','W','H','biome','visibleAt','at','weatherForDay','weatherPreview',renderer+';return drawWeather;')(
-  ctx,{day},phase*25,width,844,rnd,zoom,()=>({x:15,y:15}),160,160,()=>terrain,()=>visible,()=>occupied?{t:'Ponte'}:null,weatherForDay,preview);
+  ctx,{day},phase*120,width,844,rnd,zoom,()=>({x:15,y:15}),160,160,()=>terrain,()=>visible,()=>occupied?{t:'Ponte'}:null,weatherForDay,preview);
  render(15000);
  return calls;
 }
