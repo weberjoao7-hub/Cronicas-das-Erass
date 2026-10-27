@@ -21,7 +21,7 @@ test('building shadows include ground contact and a daylight projection',()=>{
 });
 test('night and distant zoom omit long projected shadows',()=>{
  const day=scene();day.drawStructureShadow(100,100,74,38,'Torre',1200);
- const night=scene(22.5);night.drawStructureShadow(100,100,74,38,'Torre',1200);
+ const night=scene(105);night.drawStructureShadow(100,100,74,38,'Torre',1200);
  const far=scene();far.drawStructureShadow(100,100,20,10,'Torre',1200);
  assert.ok(day.ops.length>night.ops.length);
  assert.ok(day.ops.length>far.ops.length);
