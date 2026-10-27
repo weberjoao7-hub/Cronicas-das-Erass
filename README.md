@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.38** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.39** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.39 — Pontes históricas em oito eras
+- As pontes existentes evoluem visualmente conforme a era: tabuleiro e pilares de madeira nas eras iniciais, arcos e guarda-corpos de pedra a partir da Clássica, longarinas e rebites metálicos na Industrial, e pavimento com marcações na Contemporânea.
+- A construção progressiva continua visível, com os elementos mais avançados aparecendo apenas quando o estágio da obra permite; orientação nos dois eixos isométricos preservada.
+- Renderização simplificada no zoom distante, sem novos recursos externos, sem mudanças na navegação, nos custos ou no salvamento `cronicas-v04`. Testes em `tests/bridge-era-visual.test.cjs`; inspeção em Safari iPhone físico ainda pendente.
 
 ## Atualização v6.38 — Margens vivas dos lagos
 - `riparianMask` pré-calculada em 25.600 células identifica pradarias e campos adjacentes aos lagos, sem repetir buscas por vizinhos em cada quadro.
