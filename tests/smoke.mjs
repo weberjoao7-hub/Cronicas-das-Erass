@@ -27,7 +27,7 @@ function element(id){
    getContext:()=>context2d,
    addEventListener:(name,fn)=>events.set(name,fn),
    setPointerCapture(){},querySelectorAll:()=>[],
-   getBoundingClientRect:()=>({left:0,top:0,width:116,height:116}),
+   getBoundingClientRect:()=>({left:0,top:0,width:id==='world'?sandbox.innerWidth:116,height:id==='world'?sandbox.innerHeight:116}),
    innerHTML:'',textContent:''
   });
  }
