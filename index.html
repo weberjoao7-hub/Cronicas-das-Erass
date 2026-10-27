@@ -3185,6 +3185,43 @@ function drawOrderOverlay(now=Date.now()){
    ctx.restore();
   }
  }
+ // Guias discretas de fileiras: ouro para linha de frente, verde para arqueiros.
+ // Só conectam destinos próximos e explorados; sem linhas atravessando a névoa.
+ if(scale>=.82&&selectedGroup.size>=3){
+  const ranks=[[],[]];
+  for(const unit of highlighted){
+   if(!isMilitary(unit.kind)||!Array.isArray(unit.path)||!unit.path.length)continue;
+   const target=unit.path[unit.path.length-1];
+   if(!visibleAt(target.x,target.y))continue;
+   const [px,py]=point(target.x,target.y);
+   if(px< -30||px>w+30||py< -30||py>h+30)continue;
+   ranks[unit.kind==='archer'?1:0].push({x:target.x,y:target.y,px,py});
+  }
+  for(let rank=0;rank<2;rank++){
+   const points=ranks[rank].sort((a,b)=>a.px-b.px);
+   if(points.length<2)continue;
+   ctx.save();ctx.beginPath();let segments=0;
+   for(let i=1;i<points.length;i++){
+    const a=points[i-1],b=points[i];
+    if(Math.hypot(a.x-b.x,a.y-b.y)>4.2)continue;
+    let revealed=true;
+    for(let t=.25;t<1;t+=.25){
+     if(!visibleAt(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t)){revealed=false;break}
+    }
+    if(!revealed)continue;
+    ctx.moveTo(a.px,a.py);ctx.lineTo(b.px,b.py);segments++;
+   }
+   if(segments){
+    ctx.strokeStyle='#102521';ctx.lineWidth=Math.max(2,scale*3);ctx.stroke();
+    ctx.strokeStyle=rank===0?'#d8b878':'#8ed8a2';
+    ctx.globalAlpha=.72;ctx.lineWidth=Math.max(1,scale*1.2);
+    ctx.setLineDash([Math.max(3,scale*4),Math.max(3,scale*4)]);
+    ctx.lineDashOffset=-(now*.018)%Math.max(6,scale*8);
+    ctx.stroke();
+   }
+   ctx.restore();
+  }
+ }
  // Bandeiras de ordens fora da seleção: só nos destinos atualmente visíveis.
  let shown=0;
  for(const u of game.units){
