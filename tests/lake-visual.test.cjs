@@ -33,6 +33,6 @@ test('LOD elimina detalhes no zoom distante',()=>{
 });
 test('plantas e peixes não atravessam construções aquáticas',()=>{
  assert.ok(scene(.85,1,false).length>scene(.85,1,true).length);
- assert.ok(scene(.97,0,false).length>scene(.97,0,true).length);
+ assert.ok(scene(.99,0,false).length>scene(.99,0,true).length);
 });
 test('geometria limitada por terreno',()=>assert.ok(scene(.99,15,false).length<170));
