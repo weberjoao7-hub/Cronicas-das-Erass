@@ -188,7 +188,10 @@ function redrawMinimap(){if(miniBase){mc.putImageData(miniBase,0,0);return}let i
  // Safari: o viewport visual e 100dvh podem diferir de innerHeight durante a barra de endereço.
  const rect=C.getBoundingClientRect();
  w=Math.max(1,rect.width||innerWidth);h=Math.max(1,rect.height||innerHeight);
- dpr=Math.min(devicePixelRatio||1,2);
+ // Limita a memória do backing store em tablets Retina sem reduzir a resolução do iPhone.
+ const mobileViewport=w<700||(typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches);
+ const maxPixels=mobileViewport?2600000:6000000;
+ dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(maxPixels/(w*h)));
  const bw=Math.round(w*dpr),bh=Math.round(h*dpr);
  if(C.width!==bw)C.width=bw;
  if(C.height!==bh)C.height=bh;
