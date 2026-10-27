@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.45** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.49** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.49 — Cais históricos isométricos
+- Os cais dos pesqueiros evoluem em oito eras: madeira primitiva, madeira trabalhada, alvenaria antiga e clássica, pedra medieval e renascentista, aço industrial e concreto contemporâneo.
+- A plataforma agora tem faces laterais, sombra de contato, pilares e fixações; guarda-corpos, cabeços de amarração e sinalização surgem nas eras correspondentes.
+- Detalhes finos são desenhados apenas em zoom próximo; os pesqueiros em obra, na prévia e concluídos usam a mesma evolução. Economia, rotas de pesca e salvamento `cronicas-v04` foram preservados.
+- Regressões em `tests/dock-era-visual.test.cjs`. Testes visuais e FPS no Safari iPhone físico continuam pendentes.
 
 ## Atualização v6.45 — Minas históricas e extração animada
 - Minas ganharam estrutura de extração coerente com cada período: armação de madeira e cesto nas eras Primordial/Tribal; portal de pedra e roldana nas eras Antiga/Clássica; guincho com contrapeso nas eras Medieval/Renascença; torre metálica, trilhos e chaminé na Industrial; guincho elétrico, cabine e iluminação na Contemporânea.
