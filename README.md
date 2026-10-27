@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.50** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.51** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.51 — Fileiras militares e animação natural
+- Corrigida a marcha por classe: infantaria, cavalaria e arqueiros nunca compartilham uma mesma fileira, inclusive quando a quantidade de unidades não preenche a linha inteira. Fileiras parciais ficam centralizadas e a busca de células transitáveis/A* permanece ativa.
+- Cada unidade recebe um deslocamento de tempo de animação estável em memória (WeakMap). Isso reduz o efeito de soldados, cavalos e trabalhadores executando a mesma passada simultaneamente, sem criar campos novos nos salvamentos.
+- Aplicado aos atlas SVG de tropas, cavalaria e aldeões, às poses de trabalho e ao galope procedural; o tempo de ataque e de dano permanece independente da fase visual.
+- Novas regressões em `tests/formation-animation-v651.test.cjs`. Sintaxe do script e simulação de fileiras por classe verificadas antes do commit. Inspeção visual e FPS no Safari físico continuam pendentes.
 
 ## Atualização v6.50 — Marcha em formação por classes
 - Ordens de grupo distribuem tropas em fileiras orientadas pela direção da marcha: guerreiros à frente, cavalaria no meio e arqueiros na retaguarda.
