@@ -24,7 +24,7 @@ const tile=(predicate)=>{for(let y=0;y<40;y++)for(let x=0;x<40;x++)if(predicate(
 const wet=tile(v=>v>.85),dry=tile(v=>v<.20);
 test('v6.66 compila e preserva a chave de salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.66<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('sem chuva, zoom distante, lago, floresta ou montanha não desenham poças',()=>{

@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.66** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.67** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.67 — Sombras solares das florestas
+- Copas de bétulas, carvalhos e coníferas projetam sombras no chão na direção da luz, sincronizadas com o ciclo dia/noite já utilizado pelos edifícios. Cada sombra combina a projeção do tronco e da copa, ancorada à posição real da árvore.
+- Em zoom médio, somente uma silhueta por bosque é desenhada; abaixo de 32 px e à noite o efeito é omitido. Em bosques com tropas, as sombras ficam na camada de chão, sem duplicação durante o intercalamento de personagens e árvores.
+- Alteração exclusivamente visual, sem modificar colisões, IA, economia, biomas ou salvamento `cronicas-v04`. Regressões em `tests/forest-cast-shadows-v667.test.cjs`; Safari físico e FPS reais ainda pendentes.
 
 ## Atualização v6.66 — Poças de chuva isométricas
 - Durante dias chuvosos ou no modo de prévia de chuva, poças com reflexos e ondulações aparecem sobre trilhas, prados e terrenos rochosos planos, acompanhando a geometria do chão. A variação é determinística por terreno e a animação é sincronizada ao quadro.
