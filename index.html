@@ -337,6 +337,42 @@ function drawBiomeSeam(px,py,ww,hh,x,y,mask){
 
 // Espuma dinâmica na costa: ondas paralelas às arestas do losango,
 // recortadas no ladrilho e simplificadas automaticamente no zoom distante.
+// Reflexos de copas em águas rasas: somente nas bordas que tocam florestas.
+// A geometria acompanha as arestas do losango e é recortada no ladrilho;
+// ondulações são calculadas por tempo, sem partículas ou dados persistidos.
+function drawForestWaterReflections(px,py,ww,hh,x,y,mask,now=Date.now()){
+ if(!mask||ww<34)return;
+ const edges=[[3,0,1,-1,0],[0,1,2,0,-1],[1,2,4,1,0],[2,3,8,0,1]];
+ const adjacent=edges.filter(e=>(mask&e[2])&&biome(x+e[3],y+e[4])===3);
+ if(!adjacent.length)return;
+ const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
+ const detailed=ww>=56;
+ ctx.save();
+ ctx.beginPath();ctx.moveTo(...corners[0]);
+ for(let i=1;i<4;i++)ctx.lineTo(...corners[i]);
+ ctx.closePath();ctx.clip();
+ for(const [a,b,flag] of adjacent){
+  const p=corners[a],q=corners[b],strands=detailed?4:2;
+  for(let i=0;i<strands;i++){
+   const t=(i+.7)/(strands+.4)+(rnd(x+i,y+flag,241)-.5)*.07;
+   const ex=p[0]+(q[0]-p[0])*t,ey=p[1]+(q[1]-p[1])*t;
+   const bands=detailed?4:2;
+   for(let j=0;j<bands;j++){
+    const depth=.12+j*.12;
+    const wave=Math.sin(now*.0013+i*1.8+j*.95+x*.41+y*.29+flag)*ww*.009;
+    const rx=ex+(px-ex)*depth+wave,ry=ey+(py-ey)*depth;
+    const width=ww*(.054-j*.007);
+    ctx.globalAlpha=(.29-j*.045)*(i%2?.88:1);
+    ctx.strokeStyle=i%2?'#245d61':'#315d54';
+    ctx.lineWidth=Math.max(.8,ww*.012);
+    ctx.beginPath();ctx.moveTo(rx-width,ry);
+    ctx.quadraticCurveTo(rx,ry-hh*.024+wave*.13,rx+width*.82,ry+hh*.009);
+    ctx.stroke();
+   }
+  }
+ }
+ ctx.restore();
+}
 function drawShoreFoam(px,py,ww,hh,x,y,mask,now){
  if(!mask||ww<34)return;
  const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
@@ -3935,7 +3971,7 @@ for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=M
 ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue; // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
-if(b===0&&shoreMask[y*W+x]&&ww>20){drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);drawShoreFoam(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime)}
+if(b===0&&shoreMask[y*W+x]&&ww>20){drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);drawForestWaterReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);drawShoreFoam(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime)}
 
 if(b===0)drawLakeDetails(px,py,ww,hh,x,y,q,shoreMask[y*W+x],structures.has(key(x,y)),frameTime);
 if(b===0&&shoreMask[y*W+x]&&q>.965&&!structures.has(key(x,y))&&!boatTiles.has(key(x,y))&&visibleFog[y*W+x])drawWadingBird(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);

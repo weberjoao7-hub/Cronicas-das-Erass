@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.63** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.64** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.64 — Reflexos das florestas nos lagos
+- Nas margens de lagos adjacentes a florestas, reflexos curtos e ondulantes das copas acompanham as arestas isométricas da água, com máscara recortada ao ladrilho.
+- Reflexos usam apenas a máscara costeira e os biomas existentes, não alteram o mapa nem a pesca. Redução automática de 16 para 4 traços por borda quando o zoom diminui; abaixo de 34 px de largura o efeito é omitido.
+- Sem mudanças no salvamento `cronicas-v04`. Regressões em `tests/forest-water-reflections-v664.test.cjs`. Aparência e FPS no Safari físico ainda precisam de validação.
 
 ## Atualização v6.63 — Profundidade individual de tropas nas florestas
 - Em terrenos florestais ocupados por várias unidades, copas e troncos são intercalados com **cada personagem** conforme a profundidade dos pés no mapa isométrico, em vez de usar a média das posições do grupo.
