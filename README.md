@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.68** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.69** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.69 — Passos e respingos em solo molhado
+- Unidades aliadas em movimento agora deixam pequenos respingos e anéis de água no solo quando chove; em tempo seco permanece a poeira original. Cavalaria projeta respingos mais largos.
+- A animação é calculada em função do tempo e da posição dos pés, sem acumular partículas no estado do jogo. Em zoom distante, terrenos aquáticos ou montanhas, o efeito é omitido. O nível de chuva é calculado uma vez por quadro e compartilhado com os passos.
+- Nenhuma alteração no combate, economia, IA, formato de salvamento `cronicas-v04` ou comportamento da câmera. Regressões em `tests/wet-footsteps-v669.test.cjs`. Safari físico e FPS reais ainda pendentes.
 
 ## Atualização v6.68 — Chuva nos telhados e área segura do iPhone
 - Durante chuva real ou prévia de chuva, os beirais de cabanas, centro da aldeia e quartéis concluídos recebem filetes de água e pequenos respingos no solo, ancorados à geometria isométrica. A quantidade de gotas varia de 2 a 6 conforme o zoom, e o efeito desaparece no zoom distante e em tempo seco.

@@ -18,7 +18,7 @@ function scene(){
 }
 test('v6.68 compila e preserva o salvamento legado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.68<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/cronicas-v04/);
 });
 test('beirais só escorrem durante chuva e em zoom suficiente',()=>{
