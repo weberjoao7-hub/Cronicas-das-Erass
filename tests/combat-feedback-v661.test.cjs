@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal encontrado');
 const start=script.indexOf('function drawCombatFeedback('),end=script.indexOf('function drawMarchDust(',start);
 assert.ok(start>=0&&end>start,'efeitos isoláveis');
@@ -21,7 +21,7 @@ function render(unit,zoom=1.2,now=10000,enemy=false){
 const unit=(data={})=>({kind:'warrior',x:12.4,y:10.7,face:1,...data});
 test('script principal compila e mantém salvamento v04',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(script,/localStorage\\.getItem\\('cronicas-v04'\\)/);
+ assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('fora da janela de combate não executa desenho',()=>{
  assert.equal(render(unit()).calls.length,0);
@@ -49,6 +49,6 @@ test('impactos têm LOD de 3 ou 5 raios e desaparecem após 260 ms',()=>{
  assert.ok(close.calls.some(c=>c.method==='ellipse'));
 });
 test('feedback é desenhado após sprite sem modificar combate nem salvamento',()=>{
- assert.match(script,/drawUnitSprite\\(u,px,py,z,enemy\\);\\s*drawCombatFeedback\\(u,px,py,z,now,enemy\\);/);
- assert.doesNotMatch(source,/\\b(?:localStorage|game|save|attackDamage|combatTurn)\\b/);
+ assert.match(script,/drawUnitSprite\(u,px,py,z,enemy\);\s*drawCombatFeedback\(u,px,py,z,now,enemy\);/);
+ assert.doesNotMatch(source,/\b(?:localStorage|game|save|attackDamage|combatTurn)\b/);
 });
