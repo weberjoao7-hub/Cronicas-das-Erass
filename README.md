@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.71** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.72** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.72 — Florestas sazonais
+- Ciclo visual de 32 dias: primavera (dias 1–8), verão (9–16), outono (17–24) e inverno (25–32), repetindo sem alterar a simulação.
+- Carvalhos e bétulas mudam de verde-claro para verde escuro, passam a copas ocres no outono e perdem folhas no inverno, quando os galhos ficam visíveis. Pinheiros permanecem verdes e ganham neve nos ramos no inverno.
+- Bosques recebem folhas caídas no outono e neve leve no solo no inverno. O detalhe usa LOD, respeita a profundidade individual das tropas e não cria partículas persistentes. Estação indicada no HUD.
+- Mantidos biomas, rotas, economia, combate, clima e salvamento `cronicas-v04`. Regressões em `tests/forest-seasons-v672.test.cjs`; Safari físico e FPS reais ainda pendentes.
 
 ## Atualização v6.71 — Iluminação defensiva e portuária
 - Torres e pesqueiros concluídos recebem balizas noturnas ancoradas à estrutura: tochas animadas nas eras históricas e luminárias azuladas nas eras Industrial/Contemporânea.

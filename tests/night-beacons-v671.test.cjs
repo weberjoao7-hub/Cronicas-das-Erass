@@ -15,7 +15,7 @@ function scene({era=3,phase=.82,zoom=1,visible=true,now=1200,buildings=[{x:80,y:
 }
 test('v6.71: sintaxe e chave de salvamento preservadas',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.71<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.72<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
