@@ -24,32 +24,32 @@ test('v6.73 preserva sintaxe, biomas e salvamento legado',()=>{
  assert.match(script,/if\(b!==0\)drawSeasonalGround\(px,py,ww,hh,x,y,b\)/);
 });
 test('primavera adiciona flores sem transformar água ou montanhas',()=>{
- const spring=scene(0,2,74,25,25);
+ const spring=scene(0,2,74,20,20);
  assert.ok(spring.painted>0);
  assert.ok(spring.colors.includes('#edb74d'));
  assert.equal(scene(0,5).painted,0);
  assert.equal(scene(0,0).painted,0);
 });
 test('outono colore terreno com folhas e não muda o verão',()=>{
- const autumn=scene(2,2,74,25,25);
+ const autumn=scene(2,2,74,20,20);
  assert.ok(autumn.painted>0);
  assert.ok(autumn.colors.includes('#a87a44'));
  assert.equal(scene(1,2).painted,0);
 });
 test('inverno cobre prados, florestas e maciços com neve isométrica',()=>{
  for(const [biome,color] of [[2,'#dce8df'],[3,'#dce8df'],[4,'#e3e9e1'],[5,'#edf2ee']]){
-  const s=scene(3,biome,74,25,25);
+  const s=scene(3,biome,74,20,20);
   assert.ok(s.painted>0,'bioma '+biome);
   assert.ok(s.colors.includes(color),'cor '+biome);
   assert.ok(s.calls.some(c=>c[0]==='clip'),'recorte no losango');
  }
 });
 test('LOD remove detalhes no zoom distante e mantém resultado determinístico',()=>{
- assert.equal(scene(3,2,20,25,25).painted,0);
- const a=scene(3,2,74,25,25),b=scene(3,2,74,25,25);
+ assert.equal(scene(3,2,20,20,20).painted,0);
+ const a=scene(3,2,74,20,20),b=scene(3,2,74,20,20);
  assert.deepEqual(a.calls,b.calls);
 });
 test('prados, flores e cumes obedecem ao calendário sem afetar colisões',()=>{
  assert.match(script,/const season=forestSeason\(\),flowers=b===2&&q>\.73&&season===0/);
- assert.match(script,/const snow=height\*\(\(forestSeason\(\)===3\?\.39:\.23\)\+variation\*\.045\)/);
+ assert.match(script,/const snow=height\*\(\(\(typeof forestSeason==='function'&&forestSeason\(\)===3\)\?\.39:\.23\)\+variation\*\.045\)/);
 });

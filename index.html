@@ -1097,7 +1097,7 @@ function drawMountain(px,py,ww,hh,x,y){
  ctx.lineTo(px+ww*.22,base-hh*.18);ctx.lineTo(px-ww*.08,base-hh*.20);
  ctx.closePath();ctx.fill();
  if(crest&&ww>=27){
-  const snow=height*((forestSeason()===3?.39:.23)+variation*.045);
+  const snow=height*(((typeof forestSeason==='function'&&forestSeason()===3)?.39:.23)+variation*.045);
   ctx.fillStyle='#e5e9e2';ctx.beginPath();
   ctx.moveTo(peakX,peakY);
   ctx.lineTo(peakX-ww*.14,peakY+snow);
