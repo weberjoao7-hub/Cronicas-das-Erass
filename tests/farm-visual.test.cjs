@@ -28,5 +28,5 @@ test('render is deterministic at fixed animation time',()=>{
 });
 test('legacy saves and farm dispatch are preserved',()=>{
  assert.ok(html.includes("localStorage.getItem('cronicas-v04')"));
- assert.ok(html.includes("drawFarm(px,py,ww,hh,obj.level)"));
+ assert.ok(html.includes("drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y)"));
 });
