@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
 const a=script.indexOf('function drawResidenceNightWindows('),b=script.indexOf('function drawAtmosphere(',a);
 assert.ok(a>=0&&b>a,'renderizador noturno');
@@ -21,8 +21,8 @@ function scene({era=4,phase=.82,zoom=1,visible=true,buildings=[{x:80,y:80,t:'Cab
 }
 test('JavaScript compiles and original save key remains unchanged',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(script,/localStorage\\.getItem\\('cronicas-v04'\\)/);
- assert.match(script,/localStorage\\.setItem\\('cronicas-v04'/);
+ assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
+ assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
 test('windows light at dusk and night, but never in daylight',()=>{
  assert.equal(scene({phase:.15}).count,0);
@@ -53,7 +53,7 @@ test('effects are bounded, time-varying and canvas state balanced',()=>{
  assert.ok(a.calls.some(([m])=>m==='ellipse'),'luz projetada no piso');
 });
 test('lighting runs after atmosphere overlay and at dusk, not on top of fog',()=>{
- assert.match(script,/if\\(night<\\.01\\)\\{drawResidenceNightWindows\\(phase,Date\\.now\\(\\)\\);return;\\}/);
- assert.match(script,/ctx\\.restore\\(\\);\\s*drawResidenceNightWindows\\(phase,Date\\.now\\(\\)\\);/);
+ assert.match(script,/if\(night<\.01\)\{drawResidenceNightWindows\(phase,Date\.now\(\)\);return;\}/);
+ assert.match(script,/ctx\.restore\(\);\s*drawResidenceNightWindows\(phase,Date\.now\(\)\);/);
  assert.ok(script.indexOf('drawAtmosphere();')<script.indexOf('drawAmbientParticles(frameTime);drawWeather'));
 });
