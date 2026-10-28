@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.57** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.58** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.58 — Quintais isométricos das residências
+- Residências concluídas recebem um caminho de acesso à porta, pisos e pedras adequados à era, vegetação baixa e materiais de apoio ancorados ao terreno. Nas eras Industrial e Contemporânea, os materiais mudam para tijolos e pavimentação moderna.
+- Os detalhes são determinísticos por posição, mantidos dentro do losango do terreno e reduzidos conforme o zoom para limitar o trabalho do Canvas no Safari móvel.
+- Sem mudanças em colisões, recursos, caminhos ou salvamento `cronicas-v04`. Testes em `tests/residence-yard-v658.test.cjs`. Avaliação visual e FPS em iPhone físico pendentes.
 
 ## Atualização v6.57 — Iluminação das residências
 - Janelas das cabanas agora acendem no crepúsculo e à noite, com vidros âmbar nas eras históricas e luz azulada na Contemporânea. Os painéis seguem as duas fachadas isométricas, com brilho discreto e reflexo ancorado ao piso.
