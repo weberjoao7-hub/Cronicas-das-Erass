@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.69** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.70** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.70 — Profundidade visual dos lagos
+- Distância à margem pré-calculada por BFS em cada terreno aquático. Lagos escurecem progressivamente em direção ao centro, sem alterar a navegabilidade nem a pesca.
+- Reflexos solares animados aparecem apenas em águas profundas com zoom próximo; desaparecem à noite e no zoom distante. O custo da busca ocorre uma vez ao iniciar o jogo.
+- Preservados costa, espuma, reflexos florestais, economia e salvamento `cronicas-v04`. Testes em `tests/lake-depth-v670.test.cjs`. Safari físico e FPS reais pendentes.
 
 ## Atualização v6.69 — Passos e respingos em solo molhado
 - Unidades aliadas em movimento agora deixam pequenos respingos e anéis de água no solo quando chove; em tempo seco permanece a poeira original. Cavalaria projeta respingos mais largos.
