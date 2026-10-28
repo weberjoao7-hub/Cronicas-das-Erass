@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.59** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.60** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.60 — Telhados históricos detalhados
+- Residências das eras Antiga, Clássica, Medieval e Renascença agora têm fiadas de telhas de barro ou ardósia, com variação determinística de cor e geometria presa às duas águas do telhado. A era Industrial recebe nervuras metálicas e rebites junto ao beiral.
+- Os detalhes são desenhados no plano isométrico da cobertura, sem sprites flutuantes; a quantidade de peças diminui no zoom intermediário e é omitida no zoom distante. Construções prontas e prévias utilizam o mesmo renderizador.
+- Apenas arte: economia, colisões, rotas e salvamento `cronicas-v04` permanecem inalterados. Testes em `tests/residence-roof-v660.test.cjs`; FPS e Safari físico ainda exigem validação.
 
 ## Atualização v6.59 — Margens úmidas dos lagos
 - Faixas de sedimento escurecido, linha irregular de água, cascalho e pequenos reflexos agora acompanham cada uma das quatro bordas isométricas de lagos nos campos e pradarias.
