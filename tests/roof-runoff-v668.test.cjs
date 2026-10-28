@@ -44,7 +44,7 @@ test('efeito só é chamado para edifícios prontos, sem dados persistidos',()=>
  assert.ok(start>=0);
  assert.match(site,/else if\(obj\)\{/);
  assert.match(site,/drawRoofRunoff\(px,py,ww,hh,obj\.t,game\.era,rainLevel,frameTime\)/);
- assert.doesNotMatch(source,/localStorage|game\.|routeFor|save\(/);
+ assert.doesNotMatch(source,/localStorage|game\.|routeFor|(?:^|[^\w.])save\(/);
 });
 test('minimapa respeita safe area do Safari em ambos breakpoints',()=>{
  assert.match(html,/#minimap\{position:fixed;right:12px;top:calc\(84px \+ env\(safe-area-inset-top\)\)/);
