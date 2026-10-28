@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.73** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.74** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.74 — Neve sobre telhados isométricos
+- No inverno, cabanas e sedes de aldeia recebem neve diretamente nos planos inclinados do telhado, com beirais claros e pingentes discretos no zoom próximo. A arquitetura acompanha as diferentes eras, incluindo bordas das residências contemporâneas sem encobrir painéis solares.
+- A camada é desenhada apenas em construções concluídas, com LOD para Safari e variação determinística por edifício. Sem sprites soltos, partículas persistentes ou modificações na simulação.
+- Mantidos economia, navegação, combate e salvamento `cronicas-v04`. Regressões em `tests/winter-roof-snow-v674.test.cjs`; Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.73 — Estações no terreno e nas montanhas
 - Primavera adiciona flores pequenas e determinísticas nos prados; outono colore o solo e espalha folhas, enquanto o inverno acrescenta manchas de neve nos prados, bosques, colinas e maciços.
