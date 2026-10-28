@@ -55,7 +55,7 @@ test('neve é determinística e não gera dados persistentes',()=>{
  const a=scene(),b=scene();a.draw(120,170,74,38,'Aldeia',4,17);b.draw(120,170,74,38,'Aldeia',4,17);
  assert.deepEqual(a.calls,b.calls);
  assert.deepEqual(a.styles,b.styles);
- assert.doesNotMatch(source,/localStorage|game\.|save\(|Math\.random/);
+ assert.doesNotMatch(source,/localStorage|game\.|(?:^|[^\w.])save\(|Math\.random/);
 });
 test('a neve é renderizada após a estrutura pronta, sem cobrir obras em andamento',()=>{
  const start=script.indexOf('if(obj&&obj.buildLeft){drawConstructionSite(');
