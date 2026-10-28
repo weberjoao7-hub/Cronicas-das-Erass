@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.74** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.75** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.75 — Neve arquitetônica em torres, quartéis e pesqueiros
+- No inverno, quartéis tribais recebem neve nas duas águas; fortificações antigas ganham uma camada sobre a muralha; quartéis medievais e industriais recebem neve nos telhados das duas torres.
+- Torres de madeira ganham neve nas coberturas, torres de pedra sobre a plataforma e merlões, e torres industriais na cobertura metálica. Os pesqueiros acumulam neve apenas no tablado, sem encobrir vara e embarcação.
+- Geometria isométrica ancorada à construção, transparência ajustada para pedra e madeira, pingentes restritos a beirais inclinados e LOD para Safari. Apenas edifícios concluídos, sem mudar simulação, economia, colisões nem o salvamento `cronicas-v04`.
+- Regressões em `tests/winter-structures-v675.test.cjs`. Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.74 — Neve sobre telhados isométricos
 - No inverno, cabanas e sedes de aldeia recebem neve diretamente nos planos inclinados do telhado, com beirais claros e pingentes discretos no zoom próximo. A arquitetura acompanha as diferentes eras, incluindo bordas das residências contemporâneas sem encobrir painéis solares.

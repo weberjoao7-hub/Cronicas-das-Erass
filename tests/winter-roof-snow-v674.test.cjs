@@ -23,7 +23,7 @@ function scene(season=3){
 }
 test('v6.74 compila e preserva o salvamento anterior',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.74<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
