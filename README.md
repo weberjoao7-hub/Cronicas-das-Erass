@@ -1,9 +1,20 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.54** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.57** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.57 — Iluminação das residências
+- Janelas das cabanas agora acendem no crepúsculo e à noite, com vidros âmbar nas eras históricas e luz azulada na Contemporânea. Os painéis seguem as duas fachadas isométricas, com brilho discreto e reflexo ancorado ao piso.
+- O efeito é aplicado após o escurecimento da cena; omite edifícios encobertos pela névoa, obras inacabadas, objetos fora da tela e zoom distante. O limite é de 36 residências por quadro para proteger o Safari móvel.
+- Somente renderização: sem mudanças em recursos, rotas, economia ou salvamento `cronicas-v04`. Regressões em `tests/residence-night-windows-v657.test.cjs`. Inspeção visual e FPS no Safari físico ainda pendentes.
+
+## Atualização v6.56 — Barcos de pesca com tripulação
+- Pescadores por era, remadas e esteiras animadas na água com redução de detalhe conforme o zoom.
+
+## Atualização v6.55 — Espuma costeira
+- Ondas e espuma animadas junto às margens isométricas, com recorte e redução de detalhe no zoom distante.
 
 ## Atualização v6.54 — Bordas de relevo e prévias históricas
 - Colinas e montanhas ganharam faces rochosas facetadas apenas onde o terreno vizinho é mais baixo. Estratos e fissuras aparecem no zoom próximo; no zoom distante o detalhe é omitido para reduzir trabalho do Canvas no Safari.
