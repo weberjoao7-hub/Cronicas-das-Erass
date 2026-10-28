@@ -11,7 +11,7 @@ const behind=helperSource?new Function(helperSource+';return unitBehindStructure
 test('v6.65 mantém script válido e salvamento anterior',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
- assert.match(html,/<title>Crônicas das Eras v6\.65<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
 });
 test('personagens atrás da construção são ocultados; os da frente permanecem visíveis',()=>{
  assert.equal(typeof behind,'function');

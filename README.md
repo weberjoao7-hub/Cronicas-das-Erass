@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.65** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.66** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.66 — Poças de chuva isométricas
+- Durante dias chuvosos ou no modo de prévia de chuva, poças com reflexos e ondulações aparecem sobre trilhas, prados e terrenos rochosos planos, acompanhando a geometria do chão. A variação é determinística por terreno e a animação é sincronizada ao quadro.
+- As poças são recortadas ao losango isométrico e omitidas em lagos, florestas, montanhas, ruínas e lotes ocupados. O efeito é simplificado em zoom médio e removido em zoom distante para reduzir o custo no Safari.
+- Nenhuma alteração em economia, colisões, navegação ou salvamento `cronicas-v04`. Testes em `tests/rain-puddles-v666.test.cjs`. FPS e aparência no Safari físico continuam pendentes.
 
 ## Atualização v6.65 — Oclusão das tropas por construções
 - Tropas e aldeões que passam pelo mesmo terreno de uma construção agora são separados conforme a profundidade dos pés: personagens atrás do edifício são desenhados antes da fachada, e personagens à frente aparecem depois. A regra também vale para obras.
