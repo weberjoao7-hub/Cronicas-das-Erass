@@ -35,9 +35,10 @@ test('camadas mudam com a posição dos pés da unidade',()=>{
 });
 test('terrenos sem unidades mantêm o caminho de renderização original',()=>{
  assert.match(html,/else drawForestGrove\(px,py,ww,hh,x,y,q\);/);
- const occupants=html.indexOf('drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime);');
- const front=html.indexOf("drawForestGrove(px,py,ww,hh,x,y,q,frameTime,'front',forestDepthY)",occupants);
- assert.ok(occupants>=0&&front>occupants);
+ const occupants=html.indexOf('if(forestCount)drawForestOccupiedTile(');
+ const interleave=html.indexOf('function drawForestOccupiedTile(');
+ assert.ok(occupants>=0&&interleave>=0);
+ assert.match(html,/if\(forestCount\)drawForestGrove\(px,py,ww,hh,x,y,q,frameTime,'back',-Infinity\)/);
  assert.match(html,/forestOpen&&visibleFog\[y\*W\+x\]\?enemyTiles\.get/);
  assert.ok(html.includes('cronicas-v04'));
 });
