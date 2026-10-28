@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.62** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.63** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.63 — Profundidade individual de tropas nas florestas
+- Em terrenos florestais ocupados por várias unidades, copas e troncos são intercalados com **cada personagem** conforme a profundidade dos pés no mapa isométrico, em vez de usar a média das posições do grupo.
+- A serapilheira continua sendo desenhada uma única vez, e cada árvore é desenhada em um único intervalo de profundidade. Bosques vazios mantêm a renderização original; unidades inimigas ocultas pela névoa não entram na lista de atores.
+- Nenhuma mudança na IA, movimentação, combate ou formato de salvamento `cronicas-v04`. Regressões em `tests/forest-actor-interleave-v663.test.cjs` e `tests/forest-depth-v662.test.cjs`. Avaliação visual e FPS no Safari físico permanecem pendentes.
 
 ## Atualização v6.62 — Oclusão de árvores e tropas
 - Árvores e unidades que ocupam o mesmo terreno florestal agora respeitam a profundidade de seus pontos de contato com o solo. Árvores ao fundo são desenhadas antes dos personagens; troncos e copas à frente podem ocultá-los naturalmente.
