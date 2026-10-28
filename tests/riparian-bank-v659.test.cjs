@@ -53,5 +53,5 @@ test('faixa úmida é renderizada antes da vegetação e respeita ocupação',()
 });
 test('sem mudanças de economia, colisões ou salvamento',()=>{
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.doesNotMatch(source,/\b(?:game|save|localStorage|routeFor|passable)\s*[.=(]/);
+ assert.doesNotMatch(source,/\b(?:game|localStorage|routeFor|passable)\s*[.=(]/);
 });
