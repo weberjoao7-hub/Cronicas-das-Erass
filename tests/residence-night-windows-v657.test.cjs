@@ -53,7 +53,7 @@ test('effects are bounded, time-varying and canvas state balanced',()=>{
  assert.ok(a.calls.some(([m])=>m==='ellipse'),'luz projetada no piso');
 });
 test('lighting runs after atmosphere overlay and at dusk, not on top of fog',()=>{
- assert.match(script,/if\(night<\.01\)\{drawResidenceNightWindows\(phase,Date\.now\(\)\);return;\}/);
- assert.match(script,/ctx\.restore\(\);\s*drawResidenceNightWindows\(phase,Date\.now\(\)\);/);
+ assert.match(script,/if\(night<\.01\)\{drawNightBeacons\(phase,Date\.now\(\)\);drawResidenceNightWindows\(phase,Date\.now\(\)\);return;\}/);
+ assert.match(script,/ctx\.restore\(\);\s*drawNightBeacons\(phase,Date\.now\(\)\);\s*drawResidenceNightWindows\(phase,Date\.now\(\)\);/);
  assert.ok(script.indexOf('drawAtmosphere();')<script.indexOf('drawAmbientParticles(frameTime);drawWeather'));
 });

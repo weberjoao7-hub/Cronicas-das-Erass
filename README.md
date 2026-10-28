@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.70** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.71** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.71 — Iluminação defensiva e portuária
+- Torres e pesqueiros concluídos recebem balizas noturnas ancoradas à estrutura: tochas animadas nas eras históricas e luminárias azuladas nas eras Industrial/Contemporânea.
+- O brilho noturno acompanha a altura das torres e píeres. Fontes atrás da névoa de guerra são descartadas para não revelar construções invisíveis.
+- Balizas omitidas em zoom distante, obras inacabadas e fora da tela; máximo de 24 estruturas por quadro. Salvamento `cronicas-v04`, economia, combate e navegação preservados.
+- Regressões em `tests/night-beacons-v671.test.cjs`; Safari físico e FPS reais ainda pendentes.
 
 ## Atualização v6.70 — Profundidade visual dos lagos
 - Distância à margem pré-calculada por BFS em cada terreno aquático. Lagos escurecem progressivamente em direção ao centro, sem alterar a navegabilidade nem a pesca.
