@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.60** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.61** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.61 — Golpes e impactos animados
+- Guerreiros, cavalaria e inimigos agora exibem arcos de golpe com direção e intensidade variáveis; unidades atingidas recebem faíscas curtas, desenhadas junto ao corpo e integradas aos sprites SVG.
+- Os efeitos são derivados dos tempos de ataque e dano já existentes, têm duração limitada (320/260 ms) e desaparecem no zoom distante para preservar o Canvas no iPhone. Não foram introduzidas partículas persistentes, alterações de combate ou novas propriedades de salvamento.
+- Testes em `tests/combat-feedback-v661.test.cjs`. FPS e aparência no Safari físico continuam pendentes.
 
 ## Atualização v6.60 — Telhados históricos detalhados
 - Residências das eras Antiga, Clássica, Medieval e Renascença agora têm fiadas de telhas de barro ou ardósia, com variação determinística de cor e geometria presa às duas águas do telhado. A era Industrial recebe nervuras metálicas e rebites junto ao beiral.
