@@ -22,7 +22,7 @@ function scene(ground=2){
 const worker={kind:'worker',x:80.5,y:80.5,path:[{x:81,y:81}]};
 test('v6.69 compila e preserva o salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.69<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/cronicas-v04/);
 });
 test('tempo seco conserva poeira e chuva substitui poeira por água',()=>{

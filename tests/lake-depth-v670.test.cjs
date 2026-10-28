@@ -18,7 +18,7 @@ function depthMap(){
 function paint(depth,ww=74,q=.95,night=0,now=5000){
  const calls=[],ctx=new Proxy({},{
   get(o,k){return k in o?o[k]:(...args)=>{for(const a of args)if(typeof a==='number')assert.ok(Number.isFinite(a));calls.push([k,...args])}},
-  set(o,k,v){o[k]=v;return true}
+  set(o,k,v){o[k]=v;calls.push(['set',k,v]);return true}
  });
  const diamond=(...args)=>calls.push(['diamond',ctx.globalAlpha,...args]);
  const fn=new Function('ctx','diamond','lightLevels','dayClock','scale',source+';return drawLakeDepth')(ctx,diamond,()=>({night}),60,1);
