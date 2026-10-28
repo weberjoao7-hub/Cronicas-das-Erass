@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.58** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.59** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.59 — Margens úmidas dos lagos
+- Faixas de sedimento escurecido, linha irregular de água, cascalho e pequenos reflexos agora acompanham cada uma das quatro bordas isométricas de lagos nos campos e pradarias.
+- O renderizador utiliza a máscara ripária já pré-calculada, reduz detalhes conforme o zoom e respeita construções, estradas e ruínas; as margens são desenhadas sob as flores e juncos, evitando sobreposição artificial.
+- Sem mudanças em colisão, pesca, economia, rotas ou salvamento `cronicas-v04`. Testes em `tests/riparian-bank-v659.test.cjs`. Aparência e FPS no Safari físico continuam pendentes.
 
 ## Atualização v6.58 — Quintais isométricos das residências
 - Residências concluídas recebem um caminho de acesso à porta, pisos e pedras adequados à era, vegetação baixa e materiais de apoio ancorados ao terreno. Nas eras Industrial e Contemporânea, os materiais mudam para tijolos e pavimentação moderna.
