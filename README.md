@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.61** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.62** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.62 — Oclusão de árvores e tropas
+- Árvores e unidades que ocupam o mesmo terreno florestal agora respeitam a profundidade de seus pontos de contato com o solo. Árvores ao fundo são desenhadas antes dos personagens; troncos e copas à frente podem ocultá-los naturalmente.
+- O solo e a vegetação rasteira são renderizados uma única vez. Terrenos sem unidades mantêm o renderizador anterior; inimigos ocultos pela névoa não influenciam a ordenação.
+- Sem mudanças na movimentação, colisões, combate ou salvamento `cronicas-v04`. Testes: `tests/forest-depth-v662.test.cjs`. Inspeção em Safari físico e FPS ainda pendentes.
 
 ## Atualização v6.61 — Golpes e impactos animados
 - Guerreiros, cavalaria e inimigos agora exibem arcos de golpe com direção e intensidade variáveis; unidades atingidas recebem faíscas curtas, desenhadas junto ao corpo e integradas aos sprites SVG.
