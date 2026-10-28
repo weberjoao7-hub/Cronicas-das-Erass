@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.52** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.54** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.54 — Bordas de relevo e prévias históricas
+- Colinas e montanhas ganharam faces rochosas facetadas apenas onde o terreno vizinho é mais baixo. Estratos e fissuras aparecem no zoom próximo; no zoom distante o detalhe é omitido para reduzir trabalho do Canvas no Safari.
+- A prévia de posicionamento de cabanas, torres e quartéis agora usa os renderizadores históricos das obras e construções prontas. Torres, quartéis e pesqueiros exibem também os estandartes da era na prévia.
+- A alteração não modifica biomas, navegação, recursos, economia ou o salvamento `cronicas-v04`. Testes em `tests/highland-cliff-preview.test.cjs`; FPS e Safari físico permanecem pendentes.
 
 ## Atualização v6.52 — Lavouras com ciclo visual de cultivo
 - Fazendas passam por quatro fases visuais: solo recém-colhido com restolho e feixes, brotos, lavoura verde e trigo dourado pronto para colheita.
