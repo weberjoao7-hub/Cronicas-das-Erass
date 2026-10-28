@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.67** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.68** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.68 — Chuva nos telhados e área segura do iPhone
+- Durante chuva real ou prévia de chuva, os beirais de cabanas, centro da aldeia e quartéis concluídos recebem filetes de água e pequenos respingos no solo, ancorados à geometria isométrica. A quantidade de gotas varia de 2 a 6 conforme o zoom, e o efeito desaparece no zoom distante e em tempo seco.
+- O minimapa e sua legenda agora respeitam a área segura superior do Safari no iPhone, inclusive em telas estreitas com recorte de câmera. O HUD de desempenho mantém seu posicionamento anterior.
+- Nenhuma mudança em economia, IA, colisões ou salvamento `cronicas-v04`. Testes: `tests/roof-runoff-v668.test.cjs`. Aparência e FPS em Safari físico ainda não validados.
 
 ## Atualização v6.67 — Sombras solares das florestas
 - Copas de bétulas, carvalhos e coníferas projetam sombras no chão na direção da luz, sincronizadas com o ciclo dia/noite já utilizado pelos edifícios. Cada sombra combina a projeção do tronco e da copa, ancorada à posição real da árvore.

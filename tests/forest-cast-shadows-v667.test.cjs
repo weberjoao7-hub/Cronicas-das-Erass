@@ -22,7 +22,7 @@ function scene(dayClock=60){
 }
 test('v6.67 compila e mantém o formato de salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.67<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.(?:67|68)<\/title>/);
  assert.match(script,/cronicas-v04/);
 });
 test('sombras mudam de direção com o sol e respeitam noite e zoom',()=>{
