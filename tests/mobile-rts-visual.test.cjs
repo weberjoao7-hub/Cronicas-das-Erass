@@ -6,7 +6,7 @@ const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
-const a=script.indexOf('function drawMarchDust('),b=script.indexOf('function draw(){',a);
+const a=script.indexOf('let renderRainLevel=0;'),b=script.indexOf('function draw(){',a);
 assert.ok(a>=0&&b>a,'helpers visuais');
 const source=script.slice(a,b);
 function render(units,enemies,visible=1,zoom=1,ground=2){
