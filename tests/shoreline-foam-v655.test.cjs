@@ -40,7 +40,7 @@ test('animação é determinística no tempo e não cria coordenadas inválidas'
  assert.ok(scene(74,15).length<200,'custo limitado por ladrilho');
 });
 test('margens usam tempo do quadro e permanecem na camada de água',()=>{
- assert.match(script,/drawCoast\(px,py,ww,hh,x,y,shoreMask\[y\*W\+x\]\);drawShoreFoam\(px,py,ww,hh,x,y,shoreMask\[y\*W\+x\],frameTime\)/);
+ assert.ok(script.includes('drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);drawForestWaterReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);drawShoreFoam('),'reflexos ficam entre costa e espuma, todos na camada de água');
  assert.match(script,/ctx\.clip\(\)/);
  assert.match(script,/if\(b===0&&shoreMask\[y\*W\+x\]&&ww>20\)/);
 });
