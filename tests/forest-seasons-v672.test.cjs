@@ -20,9 +20,9 @@ function scene(day=1,zoom=1){
   ';return {tree,oak,drawBirch,drawForestGrove,forestSeason};')(ctx,zoom,rnd,()=>3,game);
  return {...api,calls,styles};
 }
-test('v6.72 compila e mantém o salvamento existente',()=>{
+test('v6.73 compila e mantém o salvamento existente',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.72<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.73<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });

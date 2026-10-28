@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.72** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.73** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.73 — Estações no terreno e nas montanhas
+- Primavera adiciona flores pequenas e determinísticas nos prados; outono colore o solo e espalha folhas, enquanto o inverno acrescenta manchas de neve nos prados, bosques, colinas e maciços.
+- O recorte acompanha os losangos isométricos; efeitos são omitidos em água, no verão e em zoom distante. As flores dos prados respeitam a estação e a neve dos cumes aumenta no inverno.
+- Sem alterar biomas, colisões, economia, navegação ou salvamento `cronicas-v04`. Regressões em `tests/seasonal-ground-v673.test.cjs`. Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.72 — Florestas sazonais
 - Ciclo visual de 32 dias: primavera (dias 1–8), verão (9–16), outono (17–24) e inverno (25–32), repetindo sem alterar a simulação.
