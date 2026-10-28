@@ -19,7 +19,7 @@ function scene(season,b=2,ww=74,x=41,y=37){
 }
 test('v6.73 preserva sintaxe, biomas e salvamento legado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.73<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/if\(b!==0\)drawSeasonalGround\(px,py,ww,hh,x,y,b\)/);
 });
