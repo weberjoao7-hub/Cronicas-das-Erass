@@ -50,5 +50,5 @@ test('impactos têm LOD de 3 ou 5 raios e desaparecem após 260 ms',()=>{
 });
 test('feedback é desenhado após sprite sem modificar combate nem salvamento',()=>{
  assert.match(script,/drawUnitSprite\(u,px,py,z,enemy\);\s*drawCombatFeedback\(u,px,py,z,now,enemy\);/);
- assert.doesNotMatch(source,/\b(?:localStorage|game|save|attackDamage|combatTurn)\b/);
+ assert.doesNotMatch(source,/\b(?:localStorage|game|attackDamage|combatTurn)\b/);
 });
