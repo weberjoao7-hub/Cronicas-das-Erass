@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
 const start=script.indexOf('function drawForestGrove(');
 const end=script.indexOf('// Decorative landmarks',start);
@@ -22,7 +22,7 @@ function scene(dayClock=60){
 }
 test('v6.67 compila e mantém o formato de salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\\.67<\\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.67<\/title>/);
  assert.match(script,/cronicas-v04/);
 });
 test('sombras mudam de direção com o sol e respeitam noite e zoom',()=>{
@@ -51,5 +51,5 @@ test('LOD mantém custo previsível e nenhuma dependência de economia',()=>{
  assert.equal(far.calls.length,0);
  assert.ok(medium.calls.length<near.calls.length);
  assert.ok(near.calls.length<50,'custo limitado por bosque');
- assert.doesNotMatch(source,/localStorage\\.|game\\.wood|game\\.food|routeFor\\(/);
+ assert.doesNotMatch(source,/localStorage\.|game\.wood|game\.food|routeFor\(/);
 });
