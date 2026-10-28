@@ -11,7 +11,7 @@ function cliff(east,south,kind=4,ww=74){
  const calls=[],ctx=new Proxy({},{get(o,k){return k in o?o[k]:(...args)=>calls.push([k,...args])},set(o,k,v){o[k]=v;return true}});
  const rnd=(x,y,z=0)=>{const n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
  const biome=(x,y)=>x===41&&y===40?east:x===40&&y===41?south:kind;
- const draw=new Function('ctx','rnd','biome','scale',cliffCode+';return drawHighlandCliff')(ctx,rnd,1,biome,1);
+ const draw=new Function('ctx','rnd','biome','scale',cliffCode+';return drawHighlandCliff')(ctx,rnd,biome,1);
  draw(200,150,ww,ww*38/74,40,40,kind);
  return calls;
 }
