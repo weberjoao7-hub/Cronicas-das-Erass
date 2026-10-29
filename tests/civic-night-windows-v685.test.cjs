@@ -22,7 +22,7 @@ function scene({era=4,phase=.82,zoom=1,now=1200,visible=true,buildings=[
 }
 test('v6.85: JavaScript compila e salvamento original permanece',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.85<\/title>/);
+ const version=Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1]);assert.ok(version>=85,'versão 6.85 ou posterior');
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|Math\.random|setInterval/);
 });

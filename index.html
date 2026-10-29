@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.85</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.86</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:calc(84px + env(safe-area-inset-top));z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:calc(204px + env(safe-area-inset-top));z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:calc(91px + env(safe-area-inset-top))}#mapLabel{top:calc(190px + env(safe-area-inset-top))}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}#perfHud{display:none;position:fixed;left:12px;top:calc(81px + env(safe-area-inset-top));z-index:4;pointer-events:none;padding:7px 10px;border:1px solid #a5c7a0;border-radius:8px;background:#0c211ce8;color:#f6edce;font:600 11px system-ui,sans-serif;box-shadow:0 3px 12px #0008;white-space:nowrap}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -2965,6 +2965,7 @@ function drawConstructionSite(b,px,py,ww,hh){
   ['#8d7c61','#594b38','#6c5b43','#c6a276','#c39b64'];
  if(b.t==='Ponte'){
   drawBridge(px,py,ww,hh,b.axis||'x',progress,game.era);
+  drawConstructionCrew(b,px,py,ww,hh,era);
   const barW=Math.max(22,ww*.60),barY=py-hh*.96;
   ctx.fillStyle='#10251ddc';ctx.fillRect(px-barW*.5-2,barY-2,barW+4,Math.max(4,scale*3)+4);
   ctx.fillStyle='#d7a96c';ctx.fillRect(px-barW*.5,barY,barW*progress,Math.max(3,scale*3));
@@ -3033,6 +3034,7 @@ function drawConstructionSite(b,px,py,ww,hh){
   ctx.strokeStyle=metal?'#c4d1cb':'#ddba79';ctx.lineWidth=Math.max(1,scale*1.5);
   for(let n=0;n<3;n++){ctx.beginPath();ctx.moveTo(px-ww*.37,py+hh*(.25-n*.07));ctx.lineTo(px-ww*.12,py+hh*(.13-n*.07));ctx.stroke()}
  }
+ drawConstructionCrew(b,px,py,ww,hh,era);
  // Compact progress bar is readable even at the minimum zoom.
  const barW=Math.max(22,ww*.64),barH=Math.max(3,scale*3.5),barY=py-hh*1.82;
  ctx.fillStyle='#132921dd';ctx.fillRect(px-barW*.5-2,barY-2,barW+4,barH+4);
@@ -3041,6 +3043,93 @@ function drawConstructionSite(b,px,py,ww,hh){
  if(ww>55){ctx.font='bold '+Math.max(10,scale*10)+'px system-ui,sans-serif';ctx.fillStyle='#fff3cf';ctx.textAlign='center';ctx.fillText(Math.round(progress*100)+'%',px,barY-5)}
  ctx.restore();
 }
+
+// v6.86: equipe de obra animada, com marteladas, transporte de tábuas e guincho.
+// Figuras presas ao piso isométrico, sem entidades adicionais nem alterações no save.
+function drawConstructionCrew(b,px,py,ww,hh,era,now=Date.now()){
+ if(ww<42||!b||!(b.buildLeft>0))return 0;
+ const count=ww>=66?2:1,industrial=era>=6,medieval=era>=4;
+ const progress=Math.max(0,Math.min(1,1-b.buildLeft/Math.max(1,b.buildTotal||18)));
+ const seed=b.x*1.71+b.y*2.39,unit=ww*.088;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ // O guincho é montado na armação; a carga sobe apenas durante a obra.
+ if(b.t!=='Ponte'&&ww>=66&&progress>.25){
+  const hx=px+ww*.19,hy=py-hh*(.68+progress*.52);
+  const lift=.12+.18*(.5+.5*Math.sin(now*.0016+seed));
+  ctx.strokeStyle=industrial?'#6f858a':'#6c4b32';ctx.lineWidth=Math.max(1.3,ww*.026);
+  ctx.beginPath();ctx.moveTo(hx-ww*.18,hy+hh*.21);ctx.lineTo(hx-ww*.18,hy-hh*.18);
+  ctx.lineTo(hx+ww*.12,hy-hh*.18);ctx.stroke();
+  ctx.fillStyle=industrial?'#9caeb2':'#bd9964';
+  ctx.beginPath();ctx.arc(hx+ww*.12,hy-hh*.18,ww*.025,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#c9b895';ctx.lineWidth=Math.max(.8,ww*.012);
+  ctx.beginPath();ctx.moveTo(hx+ww*.12,hy-hh*.18);
+  ctx.lineTo(hx+ww*.12,hy+hh*lift);ctx.stroke();
+  ctx.fillStyle=industrial?'#65787c':'#9c7750';
+  ctx.fillRect(hx+ww*.065,hy+hh*lift,ww*.11,hh*.10);
+  ctx.strokeStyle=industrial?'#b2c5c5':'#d1b88a';
+  ctx.strokeRect(hx+ww*.065,hy+hh*lift,ww*.11,hh*.10);
+ }
+ for(let i=0;i<count;i++){
+  const hammer=i===0;
+  const x=px+ww*(hammer?-.26:.30),y=py+hh*(hammer?.25:.21);
+  const phase=now*.008+seed+i*2.1,step=Math.sin(phase*.55);
+  // A sombra e os pés fixam a figura à superfície, evitando efeito de sprite flutuante.
+  ctx.fillStyle='#15241c83';ctx.beginPath();
+  ctx.ellipse(x+unit*.20,y+unit*.38,unit*.93,unit*.30,-.12,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#393b37';ctx.lineWidth=Math.max(1.5,unit*.30);
+  for(const side of [-1,1]){
+   ctx.beginPath();ctx.moveTo(x+side*unit*.18,y-unit*.18);
+   ctx.lineTo(x+side*unit*.19+step*side*unit*.13,y+unit*.31);ctx.stroke();
+  }
+  // Túnicas nas eras antigas, avental de couro medieval, macacão e capacete industrial.
+  ctx.fillStyle=industrial?'#516d78':medieval?'#846a4a':'#967b52';
+  ctx.beginPath();ctx.moveTo(x-unit*.40,y-unit*1.12);
+  ctx.lineTo(x+unit*.40,y-unit*1.12);ctx.lineTo(x+unit*.45,y-unit*.14);
+  ctx.lineTo(x-unit*.43,y-unit*.14);ctx.closePath();ctx.fill();
+  ctx.fillStyle=industrial?'#c7aa67':'#604a35';
+  ctx.fillRect(x-unit*.40,y-unit*.46,unit*.81,Math.max(1,unit*.14));
+  ctx.fillStyle='#d6aa83';ctx.beginPath();
+  ctx.ellipse(x,y-unit*1.40,unit*.32,unit*.37,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=industrial?'#d7b45e':medieval?'#655544':'#695139';
+  ctx.beginPath();ctx.ellipse(x,y-unit*1.70,unit*.39,unit*.18,0,Math.PI,Math.PI*2);ctx.fill();
+  if(industrial){ctx.fillRect(x-unit*.40,y-unit*1.70,unit*.80,unit*.11)}
+  if(hammer){
+   const swing=.5+.5*Math.sin(phase),handX=x+unit*(.38+swing*.32),handY=y-unit*(.84+swing*.62);
+   ctx.strokeStyle='#c89b77';ctx.lineWidth=Math.max(1.4,unit*.20);
+   ctx.beginPath();ctx.moveTo(x+unit*.32,y-unit*.98);ctx.lineTo(handX,handY);ctx.stroke();
+   ctx.strokeStyle='#715035';ctx.lineWidth=Math.max(1,unit*.15);
+   ctx.beginPath();ctx.moveTo(handX-unit*.08,handY+unit*.31);
+   ctx.lineTo(handX+unit*.22,handY-unit*.39);ctx.stroke();
+   ctx.strokeStyle=industrial?'#c0ced0':'#7d8582';
+   ctx.lineWidth=Math.max(2,unit*.35);
+   ctx.beginPath();ctx.moveTo(handX+unit*.04,handY-unit*.48);
+   ctx.lineTo(handX+unit*.42,handY-unit*.30);ctx.stroke();
+   if(swing<.08&&ww>=66){
+    const impactX=x+unit*.89,impactY=y-unit*.40;
+    ctx.strokeStyle='#e8c478';ctx.lineWidth=Math.max(.7,unit*.09);
+    for(let spark=0;spark<3;spark++){
+     const a=(spark-1)*.65;
+     ctx.beginPath();ctx.moveTo(impactX,impactY);
+     ctx.lineTo(impactX+Math.cos(a)*unit*.27,impactY-Math.sin(a+.9)*unit*.29);ctx.stroke();
+    }
+   }
+  }else{
+   // Segundo operário transporta tábuas; braços e carga oscilam no mesmo ritmo.
+   ctx.strokeStyle='#c89b77';ctx.lineWidth=Math.max(1.4,unit*.19);
+   ctx.beginPath();ctx.moveTo(x-unit*.34,y-unit*.98);
+   ctx.lineTo(x-unit*.48,y-unit*.67+step*unit*.08);
+   ctx.moveTo(x+unit*.33,y-unit*.98);
+   ctx.lineTo(x+unit*.50,y-unit*.67-step*unit*.08);ctx.stroke();
+   ctx.fillStyle=industrial?'#9caca8':'#ad8654';
+   ctx.save();ctx.translate(x,y-unit*(.68+step*.05));ctx.rotate(-.14);
+   ctx.fillRect(-unit*.85,-unit*.11,unit*1.7,unit*.24);
+   ctx.fillStyle=industrial?'#6b7e81':'#715237';
+   ctx.fillRect(-unit*.85,unit*.13,unit*1.7,unit*.13);ctx.restore();
+  }
+ }
+ ctx.restore();return count;
+}
+
 // Only the civic center and selected structures carry labels; roofs remain unobstructed.
 // Sun-cast shadows ground tall isometric structures without changing save data.
 // Estandartes isométricos: leitura da civilização e da função militar sem etiquetas sobre os telhados.
