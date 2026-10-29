@@ -4,7 +4,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.split('<script>')[1].split('</script>')[0];
 const a=script.indexOf('function drawCloudShadows('),b=script.indexOf('\nfunction ',a+1);
 assert.ok(a>0&&b>a,'world-anchored cloud shadow renderer');
-const source=script.slice(a,b);
+const source=script.slice(a,b)+'\n';
 const rnd=(x,y,z=0)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
 function scene({zoom=1,night=0,rain=0,now=150000,width=390,height=844}={}){
  const calls=[],state={};
