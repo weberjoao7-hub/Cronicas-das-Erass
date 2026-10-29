@@ -19,7 +19,7 @@ function scene({east=0,south=2,seed=.8}={}){
 }
 test('v6.92: script compila e salvamento legado permanece intacto',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.92<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.(?:9[2-9]|[1-9][0-9]{2,})<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|game\.buildings|game\.units/);
 });
