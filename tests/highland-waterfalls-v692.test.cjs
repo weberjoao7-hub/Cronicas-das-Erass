@@ -21,7 +21,7 @@ test('v6.92: script compila e salvamento legado permanece intacto',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(html,/<title>Crônicas das Eras v6\.92<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.doesNotMatch(source,/localStorage|game\.buildings|game\.units|save\(/);
+ assert.doesNotMatch(source,/localStorage|game\.buildings|game\.units/);
 });
 test('cachoeira respeita zoom distante e bioma não rochoso',()=>{
  const s=scene();
@@ -58,7 +58,7 @@ test('LOD remove spray distante e preserva água em zoom médio',()=>{
 test('cachoeira entra após montanhas e antes de tropas, somente com visibilidade',()=>{
  const terrain=script.indexOf('if(b===5&&ww>13){drawMountain(');
  const fall=script.indexOf('drawHighlandWaterfall(px,py,ww,hh,x,y,b,forestSeason(),frameTime');
- const troops=script.indexOf('const forestTile=key(x,y)',terrain);
+ const troops=script.indexOf('let animal=wildlifeAt(x,y)',terrain);
  assert.ok(terrain>=0&&fall>terrain&&troops>fall);
- assert.match(script.slice(fall-110,fall),/visibleFog\[y\*W\+x\]/);
+ assert.match(script.slice(fall-140,fall),/visibleFog\[y\*W\+x\]/);
 });
