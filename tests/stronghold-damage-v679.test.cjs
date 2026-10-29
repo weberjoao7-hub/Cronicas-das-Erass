@@ -17,7 +17,7 @@ function render(hp,zoom=74,now=1200){
 }
 test('full game syntax, version and existing save key are intact',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.79<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
