@@ -1,9 +1,14 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.76** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.77** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.77 — Fumaça e impactos da artilharia
+- Após o disparo, o canhão libera cinco camadas de fumaça de pólvora junto à boca do cano, com expansão, deslocamento vertical e desaparecimento gradual em 920 ms. Não há partículas persistentes e o efeito é omitido em zoom distante e durante deslocamento.
+- O impacto dos projéteis de canhão ganha marca escura e cinco nuvens baixas de poeira, ancoradas ao solo isométrico. As flechas preservam seu efeito anterior; as nuvens detalhadas são simplificadas no zoom distante.
+- Nenhuma alteração de dano, alcance, IA, economia ou formato de salvamento `cronicas-v04`. Testes em `tests/cannon-smoke-v677.test.cjs`. Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.76 — Canhões de cerco isométricos
 - Canhões desbloqueados na Era Industrial: 65 madeira, 35 pedra, 45 minério e uma vaga de população. Recrutamento no quartel ou em Tropas; deslocamento lento.

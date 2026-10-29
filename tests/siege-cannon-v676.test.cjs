@@ -4,7 +4,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.split('<script>')[1].split('</script>')[0];
 const part=(a,b)=>{const x=script.indexOf(a),y=script.indexOf(b,x+a.length);assert.ok(x>=0&&y>x,a);return script.slice(x,y)};
 const stats=new Function(part('const isMilitary=','// Linha de tiro no terreno')+';return {isMilitary,attackRange,attackDamage}')();
-test('sintaxe e compatibilidade do save',()=>{assert.doesNotThrow(()=>new Function(script));assert.ok(html.includes('Crônicas das Eras v6.76'));assert.ok(script.includes("localStorage.getItem('cronicas-v04')"));assert.ok(script.includes("localStorage.setItem('cronicas-v04'"))});
+test('sintaxe e compatibilidade do save',()=>{assert.doesNotThrow(()=>new Function(script));assert.ok(/<title>Crônicas das Eras v6\.\d+<\/title>/.test(html));assert.ok(script.includes("localStorage.getItem('cronicas-v04')"));assert.ok(script.includes("localStorage.setItem('cronicas-v04'"))});
 test('perfil da artilharia',()=>{assert.equal(stats.isMilitary('cannon'),true);assert.equal(stats.isMilitary('worker'),false);assert.equal(stats.attackRange('cannon'),6.3);assert.equal(stats.attackDamage('cannon'),44);assert.equal(stats.attackRange('archer'),4.6)});
 test('recrutamento bloqueado antes da Era Industrial',()=>{
  const game={era:5,wood:120,food:50,stone:70,ore:80,people:5,army:0,units:[],buildings:[{x:80,y:80,t:'Aldeia'},{x:85,y:85,t:'Quartel'}]};
