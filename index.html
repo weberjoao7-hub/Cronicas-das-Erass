@@ -3870,7 +3870,7 @@ const ROAD_STYLES=[
 ];
 // Iluminação histórica: tocha medieval, lampião, gás e LED em perspectiva.
 // v6.82: neve nas bordas das vias, ancorada ao terreno e com LOD.
-function drawWinterRoadSnow(px,py,ww,hh,x,y,links,width,season=forestSeason()){
+function drawWinterRoadSnow(px,py,ww,hh,x,y,links,width,season=(typeof forestSeason==='function'?forestSeason():1)){
  if(season!==3||ww<32||!links.length)return 0;
  ctx.save();ctx.lineCap='round';let count=0;
  for(const [dx,dy] of links){
