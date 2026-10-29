@@ -15,7 +15,7 @@ function harness(){
 const troop=(x,y,kind='warrior',hp=100)=>({x,y,kind,hp});
 test('JavaScript parses and save schema remains v04',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.81<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|game\.units\s*=|game\.buildings\s*=/);
 });

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.81</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.82</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:calc(84px + env(safe-area-inset-top));z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:calc(204px + env(safe-area-inset-top));z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:calc(91px + env(safe-area-inset-top))}#mapLabel{top:calc(190px + env(safe-area-inset-top))}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}#perfHud{display:none;position:fixed;left:12px;top:calc(81px + env(safe-area-inset-top));z-index:4;pointer-events:none;padding:7px 10px;border:1px solid #a5c7a0;border-radius:8px;background:#0c211ce8;color:#f6edce;font:600 11px system-ui,sans-serif;box-shadow:0 3px 12px #0008;white-space:nowrap}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -3869,6 +3869,31 @@ const ROAD_STYLES=[
  {edge:'#232b2d',base:'#3d484b',top:'#656f72',joint:'#aeb7b0',gravel:'#949d9b',hub:'#606b6d',kind:'asphalt'}
 ];
 // Iluminação histórica: tocha medieval, lampião, gás e LED em perspectiva.
+// v6.82: neve nas bordas das vias, ancorada ao terreno e com LOD.
+function drawWinterRoadSnow(px,py,ww,hh,x,y,links,width,season=forestSeason()){
+ if(season!==3||ww<32||!links.length)return 0;
+ ctx.save();ctx.lineCap='round';let count=0;
+ for(const [dx,dy] of links){
+  const vx=(dx-dy)*ww*.25,vy=(dx+dy)*hh*.25;
+  const len=Math.hypot(vx,vy)||1,nx=-vy/len,ny=vx/len;
+  for(const side of [-1,1]){
+   const offset=width*side*.58;
+   const jitter=(rnd(x+dx*11+side,y+dy*13,218)-.5)*width*.15;
+   ctx.globalAlpha=.38+rnd(x+side*5,y+dx*7+dy,219)*.25;
+   ctx.strokeStyle='#e6f0e9';ctx.lineWidth=Math.max(1,ww*.027);
+   ctx.beginPath();ctx.moveTo(px+nx*offset+vx*.10,py+ny*offset+vy*.10);
+   ctx.quadraticCurveTo(px+vx*.48+nx*(offset+jitter),py+vy*.48+ny*(offset+jitter),
+    px+vx*.90+nx*offset,py+vy*.90+ny*offset);ctx.stroke();count++;
+  }
+  if(ww>=52){
+   const drift=.08+rnd(x+dx,y+dy,220)*.12;
+   ctx.globalAlpha=.50;ctx.fillStyle='#f4f7ef';ctx.beginPath();
+   ctx.ellipse(px+vx*.72+nx*width*.59,py+vy*.72+ny*width*.59,
+    width*drift,Math.max(1,hh*.022),-.18,0,Math.PI*2);ctx.fill();
+  }
+ }
+ ctx.restore();return count;
+}
 function drawRoadLantern(px,py,ww,hh,x,y,era=game.era,now=Date.now()){
  if(era<4||ww<35)return;
  const stage=Math.min(7,Math.max(4,era|0)),lx=px+ww*.22,ly=py+hh*.11;
@@ -3974,6 +3999,7 @@ function drawRoad(px,py,ww,hh,x,y){
    ctx.ellipse(px+Math.cos(ang)*r,py+Math.sin(ang)*r*.6,ww*.016,hh*.018,0,0,Math.PI*2);ctx.fill();
   }
  }
+ drawWinterRoadSnow(px,py,ww,hh,x,y,links,width);
  ctx.restore();
 }
 // Praça central sob o salão da aldeia, sem alterar colisão, população ou salvamentos.
@@ -4485,7 +4511,30 @@ function drawMarchDust(u,px,py,z,now=Date.now()){
  if(ground===0||ground===5)return;
  const pulse=(Math.sin(now*.013+u.x*2.1+u.y*1.7)+1)*.5;
  ctx.save();
- if(renderRainLevel>.24){
+ if(typeof forestSeason==='function'&&forestSeason()===3){
+  // Pegadas de infantaria, cascos e trilhas de rodas; nenhum estado persistente.
+  const step=((now*.0018+u.x*.19+u.y*.11)%1+1)%1;
+  const mounted=u.kind==='cavalry',siege=u.kind==='cannon';
+  ctx.fillStyle='#4c6b72';ctx.strokeStyle='#eaf5ef';ctx.lineWidth=Math.max(.7,z*.85);
+  for(let i=0;i<2;i++){
+   const age=(step+i*.5)%1,side=i?1:-1;
+   const fx=px+side*z*(siege?7.2:mounted?4.8:2.8),fy=py+z*(2.2+age*3.6);
+   ctx.globalAlpha=(1-age)*.46;ctx.beginPath();
+   ctx.ellipse(fx,fy,z*(siege?3.1:mounted?2.3:1.55),
+    z*(siege?1.25:mounted?1.05:.75),-.14,0,Math.PI*2);ctx.fill();
+   if(z>=1.25&&!siege){
+    ctx.globalAlpha=(1-age)*.32;ctx.beginPath();
+    ctx.ellipse(fx,fy,z*(mounted?2.9:1.9),z*(mounted?1.4:.95),-.14,0,Math.PI*2);ctx.stroke();
+   }
+  }
+  if(siege&&z>=1.1){
+   ctx.globalAlpha=.28;ctx.lineWidth=Math.max(.8,z*1.2);
+   for(const side of [-1,1]){
+    ctx.beginPath();ctx.moveTo(px+side*z*7.2,py+z*2);
+    ctx.lineTo(px+side*z*7.2-z*2,py+z*5);ctx.stroke();
+   }
+  }
+ }else if(renderRainLevel>.24){
   const wet=Math.min(1,(renderRainLevel-.24)*1.6),mounted=u.kind==='cavalry'?1.35:1;
   ctx.strokeStyle='rgba(205,231,223,.82)';
   ctx.lineWidth=Math.max(.75,z*.75);
@@ -5255,6 +5304,6 @@ function loop(t){
  if(document.hidden){lastFrame=t;requestAnimationFrame(loop);return}
  let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*(u.kind==='cavalry'?3.1:u.kind==='warrior'?2.3:u.kind==='archer'?1.9:u.kind==='cannon'?1.05:1.5));u.x+=dx/len*step;u.y+=dy/len*step;dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:wildlifeAt(hx,hy)==='boar'?20:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}updateFishingBoats(dt);enemyTurn(dt);combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=120){dayClock-=120;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;const drawStart=performance.now();draw();adjustRenderCadence(performance.now()-drawStart);recordRenderSample(t,performance.now()-drawStart);renderTick=t}
 if(t-minimapTick>400){redrawMinimap();drawMinimap();minimapTick=t}if(t-lightLabelTick>1200){lightLabelTick=t;const phase=(dayClock%120)/120,light=lightLevels(phase);eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+seasonNames[forestSeason()]+' · '+(weatherPreview?(forestSeason()===3?'❄️ Prévia de neve · ':'🌧️ Prévia · '):weatherForDay(game.day,phase)>.12?(forestSeason()===3?'❄️ Neve · ':'🌧️ Chuva · '):'')+(light.night>.28?'🌙 Noite':phase>.48?'🌇 Crepúsculo':'☀️ Dia')}
-requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v6.80: tempestades de inverno agora trazem neve animada!');
+requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v6.82: neve nas estradas e rastros de tropas!');
 })();
 </script></body></html>
