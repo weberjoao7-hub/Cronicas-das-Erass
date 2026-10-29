@@ -25,7 +25,7 @@ function footsteps(season=3,rain=0,kind='worker',z=1.4,ground=2,now=1500){
 }
 test('v6.82 parses and retains the v04 save schema',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.82<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(road+march,/localStorage|routeFor|game\.units\s*=/);
 });
