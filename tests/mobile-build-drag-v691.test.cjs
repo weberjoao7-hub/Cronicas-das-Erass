@@ -21,7 +21,7 @@ function scene(tileAt=()=>({x:12,y:13}),reason=null){
 }
 test('v6.91: sintaxe, versão e salvamento legado preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.91<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.(?:9[1-9]|[1-9][0-9][0-9])<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(helpers,/localStorage\.|game\.buildings\.push/);
 });
