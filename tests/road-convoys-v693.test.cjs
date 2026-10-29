@@ -33,7 +33,7 @@ function scene(era=4,ww=74,now=2000){
 }
 test('v6.93: JavaScript válido e formato de salvamento preservado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.93<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.(?:9[3-9]|[1-9][0-9]{2,})<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(roadSource+drawSource,/localStorage|setInterval|Math\.random/);
 });
