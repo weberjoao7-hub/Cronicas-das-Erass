@@ -14,10 +14,10 @@ function scene(tileAt=()=>({x:12,y:13}),reason=null){
   let pointers=new Map([[5,{x:10,y:10}]]);const W=160,H=160;
   ${helpers}
   placementPointerId=5;
-  return {preview:placementPreviewAt,finish:finishTouchPlacement,hint,placed,pointers,
+  return {preview:placementPreviewAt,finish:finishTouchPlacement,pointers,
    state:()=>({hoverTile,dirty,dragged,placementPointerId})};
  `);
- return run(tileAt,()=>reason,(t,x,y)=>placed.push({t,x,y}),hint);
+ return {...run(tileAt,()=>reason,(t,x,y)=>placed.push({t,x,y}),hint),hint,placed};
 }
 test('v6.91: sintaxe, versão e salvamento legado preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
