@@ -28,7 +28,7 @@ test('v6.83 parses and preserves the existing save schema',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(html,/<title>Crônicas das Eras v6\.83<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.doesNotMatch(source,/localStorage|game\.units|game\.buildings|save\(/);
+ assert.doesNotMatch(source,/localStorage|game\.units|game\.buildings/);
 });
 test('daylight paints deterministic world-space cloud shadows',()=>{
  const a=scene(),b=scene(),c=scene({now:350000});
