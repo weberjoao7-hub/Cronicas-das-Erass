@@ -55,6 +55,6 @@ test('renderização respeita terrenos ocupados, ruínas e ordem das camadas',()
  const b=script.indexOf('if(rainLevel>.17&&!structures.has(key(x,y))&&!ruinKind)drawRainPuddles(',a);
  const c=script.indexOf('if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){',b);
  assert.ok(a>0&&b>a&&c>b);
- assert.match(script,/const rainLevel=weatherPreview \? \.82 : weatherForDay\(game\.day,/);
+ assert.match(script,/const rainLevel=forestSeason\(\)===3\?0:\(weatherPreview \? \.82 : weatherForDay\(game\.day,/);
  assert.doesNotMatch(source,/\b(?:game|localStorage|routeFor|passable)\s*[.=(]/);
 });
