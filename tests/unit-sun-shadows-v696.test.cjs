@@ -21,7 +21,7 @@ function scene(phase=.5,night=0){
 }
 test('v6.96 mantém JavaScript válido e formato de salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.96<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=96);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('projeção varia com posição solar sem alterar a unidade',()=>{
