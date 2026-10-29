@@ -16,7 +16,7 @@ function scene(era=4,ww=74,now=1000){
 }
 test('v6.98: sintaxe valida e save legado preservado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.ok(html.includes('Crônicas das Eras v6.98'));
+ assert.ok(Number(html.match(/Crônicas das Eras v6\.(\d+)/)?.[1])>=98);
  assert.ok(script.includes("localStorage.getItem('cronicas-v04')"));
 });
 test('LOD: nao desenha mineiro no zoom distante',()=>{
