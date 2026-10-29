@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.split('<script>')[1].split('</script>')[0];
-const a=script.indexOf('function drawCloudShadows('),b=script.indexOf('function drawAtmosphere(',a);
+const a=script.indexOf('function drawCloudShadows('),b=script.indexOf('\nfunction ',a+1);
 assert.ok(a>0&&b>a,'world-anchored cloud shadow renderer');
 const source=script.slice(a,b);
 const rnd=(x,y,z=0)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
