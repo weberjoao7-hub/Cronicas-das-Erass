@@ -55,7 +55,9 @@ test('town square renders beneath the town hall and respects zoom LOD',()=>{
  s.ops.length=0;s.drawVillageSquare(180,220,18,9,80,80);
  assert.equal(s.ops.length,0);
  assert.ok(near>10);
- assert.match(script,/drawVillageSquare\(px,py,ww,hh,x,y\);drawTownHall/);
+ const square=script.indexOf('drawVillageSquare(px,py,ww,hh,x,y);drawVillageLife(');
+ const hall=script.indexOf('drawTownHall(px,py,ww,hh,false)',square);
+ assert.ok(square>0&&hall>square,'praça e bancas permanecem atrás do salão');
 });
 
 test('all eight eras have distinct road surfaces and matching LOD',()=>{
