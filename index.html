@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.83</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.84</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:calc(84px + env(safe-area-inset-top));z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:calc(204px + env(safe-area-inset-top));z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:calc(91px + env(safe-area-inset-top))}#mapLabel{top:calc(190px + env(safe-area-inset-top))}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}#perfHud{display:none;position:fixed;left:12px;top:calc(81px + env(safe-area-inset-top));z-index:4;pointer-events:none;padding:7px 10px;border:1px solid #a5c7a0;border-radius:8px;background:#0c211ce8;color:#f6edce;font:600 11px system-ui,sans-serif;box-shadow:0 3px 12px #0008;white-space:nowrap}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -4017,6 +4017,83 @@ function drawVillageSquare(px,py,ww,hh,x,y){
  }
  ctx.restore();
 }
+// v6.84: praça viva, com bancas por era e aldeões ambientais ancorados no piso.
+// Renderização em duas camadas, sem entidades, economia ou dados de salvamento novos.
+function drawVillageLife(px,py,ww,hh,era=0,now=Date.now(),layer='front',season=forestSeason(),visible=true){
+ if(ww<42)return 0;
+ const late=era>=6,settled=era>=2,night=lightLevels((dayClock%120)/120).night;
+ const p=(x,y)=>[px+x*ww,py+y*hh];
+ const polygon=(points,color)=>{
+  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...p(...points[0]));
+  for(let i=1;i<points.length;i++)ctx.lineTo(...p(...points[i]));
+  ctx.closePath();ctx.fill();
+ };
+ ctx.save();
+ if(layer==='back'){
+  // Bancas nas laterais do salão: sombra, tablado, estoque e toldo isométrico.
+  for(let i=0;i<2;i++){
+   const x=i===0?-.37:.37,y=i===0?.06:.035;
+   ctx.fillStyle='#10271f77';ctx.beginPath();ctx.ellipse(...p(x,y+.15),ww*.14,hh*.10,-.12,0,Math.PI*2);ctx.fill();
+   polygon([[x-.11,y],[x+.11,y],[x+.11,y+.11],[x-.11,y+.11]],late?'#87918c':'#916e48');
+   polygon([[x-.11,y+.11],[x+.11,y+.11],[x+.11,y+.16],[x-.11,y+.16]],'#574733');
+   if(settled){
+    const roof=i===0?(late?'#668a87':'#b86b50'):(late?'#9caeac':'#d7af67');
+    polygon([[x-.15,y-.22],[x+.09,y-.22],[x+.15,y-.10],[x-.09,y-.10]],roof);
+    polygon([[x-.09,y-.10],[x+.15,y-.10],[x+.15,y-.065],[x-.09,y-.065]],late?'#526f6d':'#9b543d');
+    ctx.strokeStyle=late?'#6c7e7c':'#735638';ctx.lineWidth=Math.max(1,ww*.018);
+    for(const dx of [-.105,.105]){ctx.beginPath();ctx.moveTo(...p(x+dx,y+.10));ctx.lineTo(...p(x+dx,y-.18));ctx.stroke()}
+    if(season===3){ctx.strokeStyle='#eaf0e8';ctx.lineWidth=Math.max(1.4,ww*.025);ctx.beginPath();ctx.moveTo(...p(x-.15,y-.22));ctx.lineTo(...p(x+.09,y-.22));ctx.stroke()}
+   }else{
+    // Primeiras eras: cestos e feixes, em vez de bancas com cobertura.
+    ctx.fillStyle='#bda16e';ctx.beginPath();ctx.ellipse(...p(x-.04,y-.05),ww*.045,hh*.075,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#604c34';ctx.lineWidth=Math.max(.8,ww*.012);ctx.beginPath();ctx.ellipse(...p(x-.04,y-.05),ww*.045,hh*.03,0,0,Math.PI*2);ctx.stroke();
+   }
+   if(ww>=59){
+    for(let j=0;j<3;j++){
+     const bx=x-.065+j*.055,by=y+.065;
+     ctx.fillStyle=j===1?'#c5a35e':j===2?'#8c9b62':'#c27b4e';
+     ctx.beginPath();ctx.ellipse(...p(bx,by),ww*.024,hh*.027,0,0,Math.PI*2);ctx.fill();
+    }
+    if(night>.32&&settled){
+     ctx.fillStyle='#ffda8d';ctx.beginPath();ctx.arc(...p(x+.105,y-.13),Math.max(1.3,ww*.019),0,Math.PI*2);ctx.fill();
+    }
+   }
+  }
+  ctx.restore();return 2;
+ }
+ if(layer!=='front'||!visible){ctx.restore();return 0}
+ // Figuras de ambientação, não unidades selecionáveis; sem colisão ou economia.
+ const count=ww>=72?3:2,active=night>.68?1:count;
+ for(let i=0;i<active;i++){
+  const drift=Math.sin(now*.00045+i*2.15)*.055;
+  const x=px+ww*((i-(count-1)*.5)*.205+drift);
+  const y=py+hh*(.29+i*.029);
+  const step=Math.sin(now*.008+i*2.3),walk=Math.cos(now*.00045+i*2.15);
+  const size=Math.max(5,Math.min(13,ww*.16)),head=size*.18;
+  const coat=late?(i%2?'#526d71':'#667f72'):settled?(i%2?'#a05d49':'#4e7080'):(i%2?'#b68b59':'#83664a');
+  ctx.fillStyle='#132c2466';ctx.beginPath();ctx.ellipse(x,y+size*.045,size*.31,size*.095,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#40392f';ctx.lineWidth=Math.max(1,ww*.019);ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x-size*.095,y-size*.25);ctx.lineTo(x-size*.12+step*size*.09,y);
+  ctx.moveTo(x+size*.095,y-size*.25);ctx.lineTo(x+size*.12-step*size*.09,y);ctx.stroke();
+  ctx.fillStyle=coat;ctx.beginPath();ctx.moveTo(x-size*.22,y-size*.65);
+  ctx.lineTo(x+size*.22,y-size*.65);ctx.lineTo(x+size*.17,y-size*.24);
+  ctx.lineTo(x-size*.17,y-size*.24);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=coat;ctx.lineWidth=Math.max(1.2,size*.17);
+  ctx.beginPath();ctx.moveTo(x-size*.17,y-size*.58);ctx.lineTo(x-size*.28,y-size*.37+step*size*.025);
+  ctx.moveTo(x+size*.17,y-size*.58);ctx.lineTo(x+size*.28,y-size*.37-step*size*.025);ctx.stroke();
+  ctx.fillStyle='#c49a74';ctx.beginPath();ctx.arc(x,y-size*.83,head,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=late?'#3b4c4e':settled?'#604331':'#503c2c';
+  ctx.beginPath();ctx.ellipse(x,y-size*.94,head*1.05,head*.44,0,Math.PI*2);ctx.fill();
+  if(i===1&&ww>=72){
+   // O mercador transporta um cesto que acompanha os passos, sem flutuar.
+   const bx=x+size*.32,by=y-size*.33+walk*size*.015;
+   ctx.fillStyle='#987345';ctx.fillRect(bx-size*.12,by-size*.08,size*.25,size*.20);
+   ctx.strokeStyle='#e0bb7a';ctx.lineWidth=Math.max(.8,ww*.009);
+   ctx.beginPath();ctx.arc(bx,by-size*.08,size*.11,Math.PI,Math.PI*2);ctx.stroke();
+  }
+ }
+ ctx.restore();return active;
+}
 function drawTerritoryEdge(px,py,ww,hh,x,y,own){
  const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
  const neighbors=[[0,-1],[1,0],[0,1],[-1,0]];
@@ -4790,7 +4867,7 @@ else if(obj){
  else if(obj.t==='Fazenda')drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);
  else if(obj.t==='Moinho')drawWindmill(px,py,ww,hh,obj.level);
  else if(obj.t==='Mina')drawMine(px,py,ww,hh,obj.level,game.era,frameTime);
- else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
+ else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
  else if(obj.t==='Cabana')drawEraResidence(px,py,ww,hh,obj.level||1,x*97+y*13,game.era);
  else house(px,py,ww*.7,obj.t);
  if((obj.t==='Aldeia'||obj.t==='Quartel')&&ww>=30)drawCampfire(px,py,ww,hh,frameTime);
@@ -5338,6 +5415,6 @@ function loop(t){
  if(document.hidden){lastFrame=t;requestAnimationFrame(loop);return}
  let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*(u.kind==='cavalry'?3.1:u.kind==='warrior'?2.3:u.kind==='archer'?1.9:u.kind==='cannon'?1.05:1.5));u.x+=dx/len*step;u.y+=dy/len*step;dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:wildlifeAt(hx,hy)==='boar'?20:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}updateFishingBoats(dt);enemyTurn(dt);combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=120){dayClock-=120;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;const drawStart=performance.now();draw();adjustRenderCadence(performance.now()-drawStart);recordRenderSample(t,performance.now()-drawStart);renderTick=t}
 if(t-minimapTick>400){redrawMinimap();drawMinimap();minimapTick=t}if(t-lightLabelTick>1200){lightLabelTick=t;const phase=(dayClock%120)/120,light=lightLevels(phase);eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+seasonNames[forestSeason()]+' · '+(weatherPreview?(forestSeason()===3?'❄️ Prévia de neve · ':'🌧️ Prévia · '):weatherForDay(game.day,phase)>.12?(forestSeason()===3?'❄️ Neve · ':'🌧️ Chuva · '):'')+(light.night>.28?'🌙 Noite':phase>.48?'🌇 Crepúsculo':'☀️ Dia')}
-requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v6.83: sombras de nuvens sobre os biomas!');
+requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v6.84: praça da aldeia com comércio e moradores animados!');
 })();
 </script></body></html>
