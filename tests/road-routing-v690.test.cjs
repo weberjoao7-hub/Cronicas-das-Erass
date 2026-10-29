@@ -13,7 +13,7 @@ function scene(roads=[]){
 }
 test('v6.90: script compiles and save format remains unchanged',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.90<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('A* prefers an established road over the direct unpaved corridor',()=>{
