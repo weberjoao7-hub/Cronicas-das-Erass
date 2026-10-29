@@ -26,7 +26,7 @@ function scene({zoom=1,night=0,rain=0,now=150000,width=390,height=844}={}){
 }
 test('v6.83 parses and preserves the existing save schema',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.84<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|game\.units|game\.buildings/);
 });

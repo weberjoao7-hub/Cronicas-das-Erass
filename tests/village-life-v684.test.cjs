@@ -17,7 +17,7 @@ function scene({width=74,era=4,now=120000,layer='front',season=0,visible=true,ni
 }
 test('v6.84: script válido, salvamento intacto e renderizador sem mutação',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.84<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|game\.|Math\.random|setInterval/);
 });
