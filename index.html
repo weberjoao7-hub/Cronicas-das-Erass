@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.92</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.93</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:calc(84px + env(safe-area-inset-top));z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:calc(204px + env(safe-area-inset-top));z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:calc(91px + env(safe-area-inset-top))}#mapLabel{top:calc(190px + env(safe-area-inset-top))}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}#perfHud{display:none;position:fixed;left:12px;top:calc(81px + env(safe-area-inset-top));z-index:4;pointer-events:none;padding:7px 10px;border:1px solid #a5c7a0;border-radius:8px;background:#0c211ce8;color:#f6edce;font:600 11px system-ui,sans-serif;box-shadow:0 3px 12px #0008;white-space:nowrap}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · estradas aceleram unidades</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -4040,12 +4040,13 @@ function drawMeleeArc(r,now,attackAt,mounted=false){
 }
 
 // Rede viária derivada de edifícios concluídos: nenhum campo novo no save.
-let roadSignature='',roadTiles=new Set(),roadLinks=new Map(),roadLanternSites=[],roadLanternSet=new Set();
+let roadSignature='',roadTiles=new Set(),roadLinks=new Map(),roadLanternSites=[],roadLanternSet=new Set(),roadCartRoutes=[];
 function updateRoads(){
  const ready=game.buildings.filter(b=>!b.buildLeft&&b.t!=='Aldeia');
  const signature=ready.map(b=>key(b.x,b.y)).sort().join('|');
  if(signature===roadSignature)return;
- roadSignature=signature;roadTiles=new Set();roadLinks=new Map();
+ roadSignature=signature;roadTiles=new Set();roadLinks=new Map();roadCartRoutes=[];
+ const cartCandidates=[];
  const hub=game.buildings.find(b=>b.t==='Aldeia')||{x:80,y:80};
  // A* usa oito direções. Guardar as arestas reais evita estradas interrompidas
  // nas diagonais e conexões falsas entre caminhos apenas adjacentes.
@@ -4060,6 +4061,8 @@ function updateRoads(){
   const path=routeFor({x:hub.x+.5,y:hub.y+.5},b.x,b.y,false);
   if(!path)continue;
   roadTiles.add(key(hub.x,hub.y));
+  // Cache de rotas comerciais: os veículos decorativos percorrem somente vias existentes.
+  if(path.length>=5)cartCandidates.push({destination:key(b.x,b.y),path:[{x:hub.x+.5,y:hub.y+.5},...path]});
   let previous={x:hub.x,y:hub.y};
   for(const p of path){
    const x=Math.floor(p.x),y=Math.floor(p.y);
@@ -4067,6 +4070,8 @@ function updateRoads(){
    previous={x,y};
   }
  }
+ // Até três trajetos distintos; custo constante por quadro, mesmo com muitas construções.
+ roadCartRoutes=cartCandidates.sort((a,b)=>b.path.length-a.path.length).slice(0,3);
  for(const [id,dirs] of roadLinks)roadLinks.set(id,[...dirs].map(dir=>dir.split(',').map(Number)));
  // Lanternas espaçadas sobre vias concluídas; cache sem alteração do save.
  const occupied=new Set(game.buildings.map(b=>key(b.x,b.y)));
@@ -4078,6 +4083,28 @@ function updateRoads(){
   if(links<2)continue;
   roadLanternSites.push({x,y});roadLanternSet.add(id);
  }
+}
+
+/* Caravanas ambientais percorrem os caminhos A* já existentes.
+   Movimento contínuo, determinístico e sem alterações em economia/salvamentos. */
+function roadConvoyPositions(now,routes,limit=3){
+ if(!Number.isFinite(now)||!Array.isArray(routes)||limit<=0)return [];
+ const carts=[];
+ for(let index=0;index<Math.min(limit,routes.length);index++){
+  const path=routes[index]&&routes[index].path;
+  if(!Array.isArray(path)||path.length<5)continue;
+  const span=path.length-1,cycle=span*2;
+  const distance=((now*.00065+index*5.2)%cycle+cycle)%cycle;
+  const reverse=distance>span,travel=reverse?cycle-distance:distance;
+  const segment=Math.min(span-1,Math.floor(travel)),fraction=travel-segment;
+  const a=path[segment],b=path[segment+1];
+  if(!a||!b)continue;
+  const dx=(b.x-a.x)*(reverse?-1:1),dy=(b.y-a.y)*(reverse?-1:1);
+  const x=a.x+(b.x-a.x)*fraction,y=a.y+(b.y-a.y)*fraction;
+  if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(dx)&&Number.isFinite(dy))
+   carts.push({x,y,dx,dy,index});
+ }
+ return carts;
 }
 // Caminhos isométricos: trilhas de terra na era inicial e calçamento a partir da era clássica.
 // Texturas são determinísticas; zoom distante omite pedrinhas para poupar GPU/CPU no Safari.
@@ -4225,6 +4252,77 @@ function drawRoad(px,py,ww,hh,x,y){
  }
  drawWinterRoadSnow(px,py,ww,hh,x,y,links,width);
  ctx.restore();
+}
+
+/* Veículos isométricos com rodas, sombra de contato e carga.
+   A orientação acompanha a projeção da estrada; sem imagens flutuantes. */
+function drawRoadConvoy(cart,ww,hh,era=game.era,now=Date.now()){
+ if(!cart||ww<37)return 0;
+ const [px,py]=point(cart.x,cart.y);
+ const heading=Math.atan2((cart.dx+cart.dy)*hh,(cart.dx-cart.dy)*ww);
+ const size=Math.min(1.7,ww/72),modern=era>=6,primitive=era<2;
+ const wheelSpin=now*.008+cart.index*2;
+ ctx.save();
+ ctx.translate(px,py-hh*.045);
+ ctx.rotate(heading);
+ ctx.scale(size,size);
+ // Ground contact follows the road and scales with the vehicle.
+ ctx.fillStyle='#10241d77';ctx.beginPath();ctx.ellipse(-1,5,21,4.5,0,0,Math.PI*2);ctx.fill();
+ if(modern){
+  // Industrial supply lorry: chassis, cargo box, cab, glazing and wheel hubs.
+  ctx.fillStyle='#303b3d';ctx.fillRect(-19,-2,36,6);
+  ctx.fillStyle='#597568';ctx.fillRect(-17,-14,22,13);
+  ctx.fillStyle='#8ca39a';ctx.fillRect(-17,-14,22,3);
+  ctx.fillStyle='#415a60';ctx.beginPath();ctx.moveTo(5,-11);ctx.lineTo(13,-11);
+  ctx.lineTo(19,-5);ctx.lineTo(19,1);ctx.lineTo(5,1);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#b4d1d3';ctx.beginPath();ctx.moveTo(9,-9);ctx.lineTo(13,-9);
+  ctx.lineTo(17,-5);ctx.lineTo(9,-5);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#e8ce8a';ctx.fillRect(17,-2,2,2);
+  ctx.strokeStyle='#293637';ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(-15,-10);ctx.lineTo(3,-10);ctx.stroke();
+ }else{
+  // Handcart in the earliest eras; horse-drawn wooden wagon thereafter.
+  ctx.fillStyle='#5a3c28';ctx.fillRect(-17,-6,24,9);
+  ctx.fillStyle='#b68b55';ctx.beginPath();ctx.moveTo(-18,-7);ctx.lineTo(5,-7);
+  ctx.lineTo(8,-3);ctx.lineTo(-14,-3);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#e0b477';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-14,-5);ctx.lineTo(4,-5);ctx.stroke();
+  for(let i=0;i<3;i++){
+   ctx.fillStyle=i===1?'#a8a080':'#94714b';
+   ctx.beginPath();ctx.ellipse(-12+i*7,-8,4,3,-.2,0,Math.PI*2);ctx.fill();
+  }
+  ctx.strokeStyle='#765235';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(5,0);ctx.lineTo(primitive?19:22,0);ctx.stroke();
+  if(primitive){
+   // Carrier walks on the same ground plane as the cart.
+   const step=Math.sin(wheelSpin)*2;
+   ctx.strokeStyle='#514432';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(20,-1);ctx.lineTo(19+step,5);ctx.moveTo(20,-1);ctx.lineTo(23-step,5);ctx.stroke();
+   ctx.fillStyle='#ad8754';ctx.fillRect(18,-9,5,8);
+   ctx.fillStyle='#d7b58b';ctx.beginPath();ctx.arc(20.5,-11,3,0,Math.PI*2);ctx.fill();
+  }else{
+   // Horse body, neck, head, legs and tail are attached to the road.
+   const step=Math.sin(wheelSpin)*2.2;
+   ctx.fillStyle='#75543c';ctx.beginPath();ctx.ellipse(22,-5,9,5,0,0,Math.PI*2);ctx.fill();
+   ctx.fillRect(26,-12,4,9);
+   ctx.beginPath();ctx.ellipse(31,-12,4,3,-.35,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#4a382c';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(17,-2);ctx.lineTo(16+step,5);
+   ctx.moveTo(22,-2);ctx.lineTo(24-step,5);
+   ctx.moveTo(26,-2);ctx.lineTo(27+step,5);ctx.stroke();
+   ctx.strokeStyle='#493327';ctx.beginPath();ctx.moveTo(14,-8);ctx.lineTo(11,-12);ctx.stroke();
+   ctx.fillStyle='#e5cfaa';ctx.beginPath();ctx.arc(33,-12,1,0,Math.PI*2);ctx.fill();
+  }
+ }
+ // Two visible wheels, with rims and hub highlights, on the vehicle's ground line.
+ for(const wx of modern?[-12,12]:[-12,3]){
+  ctx.fillStyle='#252a29';ctx.beginPath();ctx.ellipse(wx,3,4.4,5,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#b1a48a';ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(wx,3,2.4,3.1,0,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='#cbb68d';ctx.beginPath();ctx.arc(wx,3,1.1,0,Math.PI*2);ctx.fill();
+ }
+ if(forestSeason()===3){
+  ctx.fillStyle='#edf2e6b8';ctx.fillRect(modern?-14:-12,modern?-15:-10,modern?17:14,1.4);
+ }
+ ctx.restore();
+ return 1;
 }
 // Praça central sob o salão da aldeia, sem alterar colisão, população ou salvamentos.
 function drawVillageSquare(px,py,ww,hh,x,y){
@@ -5148,7 +5246,7 @@ function drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,now){
  drawForestGrove(px,py,ww,hh,x,y,q,now,'front',lower);
 }
 
-function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const rainLevel=forestSeason()===3?0:(weatherPreview ? .82 : weatherForDay(game.day,(dayClock%120)/120));renderRainLevel=rainLevel;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#19362d';ctx.fillRect(0,0,w,h);updateRoads();let z=scale,ww=TW*z,hh=TH*z,bounds=visibleTileBounds();let own=claimed();const structures=new Map(game.buildings.map(b=>[key(b.x,b.y),b]));const unitTiles=new Map(),enemyTiles=new Map(),boatTiles=new Map(),activeHunts=new Set();for(const dock of game.buildings){if(dock.t!=='Pesqueiro'||dock.buildLeft||!dock.boat)continue;const boat=dock.boat,x=Math.floor(boat.x),y=Math.floor(boat.y);if(x<0||y<0||x>=W||y>=H)continue;const k=key(x,y);if(!boatTiles.has(k))boatTiles.set(k,[]);boatTiles.get(k).push(boat)}for(const u of game.units){const k=key(Math.floor(u.x),Math.floor(u.y));if(!unitTiles.has(k))unitTiles.set(k,[]);unitTiles.get(k).push(u);if(u.huntTarget)activeHunts.add(u.huntTarget)}for(const e of game.enemyUnits||[]){const k=key(Math.floor(e.x),Math.floor(e.y));if(!enemyTiles.has(k))enemyTiles.set(k,[]);enemyTiles.get(k).push(e)}
+function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const rainLevel=forestSeason()===3?0:(weatherPreview ? .82 : weatherForDay(game.day,(dayClock%120)/120));renderRainLevel=rainLevel;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#19362d';ctx.fillRect(0,0,w,h);updateRoads();let z=scale,ww=TW*z,hh=TH*z,bounds=visibleTileBounds();let own=claimed();const structures=new Map(game.buildings.map(b=>[key(b.x,b.y),b]));const roadConvoyTiles=new Map();if(ww>=37){for(const cart of roadConvoyPositions(frameTime,roadCartRoutes,ww>=54?3:1)){const id=key(Math.floor(cart.x),Math.floor(cart.y));if(!roadConvoyTiles.has(id))roadConvoyTiles.set(id,cart)}}const unitTiles=new Map(),enemyTiles=new Map(),boatTiles=new Map(),activeHunts=new Set();for(const dock of game.buildings){if(dock.t!=='Pesqueiro'||dock.buildLeft||!dock.boat)continue;const boat=dock.boat,x=Math.floor(boat.x),y=Math.floor(boat.y);if(x<0||y<0||x>=W||y>=H)continue;const k=key(x,y);if(!boatTiles.has(k))boatTiles.set(k,[]);boatTiles.get(k).push(boat)}for(const u of game.units){const k=key(Math.floor(u.x),Math.floor(u.y));if(!unitTiles.has(k))unitTiles.set(k,[]);unitTiles.get(k).push(u);if(u.huntTarget)activeHunts.add(u.huntTarget)}for(const e of game.enemyUnits||[]){const k=key(Math.floor(e.x),Math.floor(e.y));if(!enemyTiles.has(k))enemyTiles.set(k,[]);enemyTiles.get(k).push(e)}
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
 ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue;if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
@@ -5184,6 +5282,7 @@ if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  else drawLandmark(px,py,ww,hh,landmarkAt(x,y,b),x,y);
 }
 if(b===2&&q>.79&&ww>16){ctx.fillStyle='#f3bf55';for(let j=0;j<4;j++){ctx.beginPath();ctx.arc(px+(rnd(x+j,y,3)-.5)*ww*.5,py+(rnd(x,y+j,3)-.5)*hh*.45,Math.max(1,z*1.8),0,7);ctx.fill()}}
+const roadCart=roadConvoyTiles.get(key(x,y));if(roadCart&&visibleFog[y*W+x]&&!structures.has(key(x,y))&&b!==0)drawRoadConvoy(roadCart,ww,hh,game.era,frameTime);
 let animal=wildlifeAt(x,y);if(animal&&!ruinKind&&visibleFog[y*W+x]&&!game.hunted.includes(key(x,y))&&!structures.has(key(x,y))&&!(b===0&&boatTiles.has(key(x,y)))){drawWildlife(px,py,ww,hh,animal,x,y);if(activeHunts.has(key(x,y))){ctx.strokeStyle='#f3d17b';ctx.lineWidth=Math.max(1.5,z*1.7);ctx.beginPath();ctx.ellipse(px,py+hh*.12,ww*.23,hh*.18,0,0,7);ctx.stroke()}}
 if(own.has(key(x,y))){diamond(px,py,ww-1,hh-1,'#3bd88b1d',null);drawTerritoryEdge(px,py,ww,hh,x,y,own)}
 if(selected&&selected.x===x&&selected.y===y)diamond(px,py,ww-3,hh-3,null,'#fff4bd');
@@ -5790,6 +5889,6 @@ function loop(t){
  if(document.hidden){lastFrame=t;requestAnimationFrame(loop);return}
  let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*unitTravelSpeed(u,target));u.x+=dx/len*step;u.y+=dy/len*step;dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:wildlifeAt(hx,hy)==='boar'?20:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}updateFishingBoats(dt);enemyTurn(dt);combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=120){dayClock-=120;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;const drawStart=performance.now();draw();adjustRenderCadence(performance.now()-drawStart);recordRenderSample(t,performance.now()-drawStart);renderTick=t}
 if(t-minimapTick>400){redrawMinimap();drawMinimap();minimapTick=t}if(t-lightLabelTick>1200){lightLabelTick=t;const phase=(dayClock%120)/120,light=lightLevels(phase);eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+seasonNames[forestSeason()]+' · '+(weatherPreview?(forestSeason()===3?'❄️ Prévia de neve · ':'🌧️ Prévia · '):weatherForDay(game.day,phase)>.12?(forestSeason()===3?'❄️ Neve · ':'🌧️ Chuva · '):'')+(light.night>.28?'🌙 Noite':phase>.48?'🌇 Crepúsculo':'☀️ Dia')}
-requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v6.92: arraste a prévia de construção no celular!');
+requestAnimationFrame(loop)}if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!localStorage.getItem('cronicas-tutorial-v15'))showTutorial();else toast('v6.93: caravanas comerciais nas estradas!');
 })();
 </script></body></html>
