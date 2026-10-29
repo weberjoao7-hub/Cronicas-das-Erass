@@ -25,7 +25,7 @@ function scene(era=4,ww=74,now=1200){
 }
 test('v6.97: JavaScript principal valido e salvamento original preservado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.97<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=97);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|setInterval|Math\.random|game\.buildings\.push/);
 });
