@@ -31,6 +31,11 @@ test('without roads A* remains unchanged and rejects inaccessible targets',()=>{
  assert.ok(s.routeFor({x:.5,y:2.5},12,2).every(p=>p.y===2.5));
  assert.equal(s.routeFor({x:.5,y:2.5},-1,2),null);
 });
+test('adjacent roads without a real link cannot bias A* routing',()=>{
+ const s=scene(Array.from({length:11},(_,i)=>[i+1,1]));
+ for(const id of s.links.keys())s.links.set(id,[]);
+ assert.ok(s.routeFor({x:.5,y:2.5},12,2).every(p=>p.y===2.5));
+});
 test('connected roads boost workers and cavalry by 25 percent',()=>{
  const s=scene([[2,1],[3,1]]);
  assert.equal(s.unitTravelSpeed({kind:'worker',x:2.5,y:1.5},{x:3.5,y:1.5}),1.875);

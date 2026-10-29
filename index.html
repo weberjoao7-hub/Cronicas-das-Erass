@@ -5419,7 +5419,7 @@ function routeFor(u,x,y,preferRoads=true){
  const sx=Math.floor(u.x),sy=Math.floor(u.y),tx=Math.floor(x),ty=Math.floor(y);
  if(!passable(tx,ty)||sx<0||sy<0||sx>=W||sy>=H)return null;
  if(sx===tx&&sy===ty)return [{x:tx+.5,y:ty+.5}];
- const preferPaved=preferRoads&&typeof roadTiles!=='undefined'&&roadTiles.size>0;
+ const preferPaved=preferRoads&&typeof roadTiles!=='undefined'&&typeof roadLinks!=='undefined'&&roadTiles.size>0;
  const minCost=preferPaved?.82:1;
  const count=W*H,start=sy*W+sx,goal=ty*W+tx;
  const cost=new Float32Array(count),parent=new Int32Array(count),closed=new Uint8Array(count);
@@ -5438,7 +5438,8 @@ function routeFor(u,x,y,preferRoads=true){
    const nx=px+dx,ny=py+dy;if(!passable(nx,ny))continue;
    if(dx&&dy&&(!passable(px+dx,py)||!passable(px,py+dy)))continue;
    const ni=ny*W+nx;if(closed[ni])continue;
-   const next=cost[id]+step*(preferPaved&&roadTiles.has(key(nx,ny))?.82:1);if(next>=cost[ni])continue;
+   const roadEdge=preferPaved&&roadTiles.has(key(nx,ny))&&(roadLinks.get(key(px,py))||[]).some(([rx,ry])=>rx===dx&&ry===dy);
+    const next=cost[id]+step*(roadEdge?.82:1);if(next>=cost[ni])continue;
    cost[ni]=next;parent[ni]=id;push(ni,next+heuristic(nx,ny));
   }
  }
