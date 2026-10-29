@@ -1,9 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.75** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.76** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
+
+## Atualização v6.76 — Canhões de cerco isométricos
+- Canhões desbloqueados na Era Industrial: 65 madeira, 35 pedra, 45 minério e uma vaga de população. Recrutamento no quartel ou em Tropas; deslocamento lento.
+- Modelo isométrico Canvas com rodas raiadas, reparo de madeira, artilheiro, cano de aço, recuo e clarão; projéteis e impactos animados com LOD.
+- Alcance 6,3, dano 44 contra guardas e 20 contra a base. Não dispara em movimento e respeita montanhas na linha de tiro. Canhões ocupam a retaguarda da formação e aparecem no minimapa.
+- Salvamento `cronicas-v04` preservado; testes em `tests/siege-cannon-v676.test.cjs`. Safari físico e FPS reais ainda pendentes.
 
 ## Atualização v6.75 — Neve arquitetônica em torres, quartéis e pesqueiros
 - No inverno, quartéis tribais recebem neve nas duas águas; fortificações antigas ganham uma camada sobre a muralha; quartéis medievais e industriais recebem neve nos telhados das duas torres.
