@@ -52,7 +52,7 @@ test('pinça com dois dedos nunca confirma uma obra',()=>{
  const s=scene();s.pointers.set(6,{x:20,y:30});
  assert.equal(s.finish({pointerId:5,clientX:100,clientY:110}),false);
  assert.equal(s.placed.length,0);
- assert.match(script,/if\(pointers\.size>=2\)\{placementPointerId=null;/);
+ assert.match(script,/if\(pointers\.size>=2\)placementPointerId=null;/);
 });
 test('movimento da prévia não desloca câmera e mouse mantém navegação',()=>{
  const line=script.split('\n').find(l=>l.startsWith("C.addEventListener('pointermove',e=>{"));
