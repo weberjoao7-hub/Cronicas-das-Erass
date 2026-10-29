@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.80</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#102421"><title>Crônicas das Eras v6.81</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#102421;color:#f5e9c7;font:14px system-ui,sans-serif;overflow:hidden;touch-action:none}canvas{display:block;width:100vw;height:100dvh;touch-action:none}header{position:fixed;top:0;left:0;right:0;min-height:68px;padding:calc(env(safe-area-inset-top) + 7px) 12px 9px;background:linear-gradient(#071714ed,#071714ac);display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:2;pointer-events:none}header>*{pointer-events:auto}strong{font-size:15px}small{color:#c3d4bd;font-size:11px}.resources{text-align:right;line-height:1.5}button{border:1px solid #70977b;background:#234439;color:#fff3d5;border-radius:10px;padding:11px;min-height:43px;font-weight:600;cursor:pointer}button:active{background:#35674d}nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;justify-content:center;z-index:3}nav button{flex:1;max-width:135px;background:#16362bf5;padding:8px 4px;font-size:12px}#panel{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));background:#102922f7;border:1px solid #67876c;border-radius:14px;padding:14px;display:none;z-index:3;max-height:55dvh;overflow:auto;box-shadow:0 10px 35px #0008}#panel.show{display:block}#panel h3{margin:0 0 8px}#panel button{margin:3px}#toast{position:fixed;left:50%;transform:translateX(-50%);top:95px;z-index:5;padding:10px 15px;border-radius:16px;background:#0c241ce8;opacity:0;pointer-events:none;max-width:85vw;text-align:center}#tip{position:fixed;bottom:calc(65px + env(safe-area-inset-bottom));left:10px;color:#eee1bd;background:#0e2920b5;padding:6px 9px;border-radius:8px;font-size:11px;pointer-events:none}@media(min-width:750px){#panel{width:330px;left:auto;right:15px;bottom:82px}nav{left:50%;right:auto;transform:translateX(-50%);width:550px}}
 #minimap{position:fixed;right:12px;top:calc(84px + env(safe-area-inset-top));z-index:4;width:116px;height:116px;border:2px solid #aa9768;border-radius:9px;background:#1d342fdd;box-shadow:0 4px 18px #0007;touch-action:none;cursor:crosshair}#mapLabel{position:fixed;right:18px;top:calc(204px + env(safe-area-inset-top));z-index:4;color:#f5e1ae;background:#16251edb;font-size:10px;padding:2px 5px;border-radius:6px;pointer-events:none}@media(max-width:410px){#minimap{width:95px;height:95px;top:calc(91px + env(safe-area-inset-top))}#mapLabel{top:calc(190px + env(safe-area-inset-top))}} #cancelPlacement{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;background:#5a3028;border-color:#e6ad7c;box-shadow:0 4px 16px #0009;white-space:nowrap}#cancelPlacement.active{display:block}@media(min-width:750px){#cancelPlacement{left:15px;transform:none;bottom:90px}}#perfHud{display:none;position:fixed;left:12px;top:calc(81px + env(safe-area-inset-top));z-index:4;pointer-events:none;padding:7px 10px;border:1px solid #a5c7a0;border-radius:8px;background:#0c211ce8;color:#f6edce;font:600 11px system-ui,sans-serif;box-shadow:0 3px 12px #0008;white-space:nowrap}</style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · pinça para zoom · Ajuda → Testar chuva</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
@@ -4517,6 +4517,73 @@ function drawMarchDust(u,px,py,z,now=Date.now()){
 // Ocupantes de um mesmo ladrilho compartilham uma única ordenação de profundidade.
 // Sombras projetadas sob TODAS as unidades, inclusive os atlases SVG.
 // A sombra difusa acompanha a passada e permanece no solo, não no sprite.
+// Estandarte isométrico: uma única bandeira por formação militar selecionada.
+// Sem estado persistente; respeita névoa, agrupamento espacial e zoom.
+let formationStandardLeader=null;
+function selectFormationStandardLeader(units,group,visible){
+ if(!group||group.size<3)return null;
+ const active=new Set(units);
+ const troops=[...group].filter(u=>active.has(u)&&u.hp>0&&isMilitary(u.kind)&&visible(u.x,u.y));
+ if(troops.length<3)return null;
+ const center=troops.reduce((p,u)=>({x:p.x+u.x/troops.length,y:p.y+u.y/troops.length}),{x:0,y:0});
+ const near=troops.filter(u=>Math.hypot(u.x-center.x,u.y-center.y)<=4.8);
+ if(near.length<3)return null;
+ return near.reduce((best,u)=>!best||Math.hypot(u.x-center.x,u.y-center.y)<Math.hypot(best.x-center.x,best.y-center.y)?u:best,null);
+}
+function drawFormationStandard(px,py,z,era,now=Date.now()){
+ if(z<.82)return 0;
+ const tier=era<2?0:era<4?1:era<6?2:3;
+ const x=px-9*z,base=py+2*z,top=py-44*z;
+ const wave=Math.sin(now*.0034+px*.023+py*.011)*z*2.5;
+ const colors=[['#9a7046','#e1c18c'],['#9a4040','#edca85'],['#784038','#d9bd8b'],['#346e87','#d8e6e3']][tier];
+ ctx.save();
+ ctx.fillStyle='rgba(13,28,23,.24)';
+ ctx.beginPath();ctx.ellipse(x+4*z,base+z,8*z,2.3*z,-.15,0,Math.PI*2);ctx.fill();
+ ctx.lineCap='round';ctx.strokeStyle=tier>=2?'#53656a':'#513b2c';ctx.lineWidth=Math.max(1.2,2.4*z);
+ ctx.beginPath();ctx.moveTo(x,base);ctx.lineTo(x,top);ctx.stroke();
+ ctx.strokeStyle=tier>=2?'#a4b7b5':'#b79b70';ctx.lineWidth=Math.max(.7,.7*z);
+ ctx.beginPath();ctx.moveTo(x-z*.65,base-z*3);ctx.lineTo(x-z*.65,top+z*2);ctx.stroke();
+ ctx.fillStyle=tier===3?'#c3d9da':'#e2bc76';
+ ctx.beginPath();ctx.arc(x,top,Math.max(1.3,1.6*z),0,Math.PI*2);ctx.fill();
+ if(tier===0){
+  // Totem tribal de couro, penas e contas.
+  ctx.fillStyle=colors[0];ctx.beginPath();ctx.moveTo(x,top+z*3);
+  ctx.quadraticCurveTo(x+z*9,top+z*5+wave*.3,x+z*16+wave,top+z*7);
+  ctx.lineTo(x+z*7+wave*.35,top+z*24);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=colors[1];ctx.lineWidth=Math.max(.8,z);
+  for(let i=0;i<3;i++){const fx=x+z*(5+i*3)+wave*.3,fy=top+z*(8+i*2);
+   ctx.beginPath();ctx.moveTo(fx,fy);ctx.quadraticCurveTo(fx+z*3,fy+z*3,fx+z*(2+i*.5),fy+z*9);ctx.stroke();}
+  ctx.fillStyle='#d9bd83';ctx.beginPath();ctx.arc(x+z*5,top+z*8,Math.max(.8,z),0,Math.PI*2);ctx.fill();
+ }else{
+  // Bandeira ondulada: medieval recortada, industrial e contemporânea.
+  const tip=x+z*19+wave,upper=top+z*3,lower=top+z*21;
+  ctx.fillStyle=colors[0];ctx.beginPath();ctx.moveTo(x,upper);
+  ctx.quadraticCurveTo(x+z*9,upper-z*2+wave*.3,tip,upper+z*2+wave*.5);
+  ctx.lineTo(tier===1?tip-z*5:tip,lower+wave*.4);
+  if(tier===1)ctx.lineTo(tip-z*8,lower-z*5+wave*.3);
+  ctx.quadraticCurveTo(x+z*8,lower-z*3-wave*.3,x,lower-z*2);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(13,26,30,.20)';ctx.beginPath();
+  ctx.moveTo(x+z*12,upper+wave*.25);ctx.quadraticCurveTo(x+z*14,upper+z*7+wave*.5,x+z*11,lower-z*2);
+  ctx.lineTo(x+z*15,lower-z*1.5);ctx.lineTo(tip,upper+z*2+wave*.5);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=colors[1];ctx.lineWidth=Math.max(.8,z*.9);
+  ctx.beginPath();ctx.moveTo(x+z*3,upper+z*4);ctx.lineTo(x+z*10+wave*.25,upper+z*8);ctx.stroke();
+  ctx.fillStyle=colors[1];
+  if(tier===1){
+   ctx.beginPath();ctx.moveTo(x+z*6,upper+z*6);ctx.lineTo(x+z*10,upper+z*7);
+   ctx.lineTo(x+z*9,upper+z*13);ctx.lineTo(x+z*7,upper+z*15);ctx.lineTo(x+z*5,upper+z*12);ctx.closePath();ctx.fill();
+  }else if(tier===2){
+   ctx.beginPath();ctx.arc(x+z*8,upper+z*10,2.3*z,0,Math.PI*2);ctx.stroke();
+   for(let i=0;i<6;i++){const a=i*Math.PI/3,cx=x+z*8,cy=upper+z*10;
+    ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*z*3,cy+Math.sin(a)*z*3);
+    ctx.lineTo(cx+Math.cos(a)*z*4.5,cy+Math.sin(a)*z*4.5);ctx.stroke();}
+  }else{
+   ctx.beginPath();ctx.arc(x+z*8,upper+z*10,2.4*z,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#a3d2df';ctx.beginPath();ctx.moveTo(x+z*3,lower-z*4);
+   ctx.lineTo(x+z*13+wave*.3,lower-z*5);ctx.stroke();
+  }
+ }
+ ctx.restore();return 1;
+}
 function drawUnitGroundShadow(u,px,py,z,now=Date.now()){
  const r=Math.max(3,(u.kind==='cavalry'||u.kind==='cannon'?13:7.2)*z);
  const moving=Array.isArray(u.path)&&u.path.length>0;
@@ -4552,6 +4619,7 @@ function drawTileOccupants(x,y,unitTiles,enemyTiles,z,now=Date.now(),actors=tile
   const [px,py]=point(u.x,u.y),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
   drawUnitGroundShadow(u,px,py,z,now);
    if(!enemy)drawMarchDust(u,px,py,z,now);
+  if(!enemy&&u===formationStandardLeader)drawFormationStandard(px,py,z,game.era,now);
   drawUnitSprite(u,px,py,z,enemy);
   drawCombatFeedback(u,px,py,z,now,enemy);
   if(enemy){
@@ -4586,6 +4654,7 @@ function drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,now){
 }
 
 function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const rainLevel=forestSeason()===3?0:(weatherPreview ? .82 : weatherForDay(game.day,(dayClock%120)/120));renderRainLevel=rainLevel;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#19362d';ctx.fillRect(0,0,w,h);updateRoads();let z=scale,ww=TW*z,hh=TH*z,bounds=visibleTileBounds();let own=claimed();const structures=new Map(game.buildings.map(b=>[key(b.x,b.y),b]));const unitTiles=new Map(),enemyTiles=new Map(),boatTiles=new Map(),activeHunts=new Set();for(const dock of game.buildings){if(dock.t!=='Pesqueiro'||dock.buildLeft||!dock.boat)continue;const boat=dock.boat,x=Math.floor(boat.x),y=Math.floor(boat.y);if(x<0||y<0||x>=W||y>=H)continue;const k=key(x,y);if(!boatTiles.has(k))boatTiles.set(k,[]);boatTiles.get(k).push(boat)}for(const u of game.units){const k=key(Math.floor(u.x),Math.floor(u.y));if(!unitTiles.has(k))unitTiles.set(k,[]);unitTiles.get(k).push(u);if(u.huntTarget)activeHunts.add(u.huntTarget)}for(const e of game.enemyUnits||[]){const k=key(Math.floor(e.x),Math.floor(e.y));if(!enemyTiles.has(k))enemyTiles.set(k,[]);enemyTiles.get(k).push(e)}
+formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
 ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue;if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);

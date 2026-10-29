@@ -18,7 +18,7 @@ function paint({width=390,height=844,zoom=1,visible=true,strength=.82,now=15000,
 }
 test('v6.80 JavaScript parses and keeps local save schema',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.80<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(snow,/localStorage|game\.buildings|game\.units/);
 });

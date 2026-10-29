@@ -1,6 +1,15 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.77** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.81** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.81 — Porta-estandarte militar
+- Seleções com três ou mais tropas próximas exibem um único estandarte junto ao combatente central; grupos dispersos, mortos ou encobertos pela névoa não recebem marcador.
+- A bandeira acompanha o vento, tem sombra no solo, haste e tecido dobrado. Visual muda por era: totem tribal, estandarte medieval, insígnia industrial e bandeira contemporânea.
+- Uma única bandeira por formação, omitida em zoom distante (< 0,82). Sem alterar economia, IA, colisões, combate ou o save `cronicas-v04`.
+- Testes em `tests/formation-standard-v681.test.cjs`. Safari físico e medições de FPS pendentes.
+
+## Atualização v6.80 — Neve climática
+- Tempestades de neve animadas no inverno, com densidade adaptativa para iPhone, névoa de guerra e zoom; poças e gotejamento de telhados desativados durante a neve.
 
 ## Jogar
 Acesse o [jogo no GitHub Pages](https://weberjoao7-hub.github.io/Cronicas-das-Erass/). A publicação exige que o GitHub Pages esteja ativado para a branch `main`, diretório `/(root)`.
