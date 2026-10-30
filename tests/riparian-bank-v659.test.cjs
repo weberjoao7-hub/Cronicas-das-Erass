@@ -47,7 +47,7 @@ test('cascalho e brilho de margem aumentam somente em zoom próximo',()=>{
 test('faixa úmida é renderizada antes da vegetação e respeita ocupação',()=>{
  assert.match(script,/if\(\(b===1\|\|b===2\)\&\&!ruinKind\&\&!structures\.has\(key\(x,y\)\)\&\&!roadTiles\.has\(key\(x,y\)\)\)\{/);
  const a=script.indexOf('if(riparianMask[y*W+x])drawRiparianBank(');
- const b=script.indexOf('meadowDetails(px,py,ww,hh,x,y,b);',a);
+ const b=script.indexOf('meadowDetails(px,py,ww,hh,x,y,b,frameTime);',a);
  const c=script.indexOf('if(riparianMask[y*W+x])drawRiparianVegetation(',b);
  assert.ok(a>0&&b>a&&c>b,'banco, prado e juncos mantêm a ordem de camadas');
 });
