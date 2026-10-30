@@ -2395,6 +2395,81 @@ function wildlifeAt(x,y){
  if(b===2&&q>.90)return 'rabbit';
  return null;
 }
+// Rebanhos de auroques nas pradarias: silhuetas isométricas, pastagem e sombras no chão.
+// Distribuição fixa por ladrilho, sem entidades persistidas, colisões ou custo no zoom distante.
+function drawGrazingAurochs(px,py,ww,hh,x,y,now=Date.now(),season=forestSeason()){
+ if(ww<48||hh<16||![px,py,ww,hh,x,y,now].every(Number.isFinite))return 0;
+ const near=ww>=70,large=ww>=90,winter=season===3,count=large?3:2;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ for(let i=0;i<count;i++){
+  const seed=rnd(x+i*11,y+i*7,307),phase=now*.001+seed*9+i*2.3;
+  const offsetX=[-.19,.17,.015][i]+Math.sin(phase*.38)*.012;
+  const offsetY=[.04,.16,-.11][i]+Math.cos(phase*.42)*.012;
+  const size=ww*(i===0?.104:i===1?.080:.069),direction=seed>.5?1:-1;
+  const grazing=(1+Math.sin(phase*.82))*.5,step=Math.sin(phase*2.1)*size*.045;
+  const sx=px+offsetX*ww,sy=py+offsetY*hh;
+  ctx.save();ctx.translate(sx,sy);ctx.scale(direction,1);
+  // Sombras permanecem no terreno; só a cabeça e a cauda se movem.
+  ctx.fillStyle='#12251e85';ctx.beginPath();
+  ctx.ellipse(size*.05,size*.12,size*1.07,size*.28,-.13,0,Math.PI*2);ctx.fill();
+  const coat=winter?'#66594a':i===1?'#7e5840':'#624634';
+  const shade=winter?'#4e4a43':i===1?'#523e32':'#45382d';
+  const highlight=winter?'#a69a83':i===1?'#a87a51':'#8f6746';
+  // Quatro patas com joelhos articulados e cascos em contato com a sombra.
+  for(const [lx,side] of [[-.58,1],[-.34,-1],[.35,-1],[.59,1]]){
+   const lift=Math.max(0,step*side)*.32;
+   ctx.strokeStyle=shade;ctx.lineWidth=Math.max(.9,size*.19);
+   ctx.beginPath();ctx.moveTo(lx*size,-size*.40);
+   ctx.lineTo((lx+.035)*size+step*side,-size*.10-lift);
+   ctx.lineTo((lx+.045)*size+step*side,size*.075-lift);ctx.stroke();
+   ctx.strokeStyle='#2d302b';ctx.lineWidth=Math.max(.8,size*.22);
+   ctx.beginPath();ctx.moveTo((lx+.005)*size+step*side,size*.075-lift);
+   ctx.lineTo((lx+.17)*size+step*side,size*.085-lift);ctx.stroke();
+  }
+  ctx.strokeStyle=shade;ctx.lineWidth=Math.max(.9,size*.13);
+  ctx.beginPath();ctx.moveTo(-size*.84,-size*.60);
+  ctx.quadraticCurveTo(-size*1.20,-size*.86+Math.sin(phase*2)*size*.11,
+   -size*1.25,-size*.38+Math.sin(phase*2.3)*size*.15);ctx.stroke();
+  // Tronco com volume: ventre sombreado, dorso iluminado e corcova.
+  ctx.fillStyle=shade;ctx.beginPath();
+  ctx.ellipse(-size*.10,-size*.52,size*.93,size*.50,-.08,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=coat;ctx.beginPath();
+  ctx.ellipse(-size*.15,-size*.66,size*.87,size*.46,-.10,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=highlight;ctx.beginPath();
+  ctx.ellipse(-size*.26,-size*.85,size*.61,size*.20,-.10,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=coat;ctx.beginPath();
+  ctx.ellipse(size*.43,-size*.82,size*.47,size*.53,.20,0,Math.PI*2);ctx.fill();
+  // O pescoço inclina para pastar; o focinho nunca ultrapassa o terreno.
+  const headY=-size*(.94-.40*grazing);
+  ctx.strokeStyle=coat;ctx.lineWidth=Math.max(1.5,size*.35);
+  ctx.beginPath();ctx.moveTo(size*.56,-size*.76);
+  ctx.quadraticCurveTo(size*.81,headY-size*.20,size*.90,headY);ctx.stroke();
+  ctx.fillStyle=shade;ctx.beginPath();
+  ctx.ellipse(size*.94,headY,size*.35,size*.29,.12,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=highlight;ctx.beginPath();
+  ctx.ellipse(size*1.12,headY+size*.12,size*.21,size*.16,.08,0,Math.PI*2);ctx.fill();
+  // Chifres curvos, não orelhas triangulares, distinguem o auroque de um cervo.
+  ctx.strokeStyle='#d9c69d';ctx.lineWidth=Math.max(.8,size*.12);
+  for(const side of [-1,1]){
+   ctx.beginPath();ctx.moveTo(size*.80,headY-side*size*.18);
+   ctx.quadraticCurveTo(size*.64,headY-side*size*.49,
+    size*.89,headY-side*size*.56);ctx.stroke();
+  }
+  if(near){
+   ctx.fillStyle='#201f1b';ctx.beginPath();
+   ctx.arc(size*1.07,headY-size*.08,Math.max(.65,size*.06),0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#c0a27d';ctx.lineWidth=Math.max(.7,size*.08);
+   ctx.beginPath();ctx.moveTo(-size*.63,-size*.75);
+   ctx.quadraticCurveTo(-size*.24,-size*1.07,size*.13,-size*.92);ctx.stroke();
+   if(winter){
+    ctx.fillStyle='#c3bba7';ctx.beginPath();
+    ctx.ellipse(-size*.31,-size*.99,size*.38,size*.085,-.10,0,Math.PI*2);ctx.fill();
+   }
+  }
+  ctx.restore();
+ }
+ ctx.restore();return count;
+}
 function drawWildlife(px,py,ww,hh,kind,x,y){
  if(ww<23)return;
  const time=Date.now()*.001,pace=Math.sin(time*3.7+x*2+y),size=Math.max(5,ww*.16);
@@ -6385,6 +6460,8 @@ if(forestOpen){
 if((b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(riparianMask[y*W+x])drawRiparianBank(px,py,ww,hh,x,y,riparianMask[y*W+x]);
  meadowDetails(px,py,ww,hh,x,y,b,frameTime);
+ if(b===1&&q>.962&&ww>=48&&visibleFog[y*W+x]&&!riparianMask[y*W+x]&&!orchardTile(x,y,b))
+  drawGrazingAurochs(px,py,ww,hh,x,y,frameTime,forestSeason());
  if(orchardTile(x,y,b)&&!riparianMask[y*W+x])drawOrchard(px,py,ww,hh,x,y,forestSeason(),frameTime);
  if(riparianMask[y*W+x])drawRiparianVegetation(px,py,ww,hh,x,y,riparianMask[y*W+x],frameTime);
 }
