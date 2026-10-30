@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.115** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.116** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.116 — Moleiro e pátio de moagem animados
+- Moinhos concluídos receberam pátio isométrico com plataforma de descarga, carrinho de madeira ou ferragens, rodas, sacos de farinha e um moleiro que transporta carga entre a entrada e o carrinho.
+- O moleiro tem animação de marcha e braços articulados; paleta e equipamentos acompanham a era, a neve cobre o tablado no inverno e grãos aparecem no zoom próximo.
+- O desenho é omitido no zoom distante e não cria unidades, colisões, economia ou alterações no salvamento `cronicas-v04`.
+- Seis testes em `tests/windmill-yard-v6116.test.cjs` cobrem sintaxe, ordem de renderização, LOD, evolução histórica, inverno e geometria Canvas. Safari físico e FPS real ainda pendentes.
 
 ## Atualização v6.115 — Pedreiras de campo animadas
 - Trabalhadores que efetivamente extraem pedra e minério em colinas passam a aparecer junto de um posto de pedreira isométrico com rochas facetadas, veios minerais, cascalho e caixa de ferramentas.
