@@ -6433,6 +6433,37 @@ function drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,now){
  drawForestGrove(px,py,ww,hh,x,y,q,now,'front',lower);
 }
 
+// v6.119: indicador de unidade selecionada fora da tela, projetado na borda
+// util do viewport. Nao revela inimigos nem altera estado ou salvamento.
+function offscreenUnitAnchor(px,py,width,height){
+ if(![px,py,width,height].every(Number.isFinite)||width<120||height<220)return null;
+ const side=26,left=side,right=width-side;
+ const top=Math.min(118,height*.32),bottom=Math.max(top+48,height-94);
+ if(px>=left&&px<=right&&py>=top&&py<=bottom)return null;
+ const mx=width*.5,my=(top+bottom)*.5,dx=px-mx,dy=py-my;
+ if(Math.abs(dx)+Math.abs(dy)<.0001)return null;
+ const k=Math.min((right-left)*.5/Math.max(1e-6,Math.abs(dx)),
+                  (bottom-top)*.5/Math.max(1e-6,Math.abs(dy)));
+ return {x:mx+dx*k,y:my+dy*k,angle:Math.atan2(dy,dx)};
+}
+function drawOffscreenUnitIndicator(now=Date.now()){
+ const u=game.units[selectedUnit];
+ if(!u||u.hp<=0||!Number.isFinite(u.x)||!Number.isFinite(u.y)||!visibleAt(u.x,u.y))return 0;
+ const [ux,uy]=point(u.x,u.y),target=offscreenUnitAnchor(ux,uy,w,h);
+ if(!target)return 0;
+ const color=u.kind==='archer'?'#a9e6ac':u.kind==='cavalry'?'#ffd18c':
+  u.kind==='warrior'?'#8fd7ff':u.kind==='cannon'?'#f4ad83':'#ffe5a0';
+ const pulse=1+.07*Math.sin(now*.005);
+ ctx.save();ctx.translate(target.x,target.y);ctx.rotate(target.angle);ctx.scale(pulse,pulse);
+ ctx.fillStyle='#0c2924e8';ctx.strokeStyle=color;ctx.lineWidth=1.8;
+ ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(-8,-8);ctx.lineTo(-4,0);
+ ctx.lineTo(-8,8);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+ const tiles=Math.round(Math.hypot(u.x-cx,u.y-cy));
+ ctx.save();ctx.font='bold 10px system-ui,sans-serif';ctx.textAlign='center';
+ ctx.shadowColor='#071714';ctx.shadowBlur=4;ctx.fillStyle='#fff2d3';
+ ctx.fillText(tiles+' quad.',target.x,target.y+22);ctx.restore();
+ return 1;
+}
 function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const rainLevel=forestSeason()===3?0:(weatherPreview ? .82 : weatherForDay(game.day,(dayClock%120)/120));renderRainLevel=rainLevel;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#19362d';ctx.fillRect(0,0,w,h);updateRoads();let z=scale,ww=TW*z,hh=TH*z,bounds=visibleTileBounds();let own=claimed();const structures=new Map(game.buildings.map(b=>[key(b.x,b.y),b]));const roadConvoyTiles=new Map();if(ww>=37){for(const cart of roadConvoyPositions(frameTime,roadCartRoutes,ww>=54?3:1)){const id=key(Math.floor(cart.x),Math.floor(cart.y));if(!roadConvoyTiles.has(id))roadConvoyTiles.set(id,cart)}}const unitTiles=new Map(),enemyTiles=new Map(),boatTiles=new Map(),activeHunts=new Set();for(const dock of game.buildings){if(dock.t!=='Pesqueiro'||dock.buildLeft||!dock.boat)continue;const boat=dock.boat,x=Math.floor(boat.x),y=Math.floor(boat.y);if(x<0||y<0||x>=W||y>=H)continue;const k=key(x,y);if(!boatTiles.has(k))boatTiles.set(k,[]);boatTiles.get(k).push(boat)}for(const u of game.units){const k=key(Math.floor(u.x),Math.floor(u.y));if(!unitTiles.has(k))unitTiles.set(k,[]);unitTiles.get(k).push(u);if(u.huntTarget)activeHunts.add(u.huntTarget)}for(const e of game.enemyUnits||[]){const k=key(Math.floor(e.x),Math.floor(e.y));if(!enemyTiles.has(k))enemyTiles.set(k,[]);enemyTiles.get(k).push(e)}
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
@@ -6543,7 +6574,7 @@ for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){
   }
  }
 }
-drawAmbientParticles(frameTime);drawWeather(frameTime);drawRallyMarkers(frameTime);drawOrderOverlay(frameTime);drawPlacementOverlay();drawSelectionMarquee();drawDesktopEdgePanHint();
+drawAmbientParticles(frameTime);drawWeather(frameTime);drawRallyMarkers(frameTime);drawOrderOverlay(frameTime);drawPlacementOverlay();drawSelectionMarquee();drawDesktopEdgePanHint();drawOffscreenUnitIndicator(frameTime);
 }
 function refresh(){eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+seasonNames[forestSeason()];res.innerHTML='🪵 '+game.wood+' &nbsp; 🍎 '+game.food+'<br>🪨 '+game.stone+' &nbsp; ⛏️ '+game.ore+' &nbsp; 👥 '+game.units.length+'/'+game.people;dirty=true;save()}
 let cameraFollowUnit=null;
@@ -6964,6 +6995,7 @@ function finishTouchPlacement(e){
 }
 // Zoom anchored to cursor or pinch midpoint.
 function zoomAt(factor,px,py){
+ cameraFollowUnit=null;
  const world=()=>{
   const a=(px-w/2)/(TW*.5*scale)+(cx-cy);
   const b=(py-h*.47)/(TH*.5*scale)+(cx+cy);
@@ -6993,6 +7025,7 @@ function screenToWorldAt(px,py,z=scale,ox=cx,oy=cy){
 }
 function applyPinch(previous,current){
  if(!previous||!current)return;
+ cameraFollowUnit=null;
  const before=screenToWorldAt(previous.x,previous.y);
  scale=Math.max(.45,Math.min(3,scale*current.dist/previous.dist));
  const after=screenToWorldAt(current.x,current.y);
