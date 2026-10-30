@@ -16,7 +16,7 @@ function scene(unit={x:120,y:95,hp:100}){
  let menuOpen=false,minimapPointer=null;
  const panel={classList:{contains:()=>menuOpen}};
  const create=new Function('game','pointers','panel','document','getMinimapPointer',
-  'let cameraFollowUnit=null,cx=80,cy=80,dirty=false;'+
+  'const W=160,H=160;let cameraFollowUnit=null,cx=80,cy=80,dirty=false;'+
   source.replaceAll('minimapPointer!==null','getMinimapPointer()!==null')+
   'return {setCameraFollow,applyCameraFollow,state:()=>({cx,cy,dirty,follow:cameraFollowUnit})};');
  const camera=create(game,pointers,panel,document,()=>minimapPointer);
