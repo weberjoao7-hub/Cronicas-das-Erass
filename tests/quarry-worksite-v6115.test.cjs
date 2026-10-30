@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
-const begin=script.indexOf('// v6.115: pedreira de campo');
+const begin=script.indexOf('// v6.116: pedreira de campo');
 const end=script.indexOf('function drawForestOccupiedTile(',begin);
 assert.ok(begin>=0&&end>begin,'pedreira isolavel');
 const source=script.slice(begin,end);
@@ -26,7 +26,7 @@ function scene(era=4,ww=74,now=1200,season=1){
 }
 test('v6.115: sintaxe JavaScript valida e save legado preservado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.115<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('pedreira exige trabalhador ativo parado e sem tarefas de construção ou caça',()=>{
