@@ -1,6 +1,11 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.108** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.109** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.109 — Vagonetas de mina e otimização territorial
+- Vagonetas percorrem trilhos fixos em vaivém, com rodas girando, sombra de contato, minério oscilando e materiais históricos/industriais. Detalhes são simplificados no zoom distante.
+- O conjunto de ladrilhos conquistados agora é reutilizado entre quadros e reconstruído somente quando a assinatura das regiões muda, evitando milhares de alocações no Safari.
+- Sem alteração de economia, rotas, combate ou salvamento `cronicas-v04`. Testes em `tests/minecart-motion-v6109.test.cjs` e `tests/territory-cache-v6109.test.cjs`. Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.108 — Posturas animadas de tropas e cavalaria
 - Guerreiros, arqueiros e cavalaria agora respiram e deslocam discretamente o peso em repouso, com fases independentes e pés ancorados no terreno.
