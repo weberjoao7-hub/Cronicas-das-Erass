@@ -2615,6 +2615,60 @@ function drawWadingBird(px,py,ww,hh,x,y,mask,now=Date.now()){
 
 // Fazenda isométrica: lavoura em perspectiva, celeiro 3D, canais e culturas animadas.
 // O detalhe se adapta ao zoom; não altera a economia nem os dados persistidos.
+// v6.121: nenúfares isométricos nas enseadas rasas, ancorados na água.
+// Flores, reflexos e ondulações são visuais; não afetam pesca, rotas ou salvamento.
+function drawShoreLilies(px,py,ww,hh,x,y,now=Date.now(),season=forestSeason()){
+ if(ww<46||hh<16||season===3||![px,py,ww,hh,x,y,now].every(Number.isFinite))return 0;
+ const near=ww>=70,detail=ww>=92,seed=rnd(x,y,241);
+ const count=near&&seed>.78?3:2;
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ for(let i=0;i<count;i++){
+  const rx=rnd(x+i*17,y,242),ry=rnd(x,y+i*19,243);
+  const sway=Math.sin(now*.0013+rx*7+i)*ww*.007;
+  const bx=px+ww*((rx-.5)*.46)+sway;
+  const by=py+hh*((ry-.5)*.28+.08);
+  const radius=ww*(i===0?.071:.057);
+  const wave=Math.sin(now*.0022+rx*11+i*2);
+  // Sombra submersa e anéis de superfície dão profundidade sem sprites flutuantes.
+  ctx.fillStyle='#153f486b';ctx.beginPath();
+  ctx.ellipse(bx+ww*.012,by+hh*.028,radius*1.07,radius*.38,-.14,0,Math.PI*2);ctx.fill();
+  if(near){
+   ctx.strokeStyle='rgba(173,225,213,'+(.13+.10*(wave+1)/2).toFixed(3)+')';
+   ctx.lineWidth=Math.max(.65,ww*.009);
+   ctx.beginPath();ctx.ellipse(bx,by,radius*(1.32+.12*wave),radius*.51,-.12,0,Math.PI*2);ctx.stroke();
+  }
+  // Folha com fenda triangular visível, nervura e brilho na borda iluminada.
+  ctx.fillStyle=i%2?'#437d50':'#528b58';
+  ctx.beginPath();ctx.ellipse(bx,by,radius,radius*.42,-.16,.23,Math.PI*2-.28);
+  ctx.lineTo(bx+radius*.10,by+radius*.02);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#9fc48b';ctx.lineWidth=Math.max(.7,ww*.010);
+  ctx.beginPath();ctx.ellipse(bx,by,radius*.86,radius*.35,-.16,.45,Math.PI*1.70);ctx.stroke();
+  if(near){
+   ctx.strokeStyle='#83b775';ctx.lineWidth=Math.max(.55,ww*.007);
+   for(const a of [2.35,3.15,4.05]){
+    ctx.beginPath();ctx.moveTo(bx,by);
+    ctx.lineTo(bx+Math.cos(a)*radius*.72,by+Math.sin(a)*radius*.29);ctx.stroke();
+   }
+  }
+  // Flores de lótus em perspectiva; só aparecem na primavera e no verão.
+  if(i===0&&season<2&&near){
+   const fx=bx-radius*.12,fy=by-radius*.17+Math.sin(now*.0015+ry*5)*hh*.007;
+   ctx.fillStyle='#d4b4b5';ctx.beginPath();ctx.ellipse(fx,fy+radius*.10,radius*.42,radius*.17,0,0,Math.PI*2);ctx.fill();
+   for(let j=0;j<5;j++){
+    const angle=-Math.PI*.86+j*Math.PI*.43;
+    ctx.save();ctx.translate(fx,fy);ctx.rotate(angle);
+    ctx.fillStyle=j%2?'#f2c9d3':'#f8e5df';
+    ctx.beginPath();ctx.ellipse(radius*.23,0,radius*.33,radius*.17,0,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+   }
+   ctx.fillStyle='#e9bf61';ctx.beginPath();ctx.arc(fx,fy,radius*.16,0,Math.PI*2);ctx.fill();
+   if(detail){
+    ctx.fillStyle='#fff0b7';ctx.beginPath();ctx.arc(fx-radius*.05,fy-radius*.04,radius*.055,0,Math.PI*2);ctx.fill();
+   }
+  }
+ }
+ ctx.restore();return count;
+}
 function drawFarm(px,py,ww,hh,level=1,now=Date.now(),day=1,tileX=0,tileY=0){
  const lv=Math.max(1,Math.min(3,level||1)),close=ww>=46,medium=ww>=27;
  const p=(u,v)=>[px+(u-v)*ww*.38,py+(u+v-1)*hh*.36];
@@ -6491,6 +6545,7 @@ if(b===0)drawLakeDepth(px,py,ww,hh,waterDepth[y*W+x],q,frameTime);
 if(b===0)drawLakeDetails(px,py,ww,hh,x,y,q,shoreMask[y*W+x],structures.has(key(x,y)),frameTime);
 if(b===0&&shoreMask[y*W+x])drawWinterLakeIce(px,py,ww,hh,x,y,shoreMask[y*W+x],waterDepth[y*W+x],forestSeason(),structures.has(key(x,y))||boatTiles.has(key(x,y)),frameTime);
 if(b===0&&shoreMask[y*W+x]&&q>.965&&!structures.has(key(x,y))&&!boatTiles.has(key(x,y))&&visibleFog[y*W+x])drawWadingBird(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);
+if(b===0&&shoreMask[y*W+x]&&visibleFog[y*W+x]&&q>.55&&!structures.has(key(x,y))&&!boatTiles.has(key(x,y)))drawShoreLilies(px,py,ww,hh,x,y,frameTime,forestSeason());
 // Occupied forests are rendered in two depth layers so soldiers can walk behind trunks.
 const forestTile=key(x,y),forestOpen=b===3&&!structures.has(forestTile)&&!roadTiles.has(forestTile);
 const forestFriendlies=forestOpen?unitTiles.get(forestTile):null;
