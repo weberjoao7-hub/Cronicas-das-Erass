@@ -20,7 +20,8 @@ function scene(season=1,ww=74,now=1000,random=.99){
 test('v6.114: sintaxe compila, mantém salvamento e integração só em pradarias desocupadas',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(script,/if\(orchardTile\(x,y,b\)&&!riparianMask\[y\*W\+x\]\)drawOrchard/);
+ assert.match(script,/const orchardOpen=.*orchardTile\(x,y,b\)&&!riparianMask\[y\*W\+x\]/);
+ assert.match(script,/if\(orchardActors\.length\)drawOrchard\(px,py,ww,hh,x,y,forestSeason\(\),frameTime,'back',-Infinity\)/);
  assert.match(script,/if\(\(b===1\|\|b===2\)&&!ruinKind&&!structures\.has\(key\(x,y\)\)&&!roadTiles\.has\(key\(x,y\)\)\)/);
 });
 test('pomar aparece somente em pradaria e em posições determinísticas raras',()=>{

@@ -1164,7 +1164,7 @@ function meadowWindOffset(x,y,now,ww){
 }
 // Pomares silvestres isométricos, distribuídos de forma determinística.
 function orchardTile(x,y,b){return b===2&&rnd(x,y,241)>.976}
-function drawOrchard(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now()){
+function drawOrchard(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now(),layer='all',depthY=py,upperDepthY=Infinity){
  if(ww<30)return 0;
  const close=ww>=56,near=ww>=76,summer=season===1,winter=season===3;
  const foliage=winter?['#526d61','#6f8578','#8a9c8d']:
@@ -1173,14 +1173,23 @@ function drawOrchard(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now()){
   ['#4d874d','#6c9d5d','#9fba83'];
  const count=close?2:1;
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ // Sombras permanecem sob os pes das unidades e nao se repetem por camada.
+ if(layer==='all'||layer==='back')for(let i=0;i<count;i++){
+  const seed=rnd(x+i*13,y-i*7,242),size=(.70+seed*.23)*(i===0?1:.72);
+  const bx=px+ww*(i===0?-.14:.23),by=py+hh*(i===0?.105:.18);
+  const spread=ww*.20*size;
+  ctx.fillStyle='#142b2082';ctx.beginPath();
+  ctx.ellipse(bx+ww*.045,by+hh*.042,spread*1.28,hh*.095,-.14,0,Math.PI*2);ctx.fill();
+ }
  for(let i=0;i<count;i++){
   const seed=rnd(x+i*13,y-i*7,242),size=(.70+seed*.23)*(i===0?1:.72);
   const bx=px+ww*(i===0?-.14:.23),by=py+hh*(i===0?.105:.18);
+  if(layer==='back'&&by>depthY)continue;
+  if(layer==='front'&&by<=depthY)continue;
+  if(layer==='range'&&(by<=depthY||by>upperDepthY))continue;
   const h=hh*1.20*size,spread=ww*.20*size;
   const sway=close?Math.sin(now*.0012+x*.77+y*.43+i*1.8)*ww*.011:0;
-  // Sombra de contato e tronco com faces iluminada e sombreada.
-  ctx.fillStyle='#142b2082';ctx.beginPath();
-  ctx.ellipse(bx+ww*.045,by+hh*.042,spread*1.28,hh*.095,-.14,0,Math.PI*2);ctx.fill();
+  // Tronco com faces iluminada e sombreada.
   ctx.fillStyle='#543b29';ctx.beginPath();
   ctx.moveTo(bx-ww*.027,by);ctx.lineTo(bx-ww*.041,by-h*.64);
   ctx.lineTo(bx+ww*.017,by-h*.70);ctx.lineTo(bx+ww*.034,by);ctx.closePath();ctx.fill();
@@ -6475,6 +6484,18 @@ function drawQuarryWorksite(px,py,ww,hh,x,y,era=0,now=Date.now(),season=forestSe
  ctx.restore();
  return 1;
 }
+// Pomares ocupados: a profundidade dos pes define a ordem entre copas e tropas.
+function drawOrchardOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,now){
+ const actors=tileActors(x,y,unitTiles,enemyTiles);
+ let lower=-Infinity;
+ for(const actor of actors){
+  const depth=point(actor.u.x,actor.u.y)[1];
+  drawOrchard(px,py,ww,hh,x,y,forestSeason(),now,'range',lower,depth);
+  drawTileOccupants(x,y,unitTiles,enemyTiles,z,now,[actor]);
+  lower=depth;
+ }
+ drawOrchard(px,py,ww,hh,x,y,forestSeason(),now,'front',lower);
+}
 function drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,now){
  const actors=tileActors(x,y,unitTiles,enemyTiles);
  let lower=-Infinity;
@@ -6559,12 +6580,17 @@ if(forestOpen){
  if(forestFriendlies?.some(u=>isActiveForestWorker(u,x,y)))
   drawForestWorksite(px,py,ww,hh,x,y,game.era,frameTime,forestSeason());
 }
+const orchardOpen=(b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&orchardTile(x,y,b)&&!riparianMask[y*W+x];
+const orchardActors=orchardOpen?tileActors(x,y,unitTiles,enemyTiles):null;
 if((b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(riparianMask[y*W+x])drawRiparianBank(px,py,ww,hh,x,y,riparianMask[y*W+x]);
  meadowDetails(px,py,ww,hh,x,y,b,frameTime);
  if(b===1&&q>.962&&ww>=48&&visibleFog[y*W+x]&&!riparianMask[y*W+x]&&!orchardTile(x,y,b))
   drawGrazingAurochs(px,py,ww,hh,x,y,frameTime,forestSeason());
- if(orchardTile(x,y,b)&&!riparianMask[y*W+x])drawOrchard(px,py,ww,hh,x,y,forestSeason(),frameTime);
+ if(orchardOpen){
+  if(orchardActors.length)drawOrchard(px,py,ww,hh,x,y,forestSeason(),frameTime,'back',-Infinity);
+  else drawOrchard(px,py,ww,hh,x,y,forestSeason(),frameTime);
+ }
  if(riparianMask[y*W+x])drawRiparianVegetation(px,py,ww,hh,x,y,riparianMask[y*W+x],frameTime);
 }
 if(b===4&&!ruinKind)drawHighlandGround(px,py,ww,hh,x,y,4,structures.has(key(x,y))||roadTiles.has(key(x,y)));
@@ -6616,6 +6642,7 @@ else if(obj){
 if(game.enemy&&game.enemy.hp>0&&game.enemy.x===x&&game.enemy.y===y&&visibleFog[y*W+x]){diamond(px,py,ww,hh,'#ec585855','#ff6666');drawStructureShadow(px,py,ww,hh,'Aldeia',frameTime);drawTownHall(px,py,ww,hh,true);drawEnemyFortifications(px,py,ww,hh,game.era,frameTime);drawEnemyStrongholdDamage(px,py,ww,hh,game.enemy.hp,frameTime);ctx.fillStyle='#ffdddd';ctx.font='bold '+Math.max(10,ww*.14)+'px sans-serif';ctx.textAlign='center';ctx.fillText('INIMIGO',px,py-hh*1.8);ctx.fillStyle='#d65f55';ctx.fillRect(px-ww*.25,py-hh*1.4,ww*.5*game.enemy.hp/100,Math.max(2,z*3))}
 if(b===0&&visibleFog[y*W+x])for(const boat of boatTiles.get(key(x,y))||[])drawFishingBoat(boat,px+((boat.x-x-.5)-(boat.y-y-.5))*ww*.5,py+((boat.x-x-.5)+(boat.y-y-.5))*hh*.5,ww,hh,frameTime);
 if(forestCount)drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,frameTime);
+else if(orchardActors?.length)drawOrchardOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
 else if(structureActors)drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime,structureActors.filter(({u})=>!unitBehindStructure(u,x,y)));
 else drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime);
 
