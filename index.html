@@ -195,7 +195,7 @@ const ownedTile=(x,y)=>ownedRegions().has(regionId(x,y));
 // v6.109: a posse é alterada por conquista, não a cada quadro do Canvas.
 // Reutiliza a mesma coleção de ladrilhos até mudar a assinatura das regiões.
 let claimedCacheKey=null,claimedCache=new Set();
-const claimed=()=>{const regions=ownedRegions();if(claimedCacheKey===regionCacheKey)return claimedCache;const owned=new Set();for(const id of regions){const [rx,ry]=id.split(',').map(Number);for(let y=ry*REGION_SIZE;y<Math.min(H,(ry+1)*REGION_SIZE);y++)for(let x=rx*REGION_SIZE;x<Math.min(W,(rx+1)*REGION_SIZE);x++)owned.add(key(x,y))}claimedCache=owned;claimedCacheKey=regionCacheKey;return claimedCache};
+const claimed=()=>{const regions=ownedRegions();if(claimedCacheKey===regionCacheKey)return claimedCache;const owned=new Set();for(const id of regions){const [rx,ry]=id.split(',').map(Number);if(!Number.isInteger(rx)||!Number.isInteger(ry)||rx<0||ry<0||rx*REGION_SIZE>=W||ry*REGION_SIZE>=H)continue;for(let y=ry*REGION_SIZE;y<Math.min(H,(ry+1)*REGION_SIZE);y++)for(let x=rx*REGION_SIZE;x<Math.min(W,(rx+1)*REGION_SIZE);x++)owned.add(key(x,y))}claimedCache=owned;claimedCacheKey=regionCacheKey;return claimedCache};
 const at=(x,y)=>game.buildings.find(b=>b.x===x&&b.y===y);
 let miniBase=null;function visibleAt(x,y){const ix=Math.floor(x),iy=Math.floor(y);return ix>=0&&iy>=0&&ix<W&&iy<H&&visibleFog[iy*W+ix]===1}
 // v6.104: cartografia do minimapa com relevo, água profunda e perímetros regionais.
