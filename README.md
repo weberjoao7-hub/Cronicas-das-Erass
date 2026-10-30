@@ -1,6 +1,11 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.104** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.108** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.108 — Posturas animadas de tropas e cavalaria
+- Guerreiros, arqueiros e cavalaria agora respiram e deslocam discretamente o peso em repouso, com fases independentes e pés ancorados no terreno.
+- Marcha, ataque, orientação, sombras e distintivos de inimigos preservados. O efeito não roda no zoom distante nem altera o save `cronicas-v04`.
+- Testes de animação e regressão do loop em `tests/atlas-idle-v6108.test.cjs`. Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.104 — Cartografia do minimapa
 - Removidos os blocos verdes de conquista do minimapa: somente as bordas externas contínuas das regiões de 12 × 12 aparecem, sem encobrir os biomas.
