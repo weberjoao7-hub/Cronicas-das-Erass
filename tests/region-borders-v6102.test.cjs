@@ -36,7 +36,7 @@ test('interior de região não recebe tintura nem comandos Canvas',()=>{
 test('borda isolada desenha quatro lados com dupla leitura',()=>{
  const scene=render([]);
  assert.equal(scene.count,4);
- assert.equal(scene.calls.filter(c=>c[0]==='stroke').length,8);
+ assert.equal(scene.calls.filter(c=>c[0]==='stroke').length,12); // 8 arestas + 4 hastes dos marcos
  assert.equal(scene.calls.filter(c=>c[0]==='save').length,1);
  assert.equal(scene.calls.filter(c=>c[0]==='restore').length,1);
 });
