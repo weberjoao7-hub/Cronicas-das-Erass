@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.81** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.102** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.102 — Fronteiras regionais sem quadrados
+- A renderização deixa de aplicar uma película verde em cada ladrilho dominado; biomas, texturas, estradas e construções mantêm suas cores originais.
+- A posse continua calculada por regiões de 12 × 12 ladrilhos, mas o mapa mostra apenas os contornos externos, com traço de contraste e acabamento histórico.
+- Marcos com pequenas bandeiras surgem apenas nos cantos externos em zoom próximo, com materiais antigos ou industriais. Nenhuma mudança na conquista, névoa de guerra, economia ou salvamento `cronicas-v04`.
+- Testes: `tests/region-borders-v6102.test.cjs`. Safari físico e FPS reais permanecem pendentes.
 
 ## Atualização v6.81 — Porta-estandarte militar
 - Seleções com três ou mais tropas próximas exibem um único estandarte junto ao combatente central; grupos dispersos, mortos ou encobertos pela névoa não recebem marcador.

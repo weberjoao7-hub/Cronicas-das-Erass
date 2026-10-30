@@ -23,7 +23,7 @@ function scene({era=4,width=74,season=0,rain=0,type='Mina',roads=new Set(),x=20,
 }
 test('v6.101: script compila e salvamento anterior permanece intacto',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.101<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|game\.|Math\.random|requestAnimationFrame/);
 });
