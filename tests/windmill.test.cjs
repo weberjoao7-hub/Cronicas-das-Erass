@@ -20,7 +20,7 @@ test('moinho possui quatro pás e fachadas isométricas',()=>{
 test('velas são determinísticas com relógio fixo',()=>assert.deepEqual(render(74,2,1000),render(74,2,1000)));
 test('zoom distante reduz operações Canvas',()=>assert.ok(render(18).length<render(74).length));
 test('moinho integrado a custos, renderização, produção e salvamento',()=>{
- for(const marker of ["Moinho:[60,0,30]","data-t=\"Moinho\"","drawWindmill(px,py,ww,hh,obj.level)","total('Moinho')*12","case 'Moinho':return","cronicas-v04"])
+ for(const marker of ["Moinho:[60,0,30]","data-t=\"Moinho\"","drawWindmill(px,py,ww,hh,obj.level,frameTime)","total('Moinho')*12","case 'Moinho':return","cronicas-v04"])
   assert.ok(script.includes(marker),'Integração ausente: '+marker);
 });
 test('produção por nível ignora obras não concluídas',()=>{
