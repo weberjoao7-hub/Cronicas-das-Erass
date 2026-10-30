@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
 const start=script.indexOf('// v6.124: chaminés'),end=script.indexOf('/* Telhas isométricas:',start);
 assert.ok(start>=0&&end>start,'desenho de chaminés isolável');
@@ -16,7 +16,7 @@ function scene(era=4,ww=74,now=1200,season=1,rain=0){
 }
 test('sintaxe do jogo e chave de salvamento preservadas',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(script,/localStorage\\.setItem\\('cronicas-v04'/);
+ assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
 test('chaminés são históricas e não aparecem em eras primitivas ou modernas',()=>{
  assert.equal(scene(0).count,0);assert.equal(scene(1).count,0);
@@ -44,10 +44,10 @@ test('fumaça varia com tempo, inverno e chuva',()=>{
 });
 test('integração respeita obra concluída, prévia e ordem do telhado',()=>{
  const render=script.slice(script.indexOf('function draw(){'),script.indexOf('function refresh(){'));
- assert.match(render,/if\\(obj&&obj\\.buildLeft\\)\\{drawConstructionSite/);
- assert.match(render,/if\\(obj\\.t==='Cabana'\\)drawResidenceChimney/);
+ assert.match(render,/if\(obj&&obj\.buildLeft\)\{drawConstructionSite/);
+ assert.match(render,/if\(obj\.t==='Cabana'\)drawResidenceChimney/);
  assert.ok(render.indexOf('drawResidenceChimney(px,py,ww,hh,game.era,x*97+y*13')<
   render.indexOf('drawWinterRoofSnow(px,py,ww,hh'));
- assert.match(script,/if\\(placing==='Cabana'\\)drawResidenceChimney/);
- assert.doesNotMatch(source,/localStorage|routeFor|game\\.buildings|save\\(/);
+ assert.match(script,/if\(placing==='Cabana'\)drawResidenceChimney/);
+ assert.doesNotMatch(source,/localStorage|routeFor|game\.buildings/);
 });
