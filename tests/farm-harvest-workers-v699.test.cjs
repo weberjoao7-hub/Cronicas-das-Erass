@@ -56,5 +56,10 @@ test('apenas fazendas prontas e exploradas renderizam trabalhadores',()=>{
  const branch=script.slice(script.indexOf('function draw(){'),script.indexOf('function refresh(){'));
  assert.match(branch,/if\(!exploredFog\[y\*W\+x\]\)continue/);
  assert.match(branch,/if\(obj&&obj\.buildLeft\)\{drawConstructionSite\(obj,px,py,ww,hh\)\}/);
- assert.ok(branch.includes("else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}"));
+ const farm=branch.indexOf("else if(obj.t==='Fazenda'){drawFarm(");
+ assert.ok(farm>=0,'fazenda pronta presente na ramificacao de estruturas');
+ const end=branch.indexOf('}',farm),render=branch.slice(farm,end);
+ assert.ok(render.includes('drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y)'));
+ assert.ok(render.includes('drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level)'));
+ assert.ok(render.indexOf('drawFarm(')<render.indexOf('drawFarmWorkers('));
 });
