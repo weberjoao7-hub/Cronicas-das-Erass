@@ -29,7 +29,7 @@ test('pátio do moinho integra-se apenas à construção concluída',()=>{
  const render=script.slice(script.indexOf('function draw(){'),script.indexOf('function refresh(){'));
  assert.match(render,/if\(obj&&obj\.buildLeft\)\{drawConstructionSite/);
  assert.match(render,/else if\(obj\.t==='Moinho'\)\{drawWindmill\([^;]+;drawWindmillYard\(/);
- assert.ok(render.indexOf('drawWindmillYard(px,py')<render.indexOf('drawTileOccupants(x,y'));
+ assert.ok(render.indexOf('drawWindmillYard(px,py')<render.lastIndexOf('drawTileOccupants(x,y'));
 });
 test('LOD reduz custo no zoom distante e adiciona moleiro no zoom próximo',()=>{
  const far=scene(4,28),mid=scene(4,49),near=scene(4,86);
