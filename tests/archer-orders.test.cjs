@@ -53,7 +53,7 @@ test('touching a map destination actually executes the army command',()=>{
  const pointers=new Map([[1,{x:50,y:50}]]);const moves=[];
  const run=new Function('C','pointers','moveArmyTo','panel','tileAt',
   "let command='moveArmy',rallySource=null,down={x:50,y:50},dragged=false,placing=null,pinchState=null,dirty=false;const pinchSnapshot=()=>null;const finishTouchPlacement=()=>false;"+
-  "const W=160,H=160;"+listenerCode+
+  "const W=160,H=160;const focusOffscreenUnitAt=()=>false;"+listenerCode+
   ";return ()=>{C.__tap({clientX:50,clientY:50,pointerId:1});return {command,dirty};};")(
   C,
   pointers,(x,y)=>moves.push([x,y]),{classList:{remove(){}}},()=>({x:92,y:86})
