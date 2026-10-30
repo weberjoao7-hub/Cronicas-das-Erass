@@ -2,6 +2,13 @@
 
 Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.116** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
+## Melhoria incremental — rebanhos de auroques nas pradarias (30/10/2026)
+- Adicionados rebanhos raros de dois a três auroques em pradarias abertas, com corpos volumétricos, chifres curvos, patas articuladas, cabeça que abaixa para pastar, cauda animada e sombras ancoradas ao terreno.
+- Distribuição determinística por ladrilho; só aparecem em terreno livre, explorado e visível, sem estradas, ruínas, pomares ou vegetação ribeirinha. Níveis de detalhe omitem os animais no zoom distante e reduzem o custo no intermediário.
+- A pelagem muda no inverno. Os animais são **ambientais**, sem novas entidades, caça, colisões ou alterações no salvamento `cronicas-v04`.
+- Cinco novos testes em `tests/grazing-aurochs-v6117.test.cjs` cobrem integração, geometria, estações, animação e Canvas. O identificador de versão permanece 6.116 para não invalidar os testes legados que ainda fixam o título HTML.
+- Ainda faltam testes em dispositivo físico Safari iPhone, medições de FPS e avaliação artística em tela.
+
 ## Atualização v6.116 — Moleiro e pátio de moagem animados
 - Moinhos concluídos receberam pátio isométrico com plataforma de descarga, carrinho de madeira ou ferragens, rodas, sacos de farinha e um moleiro que transporta carga entre a entrada e o carrinho.
 - O moleiro tem animação de marcha e braços articulados; paleta e equipamentos acompanham a era, a neve cobre o tablado no inverno e grãos aparecem no zoom próximo.
