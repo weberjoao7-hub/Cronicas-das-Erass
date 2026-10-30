@@ -23,7 +23,7 @@ function render(owned,width=74,era=4,x=12,y=12){
 }
 test('script compila, versão atualizada e salvamento preservado',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.102<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=102);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|requestAnimationFrame|Math\.random/);
 });

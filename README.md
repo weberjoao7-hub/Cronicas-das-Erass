@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.102** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.103** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.103 — Extração florestal isométrica
+- Lenhadores efetivamente parados em florestas exibem um posto de trabalho ancorado no terreno, com toras facetadas, anéis de crescimento, cavalete histórico e proteção de serra industrial.
+- Lascas acompanham o ritmo de corte e a neve se acumula nas toras no inverno; detalhes são omitidos em zoom distante para poupar processamento no Safari.
+- As copas permanecem intercaladas com os atores. Nenhuma alteração em economia, IA, colisões, rotas ou salvamento `cronicas-v04`.
+- Regressões em `tests/forest-worksite-v6103.test.cjs`; Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.102 — Fronteiras regionais sem quadrados
 - A renderização deixa de aplicar uma película verde em cada ladrilho dominado; biomas, texturas, estradas e construções mantêm suas cores originais.
