@@ -2888,6 +2888,101 @@ function drawFarmWorkers(px,py,ww,hh,era,now,day,tileX,tileY,level=1){
  }
  return count;
 }
+
+/* Fazenda v6.123: cercas em perspectiva, irrigacao e espantalho por era.
+   Tudo e desenhado no plano da plantacao; sem entidades ou estado persistido. */
+function drawFarmBoundary(px,py,ww,hh,era=0,level=1,season=1,now=Date.now(),tileX=0,tileY=0){
+ if(ww<42||hh<14||![px,py,ww,hh,now].every(Number.isFinite))return 0;
+ const industrial=era>=6,medieval=era>=3,winter=season===3;
+ const close=ww>=68,lv=Math.max(1,Math.min(3,level||1));
+ const p=(u,v)=>[px+u*ww,py+v*hh];
+ const stroke=(points,color,width)=>{
+  ctx.beginPath();ctx.moveTo(...p(...points[0]));
+  for(let i=1;i<points.length;i++)ctx.lineTo(...p(...points[i]));
+  ctx.strokeStyle=color;ctx.lineWidth=Math.max(.8,ww*width);ctx.stroke();
+ };
+ const poly=(points,color)=>{
+  ctx.beginPath();ctx.moveTo(...p(...points[0]));
+  for(let i=1;i<points.length;i++)ctx.lineTo(...p(...points[i]));
+  ctx.closePath();ctx.fillStyle=color;ctx.fill();
+ };
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ // Cerca traseira: as duas metades seguem as arestas do losango.
+ const rail=industrial?'#8ca9a8':medieval?'#93754f':'#a78557';
+ const dark=industrial?'#3b565b':'#63472f';
+ const fence=[[-.36,-.015],[-.18,-.185],[0,-.355],[.18,-.185],[.36,-.015]];
+ for(let i=0;i<fence.length-1;i++){
+  const [ax,ay]=fence[i],[bx,by]=fence[i+1];
+  stroke([[ax,ay-.19],[bx,by-.19]],dark,.035);
+  stroke([[ax,ay-.22],[bx,by-.22]],rail,.023);
+  if(close)stroke([[ax,ay-.10],[bx,by-.10]],rail,.018);
+ }
+ for(let i=0;i<fence.length;i++){
+  const [fx,fy]=fence[i],height=industrial?.31:.28;
+  ctx.fillStyle='#1a2a2366';ctx.beginPath();
+  ctx.ellipse(...p(fx+.014,fy+.014),ww*.018,hh*.018,0,0,Math.PI*2);ctx.fill();
+  stroke([[fx,fy+.01],[fx,fy-height]],dark,industrial?.035:.045);
+  stroke([[fx-.012,fy-height*.85],[fx-.012,fy-height*.20]],rail,.013);
+  if(close&&industrial){
+   ctx.fillStyle='#c3d5d2';ctx.beginPath();
+   ctx.arc(...p(fx,fy-height),Math.max(1,ww*.012),0,Math.PI*2);ctx.fill();
+  }
+ }
+ // Canal de irrigacao: somente fazendas evoluidas, sem alterar a producao.
+ if(lv>=2){
+  const ditch=[[-.355,.055],[0,.355],[.355,.055]];
+  stroke(ditch,'#3e3529',.068);
+  stroke(ditch,winter?'#a4b6b8':'#507f80',.043);
+  stroke(ditch,winter?'#e3e8dc':'#a1c6ba',.012);
+  if(close&&!winter){
+   const ripple=((now*.00027+tileX*.17+tileY*.11)%1);
+   for(let j=0;j<3;j++){
+    const t=(ripple+j/3)%1;
+    const u=t<.5?-.355+t*.71:(t-.5)*.71;
+    const v=t<.5?.055+t*.60:.355-(t-.5)*.60;
+    stroke([[u-.017,v-.008],[u+.012,v+.004]],'#c5d8c7',.010);
+   }
+  }
+  if(industrial){
+   stroke([[-.33,.02],[-.08,.24]],'#a2b8b4',.028);
+   stroke([[.08,.24],[.33,.02]],'#a2b8b4',.028);
+   for(const u of [-.25,.25]){
+    const v=.355-Math.abs(u)*.845;
+    ctx.fillStyle='#425c60';ctx.beginPath();
+    ctx.arc(...p(u,v),Math.max(1.2,ww*.019),0,Math.PI*2);ctx.fill();
+   }
+  }
+ }
+ // Espantalho: silhueta legivel no zoom medio; pano reage ao vento.
+ if(ww>=50){
+  const sx=.235,sy=-.055,seed=tileX*.63+tileY*.29;
+  const wave=Math.sin(now*.0023+seed)*.024;
+  ctx.fillStyle='#1928206e';ctx.beginPath();
+  ctx.ellipse(...p(sx+.025,sy+.02),ww*.065,hh*.032,-.18,0,Math.PI*2);ctx.fill();
+  stroke([[sx,sy],[sx,sy-.64]],industrial?'#687a79':'#725034',.028);
+  stroke([[sx-.135,sy-.43],[sx+.145,sy-.43]],industrial?'#8d9e99':'#997047',.026);
+  poly([[sx-.085,sy-.40],[sx+.075,sy-.40],[sx+.09+wave,sy-.13],
+        [sx-.075+wave*.5,sy-.13]],industrial?'#6e8c89':medieval?'#956d48':'#ae8a55');
+  poly([[sx-.08,sy-.38],[sx-.14,sy-.41],[sx-.145+wave,sy-.24],
+        [sx-.082,sy-.29]],industrial?'#527473':'#80603e');
+  poly([[sx+.075,sy-.38],[sx+.145,sy-.41],[sx+.16+wave,sy-.23],
+        [sx+.078,sy-.29]],industrial?'#577f7b':'#9e7547');
+  ctx.fillStyle='#d1ad77';ctx.beginPath();
+  ctx.ellipse(...p(sx,sy-.56),ww*.043,hh*.085,0,0,Math.PI*2);ctx.fill();
+  poly([[sx-.065,sy-.615],[sx+.065,sy-.615],
+        [sx+.04,sy-.69],[sx-.032,sy-.69]],industrial?'#e4bb64':'#7e633d');
+  stroke([[sx-.08,sy-.62],[sx+.09,sy-.62]],'#554331',.017);
+  if(close){
+   ctx.fillStyle='#41372b';ctx.beginPath();
+   ctx.arc(...p(sx+.016,sy-.555),Math.max(.7,ww*.008),0,Math.PI*2);ctx.fill();
+   if(winter){
+    stroke([[sx-.067,sy-.62],[sx+.065,sy-.62]],'#e6e9df',.014);
+    poly([[sx-.08,sy-.39],[sx+.08,sy-.39],[sx+.07,sy-.36],[sx-.075,sy-.36]],'#d9e3db');
+   }
+  }
+ }
+ ctx.restore();return 1;
+}
 // Mina isométrica: poço, guincho e transporte de minério evoluem com as oito eras.
 // Animações puramente visuais, sem novos dados persistidos no salvamento.
 // v6.98: mineiro e vagoneta em perspectiva, animados conforme a era.
@@ -6627,7 +6722,7 @@ else if(obj){
  else if(obj.t==='Torre')drawEraWatchtower(px,py,ww,hh,obj.level,game.era,frameTime);
  else if(obj.t==='Quartel'){drawBarracks(px,py,ww,hh,game.era,frameTime);drawBarracksTraining(px,py,ww,hh,game.era,frameTime);}
  else if(obj.t==='Pesqueiro'){drawDock(px,py,ww,hh,obj.level,!!obj.boat);drawDockWorkers(px,py,ww,hh,game.era,frameTime,obj.boat,obj.level);}
- else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
+ else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmBoundary(px,py,ww,hh,game.era,obj.level,forestSeason(),frameTime,obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
  else if(obj.t==='Moinho'){drawWindmill(px,py,ww,hh,obj.level,frameTime);drawWindmillYard(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason());}
  else if(obj.t==='Mina'){drawMine(px,py,ww,hh,obj.level,game.era,frameTime);drawMineWorkers(px,py,ww,hh,game.era,frameTime);}
  else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
