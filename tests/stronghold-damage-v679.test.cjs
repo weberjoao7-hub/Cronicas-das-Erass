@@ -50,7 +50,7 @@ test('damage overlay is restricted to visible enemy stronghold and never mutates
  const end=script.indexOf('if(b===0&&visibleFog',start);
  const renderCall=script.slice(start,end);
  assert.match(renderCall,/visibleFog\[y\*W\+x\]/);
- assert.match(renderCall,/drawTownHall\(px,py,ww,hh,true\);drawEnemyStrongholdDamage\(px,py,ww,hh,game.enemy.hp,frameTime\)/);
+ assert.match(renderCall,/drawTownHall\(px,py,ww,hh,true\);(?:drawEnemyFortifications\(px,py,ww,hh,game.era,frameTime\);)?drawEnemyStrongholdDamage\(px,py,ww,hh,game.enemy.hp,frameTime\)/);
  assert.doesNotMatch(code,/game\.enemy\.hp\s*=/);
  assert.doesNotMatch(code,/localStorage|game\.buildings/);
 });
