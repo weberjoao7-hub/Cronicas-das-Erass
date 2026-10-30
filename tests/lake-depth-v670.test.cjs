@@ -26,7 +26,7 @@ function paint(depth,ww=74,q=.95,night=0,now=5000){
 }
 test('v6.70: sintaxe, salvamento e ordem de camadas',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.(?:7[0-9]|[89][0-9])<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=70);
  assert.ok(script.includes("localStorage.getItem('cronicas-v04')"));
  const a=script.indexOf('if(b===0)drawLakeDepth('),b=script.indexOf('if(b===0&&shoreMask',a);
  assert.ok(a>0&&b>a);

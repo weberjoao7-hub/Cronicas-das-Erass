@@ -20,7 +20,7 @@ function scene({ww=96,era=3,season=1,visible=true,stocks={wood:50,stone:60,food:
 }
 test('v6.88: JavaScript completo compila e salvamento anterior permanece',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.(?:8[8-9]|9[0-9])<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=88);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|Math\.random|setInterval|game\./);
 });

@@ -21,7 +21,7 @@ function paint({season=3,mask=1,depth=1,occupied=false,ww=74,now=5000}={}){
 }
 test('v6.87: script compila e mantém salvamento cronicas-v04',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.(?:8[7-9]|9[0-9])<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=87);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
 });
