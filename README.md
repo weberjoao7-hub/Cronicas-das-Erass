@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.113** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.114** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.114 — Pomares sazonais no mapa
+- Adicionados pequenos pomares silvestres em posições determinísticas das pradarias, com troncos facetados, sombras de contato, copas em três volumes, vento suave, flores de primavera, frutos no verão/outono e neve no inverno.
+- No verão, o zoom próximo revela cestos de colheita; no zoom distante o desenho é simplificado ou omitido para preservar desempenho no Safari.
+- Os pomares são decorativos, não criam colisões, não alteram recursos, movimentação nem o salvamento `cronicas-v04`. Nunca são desenhados sobre estradas, construções, ruínas ou margens de água.
+- Seis novos testes em `tests/orchard-v6114.test.cjs`: sintaxe, integração, distribuição, estações, LOD, animação e geometria Canvas. Safari físico e FPS reais ainda pendentes.
 
 ## Atualização v6.113 — Fortificações rivais evolutivas
 - Fortaleza rival ganhou muralhas isométricas integradas ao chão: paliçada de troncos nas primeiras eras, muralhas de pedra nas eras antigas, ameias e torre de bastião na fase medieval, ferragens e reforços industriais nas eras avançadas.
