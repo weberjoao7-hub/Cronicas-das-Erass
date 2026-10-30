@@ -21,7 +21,9 @@ function sample(c,cost,count=24){for(let i=0;i<count;i++)c.adjustRenderCadence(c
 test('JavaScript completo compila e preserva salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(script,/const drawStart=performance\.now\(\);draw\(\);adjustRenderCadence\(performance\.now\(\)-drawStart\)/);
+ assert.match(script,/const drawStart=performance\.now\(\);try\{draw\(\);adjustRenderCadence\(performance\.now\(\)-drawStart\)/);
+ assert.match(script,/catch\(error\)\{reportGameError\(error,'renderização'\)\}/);
+ assert.match(script,/finally\{requestAnimationFrame\(loop\)\}/);
 });
 test('iPhone rápido aumenta de 20 para aproximadamente 30 FPS',()=>{
  const c=controller(true);assert.equal(c.interval,50);
