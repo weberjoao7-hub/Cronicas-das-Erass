@@ -1477,6 +1477,63 @@ function drawMountain(px,py,ww,hh,x,y){
  }
  ctx.restore();
 }
+// v6.126: pinheiros alpinos facetados no sopé da cordilheira, presos ao solo.
+// Semente por ladrilho, sombra de contato e neve sazonal; nenhum estado persistido.
+function drawAlpinePines(px,py,ww,hh,x,y,season=0,now=Date.now()){
+ if(ww<39||hh<12||rnd(x,y,401)<.36)return 0;
+ const near=ww>=61,count=near&&rnd(x,y,402)>.46?2:1;
+ ctx.save();ctx.lineJoin='round';
+ for(let i=0;i<count;i++){
+  const seed=rnd(x+i*7,y-i*3,403),size=ww*(.23+seed*.045);
+  const bx=px+ww*(i===0?-.24+seed*.16:.15+seed*.11);
+  const by=py+hh*(.17+seed*.17);
+  const sway=near?Math.sin(now*.0014+x*.7+y*.43+i*2.1)*ww*.012:0;
+  // A sombra nasce nos pés; o tronco entra sob as saias inferiores.
+  ctx.fillStyle='rgba(13,28,24,.35)';ctx.beginPath();
+  ctx.ellipse(bx+size*.21,by+size*.10,size*.77,size*.19,-.12,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#594735';ctx.fillRect(bx-size*.085,by-size*.88,size*.17,size*.92);
+  if(near){
+   ctx.fillStyle='#b89a70';ctx.fillRect(bx-size*.055,by-size*.67,size*.036,size*.52);
+  }
+  // Três volumes cônicos sobrepostos: face esquerda iluminada, direita em sombra.
+  for(let layer=0;layer<3;layer++){
+   const top=by-size*(1.50+layer*.36),bottom=by-size*(.28+layer*.39);
+   const half=size*(.85-layer*.14),tipX=bx+sway*(.5+layer*.24);
+   ctx.fillStyle=season===3?'#496c64':'#315e50';
+   ctx.beginPath();ctx.moveTo(tipX,top);ctx.lineTo(bx-half,bottom);
+   ctx.lineTo(bx,bottom+size*.08);ctx.closePath();ctx.fill();
+   ctx.fillStyle=season===3?'#294d4d':'#20473f';
+   ctx.beginPath();ctx.moveTo(tipX,top);ctx.lineTo(bx+half,bottom);
+   ctx.lineTo(bx,bottom+size*.08);ctx.closePath();ctx.fill();
+   if(near){
+    ctx.strokeStyle='#9bb29b';ctx.lineWidth=Math.max(.65,ww*.010);
+    ctx.beginPath();ctx.moveTo(tipX,top+size*.13);
+    ctx.lineTo(bx-half*.63,bottom-size*.10);ctx.stroke();
+    ctx.strokeStyle='#163e39';ctx.beginPath();ctx.moveTo(tipX+size*.08,top+size*.18);
+    ctx.lineTo(bx+half*.70,bottom-size*.04);ctx.stroke();
+   }
+   if(season===3){
+    // A neve acompanha as arestas superiores, não flutua sobre a copa.
+    ctx.fillStyle='#e3ede6';ctx.beginPath();ctx.moveTo(tipX,top);
+    ctx.lineTo(bx-half*.43,top+(bottom-top)*.43);
+    ctx.lineTo(bx-half*.12,top+(bottom-top)*.33);
+    ctx.lineTo(bx+half*.36,top+(bottom-top)*.41);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='#b7d3d1';ctx.beginPath();ctx.moveTo(tipX,top);
+    ctx.lineTo(bx+half*.36,top+(bottom-top)*.41);
+    ctx.lineTo(bx+half*.07,top+(bottom-top)*.31);ctx.closePath();ctx.fill();
+   }
+  }
+  if(near){
+   ctx.fillStyle=season===3?'#c4d0c8':'#87918b';
+   for(let j=0;j<3;j++){
+    const gx=bx+size*(j*.35-.36),gy=by+size*(.06+j*.027);
+    ctx.beginPath();ctx.ellipse(gx,gy,size*.095,size*.038,-.2,0,Math.PI*2);ctx.fill();
+   }
+  }
+ }
+ ctx.restore();return count;
+}
 // Faces rochosas expostas em colinas e maciços; apenas decoração, sem alterar colisões.
 function drawHighlandCliff(px,py,ww,hh,x,y,kind){
  if(ww<24)return;
@@ -6815,7 +6872,7 @@ if(b===4&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(quarryWorkers?.some(u=>isActiveQuarryWorker(u,x,y)))
   drawQuarryWorksite(px,py,ww,hh,x,y,game.era,frameTime,forestSeason());
 }
-if(b===5&&ww>13){drawMountain(px,py,ww,hh,x,y);drawHighlandGround(px,py,ww,hh,x,y,5,structures.has(key(x,y))||roadTiles.has(key(x,y)));}
+if(b===5&&ww>13){drawMountain(px,py,ww,hh,x,y);drawHighlandGround(px,py,ww,hh,x,y,5,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))drawAlpinePines(px,py,ww,hh,x,y,forestSeason(),frameTime);}
 if((b===4||b===5)&&!ruinKind&&visibleFog[y*W+x])drawHighlandWaterfall(px,py,ww,hh,x,y,b,forestSeason(),frameTime,structures.has(key(x,y))||roadTiles.has(key(x,y)));
 if(rainLevel>.17&&!structures.has(key(x,y))&&!ruinKind)drawRainPuddles(px,py,ww,hh,x,y,b,rainLevel,frameTime,roadTiles.has(key(x,y)));
 if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
