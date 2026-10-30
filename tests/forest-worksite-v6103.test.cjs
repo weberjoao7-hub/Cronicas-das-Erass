@@ -18,7 +18,7 @@ function scene(era=4,ww=74,now=1200,season=1){
 }
 test('v6.103: sintaxe e salvamento legado preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.103<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=103);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('apenas aldeão ativo parado no tile gera posto de trabalho',()=>{

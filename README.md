@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.103** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.104** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.104 — Cartografia do minimapa
+- Removidos os blocos verdes de conquista do minimapa: somente as bordas externas contínuas das regiões de 12 × 12 aparecem, sem encobrir os biomas.
+- Atlas cartográfico pré-renderizado com variação de solo, relevo rochoso, vegetação ribeirinha e profundidade dos lagos, calculado uma única vez para reduzir trabalho no Safari.
+- Círculo da unidade ativa, preservando marcadores táticos, ruínas, névoa de guerra e contorno da câmera.
+- Economia, rotas, conquista e salvamento `cronicas-v04` inalterados. Testes em `tests/minimap-cartography-v6104.test.cjs`. Safari físico e FPS reais ainda não validados.
 
 ## Atualização v6.103 — Extração florestal isométrica
 - Lenhadores efetivamente parados em florestas exibem um posto de trabalho ancorado no terreno, com toras facetadas, anéis de crescimento, cavalete histórico e proteção de serra industrial.
