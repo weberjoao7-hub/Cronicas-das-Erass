@@ -1,6 +1,13 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.114** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.115** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.115 — Pedreiras de campo animadas
+- Trabalhadores que efetivamente extraem pedra e minério em colinas passam a aparecer junto de um posto de pedreira isométrico com rochas facetadas, veios minerais, cascalho e caixa de ferramentas.
+- A picareta e os estilhaços possuem animação local; os apoios evoluem de madeira para ferragens industriais e a neve se acumula sobre as pedras no inverno.
+- O posto só aparece para aldeão ativo, parado e trabalhando no ladrilho de colina (bioma 4), nunca sobre estradas, construções ou ruínas. Níveis de detalhe evitam partículas e ferramentas em zoom distante.
+- Salvamento `cronicas-v04`, IA, economia, colisões e combate permanecem inalterados. Testes em `tests/quarry-worksite-v6115.test.cjs`. Safari iPhone físico e FPS real ainda pendentes.
+- Corrigido teste legado da fortaleza que não considerava a camada de fortificações introduzida na v6.113.
 
 ## Atualização v6.114 — Pomares sazonais no mapa
 - Adicionados pequenos pomares silvestres em posições determinísticas das pradarias, com troncos facetados, sombras de contato, copas em três volumes, vento suave, flores de primavera, frutos no verão/outono e neve no inverno.
