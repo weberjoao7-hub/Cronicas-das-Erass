@@ -42,5 +42,5 @@ test('iPhone e gestos de arraste não ativam edge scrolling',()=>{
  assert.match(script,/if\(mobileRender\|\|pointers\.size\|\|panel\.classList\.contains\('show'\)\|\|document\.hidden\)/);
  assert.match(script,/if\(e\.pointerType!=='mouse'\)return/);
  assert.match(script,/C\.addEventListener\('pointerleave'/);
- assert.match(script,/applyDesktopEdgePan\(dt\);for\(let u of game\.units\)/);
+ assert.match(script,/applyDesktopEdgePan\(dt\);applyCameraFollow\(dt\);for\(let u of game\.units\)/);
 });
