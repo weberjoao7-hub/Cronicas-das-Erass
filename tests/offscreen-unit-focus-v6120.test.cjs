@@ -16,12 +16,12 @@ function fixture(){
  const state={unit:{x:900,y:300,hp:100,kind:'warrior'},visible:true,placing:false,command:null,marquee:null};
  const make=new Function('state',`
  let w=390,h=650,W=160,H=160,cx=80,cy=80,dirty=false,cameraFollowUnit={};
- let selectedUnit=0;
+ let selectedUnit=0,placing=null,command=null,marquee=null;
  const game={units:[state.unit]};
  const point=(x,y)=>[x,y];
  const visibleAt=()=>state.visible;
  ${code}
- return {anchor:()=>offscreenUnitAnchor(...point(state.unit.x,state.unit.y),w,h),
+ return {unit:state.unit,anchor:()=>offscreenUnitAnchor(...point(state.unit.x,state.unit.y),w,h),
  focus:focusOffscreenUnitAt,
  camera:()=>({cx,cy,dirty,cameraFollowUnit}),
  setState:(values)=>Object.assign(state,values)};
@@ -51,7 +51,7 @@ test('fora da area de toque de 24px nao centraliza a camera',()=>{
 test('nevoa de guerra e unidades eliminadas bloqueiam a navegacao',()=>{
  const f=fixture(),a=f.anchor();
  f.setState({visible:false});assert.equal(f.focus(a.x,a.y),false);
- f.setState({visible:true});f.setState({unit:{x:900,y:300,hp:0,kind:'warrior'}});
+ f.setState({visible:true});f.setState({visible:true});f.unit.hp=0;
  assert.equal(f.focus(a.x,a.y),false);
 });
 test('toque nao interfere em construcao, comandos ou selecao por arraste',()=>{
