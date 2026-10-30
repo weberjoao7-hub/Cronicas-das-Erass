@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.109** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.113** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Atualização v6.113 — Fortificações rivais evolutivas
+- Fortaleza rival ganhou muralhas isométricas integradas ao chão: paliçada de troncos nas primeiras eras, muralhas de pedra nas eras antigas, ameias e torre de bastião na fase medieval, ferragens e reforços industriais nas eras avançadas.
+- Portão central aberto e estandarte vermelho animado em zoom próximo. Detalhes são reduzidos no zoom distante para limitar chamadas Canvas no Safari.
+- A melhoria é exclusivamente visual: não altera colisões, HP, IA, economia, combate ou formato de salvamento `cronicas-v04`.
+- Testes em `tests/enemy-fortifications-v6113.test.cjs`: compilação, quatro níveis históricos, LOD, animação, coordenadas Canvas finitas e equilíbrio save/loop. Testes no Safari físico e medições de FPS ainda pendentes.
 
 ## Atualização v6.109 — Vagonetas de mina e otimização territorial
 - Vagonetas percorrem trilhos fixos em vaivém, com rodas girando, sombra de contato, minério oscilando e materiais históricos/industriais. Detalhes são simplificados no zoom distante.
