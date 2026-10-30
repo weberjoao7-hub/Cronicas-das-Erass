@@ -6446,6 +6446,18 @@ function offscreenUnitAnchor(px,py,width,height){
                   (bottom-top)*.5/Math.max(1e-6,Math.abs(dy)));
  return {x:mx+dx*k,y:my+dy*k,angle:Math.atan2(dy,dx)};
 }
+// O indicador de borda tambem e um alvo de toque (44 px) para Safari iPhone.
+ // A camera muda apenas por acao explicita, sem revelar areas sob nevoa.
+function focusOffscreenUnitAt(px,py){
+ if(placing||command||marquee||!Number.isFinite(px)||!Number.isFinite(py))return false;
+ const u=game.units[selectedUnit];
+ if(!u||u.hp<=0||!Number.isFinite(u.x)||!Number.isFinite(u.y)||!visibleAt(u.x,u.y))return false;
+ const [sx,sy]=point(u.x,u.y),anchor=offscreenUnitAnchor(sx,sy,w,h);
+ if(!anchor||Math.hypot(px-anchor.x,py-anchor.y)>24)return false;
+ cameraFollowUnit=null;
+ cx=Math.max(0,Math.min(W-1,u.x));cy=Math.max(0,Math.min(H-1,u.y));
+ dirty=true;return true;
+}
 function drawOffscreenUnitIndicator(now=Date.now()){
  const u=game.units[selectedUnit];
  if(!u||u.hp<=0||!Number.isFinite(u.x)||!Number.isFinite(u.y)||!visibleAt(u.x,u.y))return 0;
@@ -6455,9 +6467,12 @@ function drawOffscreenUnitIndicator(now=Date.now()){
   u.kind==='warrior'?'#8fd7ff':u.kind==='cannon'?'#f4ad83':'#ffe5a0';
  const pulse=1+.07*Math.sin(now*.005);
  ctx.save();ctx.translate(target.x,target.y);ctx.rotate(target.angle);ctx.scale(pulse,pulse);
- ctx.fillStyle='#0c2924e8';ctx.strokeStyle=color;ctx.lineWidth=1.8;
- ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(-8,-8);ctx.lineTo(-4,0);
- ctx.lineTo(-8,8);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+ // Marcador tático legível em telas Retina, com corpo e contorno da classe.
+ ctx.fillStyle='#0c2924ee';ctx.strokeStyle=color;ctx.lineWidth=2;
+ ctx.shadowColor=color;ctx.shadowBlur=5;
+ ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-4,-12);ctx.lineTo(-13,-12);
+ ctx.lineTo(-9,0);ctx.lineTo(-13,12);ctx.lineTo(-4,12);
+ ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
  const tiles=Math.round(Math.hypot(u.x-cx,u.y-cy));
  ctx.save();ctx.font='bold 10px system-ui,sans-serif';ctx.textAlign='center';
  ctx.shadowColor='#071714';ctx.shadowBlur=4;ctx.fillStyle='#fff2d3';
@@ -7036,7 +7051,7 @@ function applyPinch(previous,current){
 
 C.addEventListener('pointerdown',e=>{if(typeof C.setPointerCapture==='function')C.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(placing&&pointers.size===1&&e.pointerType!=='mouse'){placementPointerId=e.pointerId;placementPreviewAt(e.clientX,e.clientY)}if(pointers.size===1){down={x:e.clientX,y:e.clientY};dragged=false}if(pointers.size===1&&!placing&&(command==='selectArea'||(e.pointerType==='mouse'&&e.button===0&&e.shiftKey&&!command))){marquee={x0:e.clientX,y0:e.clientY,x1:e.clientX,y1:e.clientY};dragged=true}if(pointers.size>=2)placementPointerId=null;if(pointers.size>=2){pinchState=pinchSnapshot();dragged=true;down=null;marquee=null}});
 C.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;let p=pointers.get(e.pointerId);let dx=e.clientX-p.x,dy=e.clientY-p.y;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(placing&&placementPointerId===e.pointerId&&pointers.size===1){placementPreviewAt(e.clientX,e.clientY);dragged=true;return}if(marquee){marquee.x1=e.clientX;marquee.y1=e.clientY;dirty=true;return}if(pointers.size===1){if(!down)down={x:e.clientX,y:e.clientY};if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>5){dragged=true;cameraFollowUnit=null}cx=Math.max(0,Math.min(W-1,cx-(dx/(TW*scale)+dy/(TH*scale))));cy=Math.max(0,Math.min(H-1,cy-(-dx/(TW*scale)+dy/(TH*scale))))}else if(pointers.size===2){const next=pinchSnapshot();applyPinch(pinchState,next);pinchState=next;dragged=true}dirty=true});
-C.addEventListener('pointerup',e=>{if(finishTouchPlacement(e))return;if(typeof marquee!=='undefined'&&marquee){const box=marquee;marquee=null;const count=selectGroupInRect(box.x0,box.y0,box.x1,box.y1,e.ctrlKey);if(command==='selectArea')command=null;toast(count?'🛡️ '+count+' tropas selecionadas':'Nenhuma tropa na área');pointers.delete(e.pointerId);pinchState=pinchSnapshot();down=null;dragged=true;dirty=true;return}if(!dragged&&pointers.size===1&&down){let {x,y}=tileAt(e.clientX,e.clientY);if(x>=0&&x<W&&y>=0&&y<H){if(placing){placeBuilding(placing,x,y)}else if(command==='setRally'){const ok=setRallyPoint(rallySource,x,y);command=null;rallySource=null;toast(ok?'🚩 Ponto de reunião definido; novas unidades irão até ele':'Destino inválido ou sem rota terrestre')}else if(command==='moveArmy'){moveArmyTo(x,y);command=null;panel.classList.remove('show')}else if(command==='moveGroup'){moveArmyTo(x,y,selectedGroup);command=null;panel.classList.remove('show')}else if(command==='move'){let u=game.units[selectedUnit];if(!passable(x,y)){toast('Unidade precisa de uma ponte para atravessar lagos; montanhas são bloqueadas')}else{if(assignRoute(u,x,y)){toast('Caminho calculado: unidade enviada');save()}else toast('Não há caminho terrestre até o destino')}command=null}else{selected={x,y};let unitIndex=pickUnitAtScreen(e.clientX,e.clientY);if(unitIndex<0)unitIndex=game.units.findIndex(u=>Math.floor(u.x)===x&&Math.floor(u.y)===y);if(unitIndex>=0){if(cameraFollowUnit!==game.units[unitIndex])cameraFollowUnit=null;selectedGroup.clear();selectedUnit=unitIndex;unitMenu()}else tileMenu()}dirty=true}}pointers.delete(e.pointerId);pinchState=pinchSnapshot();if(pointers.size<2){const remaining=[...pointers.values()][0];down=remaining?{x:remaining.x,y:remaining.y}:null}});C.addEventListener('pointercancel',e=>{if(placementPointerId===e.pointerId)placementPointerId=null;pointers.delete(e.pointerId);pinchState=pinchSnapshot();down=null;dragged=true;marquee=null});C.addEventListener('pointermove',e=>{if(placing&&pointers.size===0){hoverTile=tileAt(e.clientX,e.clientY);dirty=true}});C.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY>0?.88:1.12,e.clientX,e.clientY)},{passive:false});
+C.addEventListener('pointerup',e=>{if(finishTouchPlacement(e))return;if(!dragged&&pointers.size===1&&focusOffscreenUnitAt(e.clientX,e.clientY)){pointers.delete(e.pointerId);pinchState=pinchSnapshot();down=null;dirty=true;toast('🎯 Unidade localizada');return;}if(typeof marquee!=='undefined'&&marquee){const box=marquee;marquee=null;const count=selectGroupInRect(box.x0,box.y0,box.x1,box.y1,e.ctrlKey);if(command==='selectArea')command=null;toast(count?'🛡️ '+count+' tropas selecionadas':'Nenhuma tropa na área');pointers.delete(e.pointerId);pinchState=pinchSnapshot();down=null;dragged=true;dirty=true;return}if(!dragged&&pointers.size===1&&down){let {x,y}=tileAt(e.clientX,e.clientY);if(x>=0&&x<W&&y>=0&&y<H){if(placing){placeBuilding(placing,x,y)}else if(command==='setRally'){const ok=setRallyPoint(rallySource,x,y);command=null;rallySource=null;toast(ok?'🚩 Ponto de reunião definido; novas unidades irão até ele':'Destino inválido ou sem rota terrestre')}else if(command==='moveArmy'){moveArmyTo(x,y);command=null;panel.classList.remove('show')}else if(command==='moveGroup'){moveArmyTo(x,y,selectedGroup);command=null;panel.classList.remove('show')}else if(command==='move'){let u=game.units[selectedUnit];if(!passable(x,y)){toast('Unidade precisa de uma ponte para atravessar lagos; montanhas são bloqueadas')}else{if(assignRoute(u,x,y)){toast('Caminho calculado: unidade enviada');save()}else toast('Não há caminho terrestre até o destino')}command=null}else{selected={x,y};let unitIndex=pickUnitAtScreen(e.clientX,e.clientY);if(unitIndex<0)unitIndex=game.units.findIndex(u=>Math.floor(u.x)===x&&Math.floor(u.y)===y);if(unitIndex>=0){if(cameraFollowUnit!==game.units[unitIndex])cameraFollowUnit=null;selectedGroup.clear();selectedUnit=unitIndex;unitMenu()}else tileMenu()}dirty=true}}pointers.delete(e.pointerId);pinchState=pinchSnapshot();if(pointers.size<2){const remaining=[...pointers.values()][0];down=remaining?{x:remaining.x,y:remaining.y}:null}});C.addEventListener('pointercancel',e=>{if(placementPointerId===e.pointerId)placementPointerId=null;pointers.delete(e.pointerId);pinchState=pinchSnapshot();down=null;dragged=true;marquee=null});C.addEventListener('pointermove',e=>{if(placing&&pointers.size===0){hoverTile=tileAt(e.clientX,e.clientY);dirty=true}});C.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY>0?.88:1.12,e.clientX,e.clientY)},{passive:false});
 // Navegação RTS por borda no desktop: movimento contínuo independente do teclado.
 // A posição é CSS pixel, a velocidade é de tela e a conversão respeita a projeção isométrica.
 // Pointer touch/pen nunca ativa o recurso; arrastes e menus suspendem a câmera.
