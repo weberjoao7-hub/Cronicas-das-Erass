@@ -303,7 +303,7 @@ function resize(){
  // Limita a memória do backing store em tablets Retina sem reduzir a resolução do iPhone.
  const mobileViewport=w<700||(typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches);
  const maxPixels=mobileViewport?2600000:6000000;
- dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(maxPixels/(w*h)))*renderResolutionScale;
+ dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(maxPixels/(w*h)))*(typeof renderResolutionScale==='number'?renderResolutionScale:1);
  const bw=Math.round(w*dpr),bh=Math.round(h*dpr);
  if(C.width!==bw)C.width=bw;
  if(C.height!==bh)C.height=bh;
@@ -5161,7 +5161,7 @@ function drawPaintedCavalry(u,px,py,z){
  const striking=!!u.attackAt&&now-u.attackAt>=0&&now-u.attackAt<340;
  const target=moving?u.path[0]:null;
  const direction=target?((target.x-u.x)-(target.y-u.y)<0?-1:1):(u.face===-1?-1:1);
- const frame=striking?3:moving?1+strideFrame(u,2,.40):0;
+ const frame=striking?3:moving?1+(typeof strideFrame==='function'?strideFrame(u,2,.40):Math.floor(visualNow/155)%2):0;
  const eraBand=Math.min(3,Math.max(0,Math.floor(game.era/2)));
  const w=44*z,h=44*z;
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
@@ -5298,7 +5298,7 @@ const paintedWorkerActions=typeof Image==='function'?new Image():{complete:false
 if(typeof Image==='function')paintedWorkerActions.src='assets/cronicas_aldeoes_trabalho.svg';
 function drawPaintedVillager(u,px,py,z,job,moving,now){
  if((job!=='idle'&&job!=='walk')||game.era>=2||!paintedVillagers.complete||!paintedVillagers.naturalWidth||z<.65)return false;
- const frame=moving?2+strideFrame(u,4,.17):Math.floor(now/550)%2;
+ const frame=moving?2+(typeof strideFrame==='function'?strideFrame(u,4,.17):Math.floor(now/170)%4):Math.floor(now/550)%2;
  const target=moving&&u.path&&u.path.length?u.path[0]:null;
  const dir=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
  const w=24*z,h=w*104/56;
@@ -5347,7 +5347,7 @@ function drawWorkerTaskProps(px,py,z,job,now){
 }
 function drawVillagerAtlas(u,px,py,z,job,moving,now){
  if(z<.65)return false;
- const frame=moving?strideFrame(u,4,.17):Math.floor(now/220)%4,img=villagerSprite(job,frame,game.era);
+ const frame=moving?(typeof strideFrame==='function'?strideFrame(u,4,.17):Math.floor(now/170)%4):Math.floor(now/220)%4,img=villagerSprite(job,frame,game.era);
  if(!img.complete||!img.naturalWidth)return false;
  const target=moving&&u.path&&u.path.length?u.path[0]:null;
  const dir=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
@@ -5364,7 +5364,7 @@ if(typeof Image==='function')paintedTroops.src='assets/cronicas_tropas_atlas.svg
 function drawPaintedTroop(u,px,py,z,archer,moving,striking,now,direction,enemy=false){
  if(z<.72||!paintedTroops.complete||paintedTroops.naturalWidth!==256||paintedTroops.naturalHeight!==896)return false;
  const eraBand=Math.min(3,Math.max(0,Math.floor(game.era/2)));
- const frame=striking?3:moving?1+strideFrame(u,2,.30):0;
+ const frame=striking?3:moving?1+(typeof strideFrame==='function'?strideFrame(u,2,.30):Math.floor(now/155)%2):0;
  const w=25*z,h=w*112/64;
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
  // Sombra do sprite ancorada em y=98 (87,5% da altura), no mesmo plano do terreno.
@@ -8395,6 +8395,8 @@ function canvasResolutionDecision(quality,avgMs,mobile,slowSamples=0,fastSamples
 }
 let resolutionSlowSamples=0,resolutionFastSamples=0,resolutionLastChange=0;
 function adjustCanvasResolution(averageMs,now=performance.now()){
+ // Testes isolados e embeds sem estado adaptativo preservam a resolução padrão.
+ if(typeof renderResolutionScale!=='number')return false;
  const next=canvasResolutionDecision(renderResolutionScale,averageMs,mobileRender,
   resolutionSlowSamples,resolutionFastSamples,now-resolutionLastChange);
  resolutionSlowSamples=next.slow;resolutionFastSamples=next.fast;
