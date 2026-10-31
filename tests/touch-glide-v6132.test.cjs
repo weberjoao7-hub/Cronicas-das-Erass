@@ -35,7 +35,7 @@ test('pinça, obra, seleção, minimapa e zoom interrompem a inércia',()=>{
  assert.match(script,/if\(pointers\.size\|\|pinchState\|\|placing\|\|marquee\|\|panel\.classList\.contains\('show'\)\|\|document\.hidden\)/);
  assert.match(script,/C\.addEventListener\('pointerdown',e=>\{stopTouchGlide\(\)/);
  assert.match(script,/C\.addEventListener\('pointercancel',e=>\{stopTouchGlide\(\)/);
- assert.match(script,/function zoomAt\(factor,px,py\)\{\s*stopTouchGlide\(\)/);
- assert.match(script,/function panMinimap\(clientX,clientY\)\{\s*stopTouchGlide\(\)/);
+ assert.match(script,/function zoomAt\(factor,px,py\)\{\s*cameraFollowUnit=null;\s*if\(typeof stopTouchGlide==='function'\)stopTouchGlide\(\)/);
+ assert.match(script,/function panMinimap\(clientX,clientY\)\{\s*cameraFollowUnit=null;\s*if\(typeof stopTouchGlide==='function'\)stopTouchGlide\(\)/);
  assert.match(script,/applyTouchGlide\(dt\);updateFishingBoats\(dt\)/);
 });
