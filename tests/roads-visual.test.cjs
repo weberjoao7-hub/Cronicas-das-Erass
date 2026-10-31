@@ -55,9 +55,13 @@ test('town square renders beneath the town hall and respects zoom LOD',()=>{
  s.ops.length=0;s.drawVillageSquare(180,220,18,9,80,80);
  assert.equal(s.ops.length,0);
  assert.ok(near>10);
- const square=script.indexOf('drawVillageSquare(px,py,ww,hh,x,y);drawVillageLife(');
- const hall=script.indexOf('drawTownHall(px,py,ww,hh,false)',square);
- assert.ok(square>0&&hall>square,'praça e bancas permanecem atrás do salão');
+ const square=script.indexOf('drawVillageSquare(px,py,ww,hh,x,y);');
+ const palisadeBack=script.indexOf("drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back')",square);
+ const marketBack=script.indexOf("drawVillageLife(px,py,ww,hh,game.era,frameTime,'back'",square);
+ const hall=script.indexOf('drawTownHall(px,py,ww,hh,false)',marketBack);
+ const palisadeFront=script.indexOf("drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front'",hall);
+ assert.ok(square>0&&palisadeBack>square&&marketBack>palisadeBack&&hall>marketBack&&palisadeFront>hall,
+  'praça, muralha traseira e bancas ficam atrás do salão; portão fica na frente');
 });
 
 test('all eight eras have distinct road surfaces and matching LOD',()=>{
