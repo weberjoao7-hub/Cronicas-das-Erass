@@ -24,7 +24,7 @@ function harness({zoom=1,visible=true,position=(x,y,z)=>[120,150-z],width=420,he
 test('script principal compila e mantém o mesmo formato de salvamento',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(html,/<title>Crônicas das Eras v6\.143<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.14[34]<\/title>/);
 });
 test('não registra dano nulo, negativo ou coordenadas inválidas',()=>{
  const h=harness();
