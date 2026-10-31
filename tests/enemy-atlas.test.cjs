@@ -30,9 +30,9 @@ test('enemy guards route through the animated troop atlas without changing their
  assert.equal(calls[0][9],true,'enemy affiliation reaches the atlas renderer');
  assert.equal(route({kind:'warrior'},false)[0][9],false);
 });
-test('damage keeps the procedural fallback and cavalry retains its dedicated renderer',()=>{
- assert.equal(route({hitAt:9900},true).length,0,'recent enemy damage uses hit effects');
- assert.equal(route({kind:'warrior',hitAt:9900},false).length,0);
+test('damage preserves the illustrated atlas and cavalry retains its dedicated renderer',()=>{
+ assert.equal(route({hitAt:9900},true).length,1,'recent enemy damage keeps illustrated atlas');
+ assert.equal(route({kind:'warrior',hitAt:9900},false).length,1);
  assert.equal(route({face:1},true,.6).length,1,'LOD is decided inside atlas renderer');
  assert.match(script,/if\(z<\.72\|\|!paintedTroops\.complete/);
 });
