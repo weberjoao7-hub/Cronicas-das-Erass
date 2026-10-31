@@ -126,7 +126,7 @@ function enemyTurn(dt){
   const dx=next.x-guard.x,dy=next.y-guard.y,len=Math.hypot(dx,dy);
   if(len<=.06){guard.x=next.x;guard.y=next.y;guard.path.shift();dirty=true}
   else{const step=Math.min(len,dt*1.3);const nx=guard.x+dx/len*step,ny=guard.y+dy/len*step;
-   if(passable(Math.floor(nx),Math.floor(ny))){guard.x=nx;guard.y=ny;dirty=true}else{guard.path=[];guard.repath=0}}
+   if(passable(Math.floor(nx),Math.floor(ny))){guard.x=nx;guard.y=ny;advanceUnitStride(guard,step);dirty=true}else{guard.path=[];guard.repath=0}}
  }
 }
 const isMilitary=kind=>kind==='warrior'||kind==='archer'||kind==='cavalry'||kind==='cannon';
@@ -5081,6 +5081,20 @@ function unitAnimationClock(u,now){
  if(offset===undefined){offset=(++nextAnimationPhase*173)%620;unitAnimationPhase.set(u,offset)}
  return now+offset;
 }
+// Passadas vinculadas a distancia percorrida, nao ao FPS ou relogio do Safari.
+// O WeakMap nao entra no salvamento: cronicas-v04 permanece compativel.
+const unitStrideDistance=new WeakMap();
+function advanceUnitStride(u,step){
+ if(!u||typeof u!=='object'||!Number.isFinite(step)||step<=0)return;
+ unitStrideDistance.set(u,((unitStrideDistance.get(u)||0)+step)%12);
+}
+function strideFrame(u,frames=2,step=.30){
+ if(!u||typeof u!=='object'||!Number.isFinite(step)||step<=0)return 0;
+ return Math.floor((unitStrideDistance.get(u)||0)/step)%frames;
+}
+function strideSwing(u){
+ return Math.sin((unitStrideDistance.get(u)||0)*Math.PI*2/.60);
+}
 const paintedCavalry=typeof Image==='function'?new Image():{complete:false,naturalWidth:0};
 if(typeof Image==='function')paintedCavalry.src='assets/cronicas_cavalaria_atlas.svg';
 // v6.108: breathing and weight shifts around the foot contact point.
@@ -5098,7 +5112,7 @@ function drawPaintedCavalry(u,px,py,z){
  const striking=!!u.attackAt&&now-u.attackAt>=0&&now-u.attackAt<340;
  const target=moving?u.path[0]:null;
  const direction=target?((target.x-u.x)-(target.y-u.y)<0?-1:1):(u.face===-1?-1:1);
- const frame=striking?3:moving?1+Math.floor(visualNow/155)%2:0;
+ const frame=striking?3:moving?1+strideFrame(u,2,.40):0;
  const eraBand=Math.min(3,Math.max(0,Math.floor(game.era/2)));
  const w=44*z,h=44*z;
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
@@ -5235,7 +5249,7 @@ const paintedWorkerActions=typeof Image==='function'?new Image():{complete:false
 if(typeof Image==='function')paintedWorkerActions.src='assets/cronicas_aldeoes_trabalho.svg';
 function drawPaintedVillager(u,px,py,z,job,moving,now){
  if((job!=='idle'&&job!=='walk')||game.era>=2||!paintedVillagers.complete||!paintedVillagers.naturalWidth||z<.65)return false;
- const frame=moving?2+Math.floor(now/150)%4:Math.floor(now/550)%2;
+ const frame=moving?2+strideFrame(u,4,.17):Math.floor(now/550)%2;
  const target=moving&&u.path&&u.path.length?u.path[0]:null;
  const dir=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
  const w=24*z,h=w*104/56;
@@ -5284,7 +5298,7 @@ function drawWorkerTaskProps(px,py,z,job,now){
 }
 function drawVillagerAtlas(u,px,py,z,job,moving,now){
  if(z<.65)return false;
- const frame=Math.floor(now/(moving?160:220))%4,img=villagerSprite(job,frame,game.era);
+ const frame=moving?strideFrame(u,4,.17):Math.floor(now/220)%4,img=villagerSprite(job,frame,game.era);
  if(!img.complete||!img.naturalWidth)return false;
  const target=moving&&u.path&&u.path.length?u.path[0]:null;
  const dir=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
@@ -5301,7 +5315,7 @@ if(typeof Image==='function')paintedTroops.src='assets/cronicas_tropas_atlas.svg
 function drawPaintedTroop(u,px,py,z,archer,moving,striking,now,direction,enemy=false){
  if(z<.72||!paintedTroops.complete||paintedTroops.naturalWidth!==256||paintedTroops.naturalHeight!==896)return false;
  const eraBand=Math.min(3,Math.max(0,Math.floor(game.era/2)));
- const frame=striking?3:moving?1+Math.floor(now/155)%2:0;
+ const frame=striking?3:moving?1+strideFrame(u,2,.30):0;
  const w=25*z,h=w*112/64;
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
  // Sombra do sprite ancorada em y=98 (87,5% da altura), no mesmo plano do terreno.
@@ -5442,7 +5456,7 @@ function drawUnitSprite(u,px,py,z,enemy=false){
   if(!enemy&&u.kind==='cannon'){drawSiegeCannon(u,px,py,z);return;}
  if(!enemy&&u.kind==='cavalry'){if(typeof drawPaintedCavalry==='function'&&drawPaintedCavalry(u,px,py,z))return;return drawCavalrySprite(u,px,py,z);}
  const r=Math.max(5.5,8.2*z),moving=Array.isArray(u.path)&&u.path.length>0;
- const now=Date.now(),visualNow=typeof unitAnimationClock==='function'?unitAnimationClock(u,now):now,phase=moving?Math.sin(visualNow*.013+(u.x+u.y)*2):0;
+ const now=Date.now(),visualNow=typeof unitAnimationClock==='function'?unitAnimationClock(u,now):now,phase=moving?strideSwing(u):0;
  const target=moving?u.path[0]:null;
  const direction=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
  const striking=now-(u.attackAt||0)<340,hit=now-(u.hitAt||0)<190;
@@ -8394,7 +8408,7 @@ function loop(t){
 }
 function gameFrame(t){
  if(document.hidden){lastFrame=t;return}
- let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;applyDesktopEdgePan(dt);applyCameraFollow(dt);for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*unitTravelSpeed(u,target));u.x+=dx/len*step;u.y+=dy/len*step;dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:wildlifeAt(hx,hy)==='boar'?20:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}applyTouchGlide(dt);updateFishingBoats(dt);enemyTurn(dt);recordGroundTracks(Date.now());combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=120){dayClock-=120;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;const drawStart=performance.now();try{draw();adjustRenderCadence(performance.now()-drawStart);recordRenderSample(t,performance.now()-drawStart)}catch(error){reportGameError(error,'renderização')}renderTick=t}
+ let dt=Math.min(.05,Math.max(0,(t-lastFrame)/1000||0));lastFrame=t;applyDesktopEdgePan(dt);applyCameraFollow(dt);for(let u of game.units){if(!Array.isArray(u.path))u.path=[];let target=u.path.length?u.path[0]:{x:u.x,y:u.y};let dx=target.x-u.x,dy=target.y-u.y,len=Math.hypot(dx,dy);if(len<=.045&&u.path.length){u.x=target.x;u.y=target.y;u.path.shift();dirty=true}else if(len>.045){let step=Math.min(len,dt*unitTravelSpeed(u,target));u.x+=dx/len*step;u.y+=dy/len*step;advanceUnitStride(u,step);dirty=true}}for(let u of game.units){if(!u.huntTarget)continue;const [hx,hy]=u.huntTarget.split(',').map(Number);if(Math.hypot(u.x-(hx+.5),u.y-(hy+.5))<.7&&(!u.path||!u.path.length)){u.huntProgress=(u.huntProgress||0)+dt;dirty=true;if(u.huntProgress>=3.5){if(!game.hunted.includes(u.huntTarget)){game.hunted.push(u.huntTarget);game.food+=wildlifeAt(hx,hy)==='deer'?30:wildlifeAt(hx,hy)==='boar'?20:12;toast('🏹 Caça concluída! Alimentos armazenados.')}u.huntTarget=null;u.huntProgress=0;u.job=false;refresh();assignWorkers()}}}applyTouchGlide(dt);updateFishingBoats(dt);enemyTurn(dt);recordGroundTracks(Date.now());combatClock+=dt;if(combatClock>=1.2){combatClock=0;warriorAutoEngage();combatTurn()}for(let b of game.buildings){if(b.buildLeft>0){let nearby=game.units.filter(u=>u.kind==='worker'&&u.buildTarget===key(b.x,b.y)&&Math.hypot(u.x-(b.x+.5),u.y-(b.y+.5))<2.7&&(!u.path||!u.path.length)).length;let speed=nearby?Math.min(nearby,3)*1.15:.12;b.buildLeft=Math.max(0,b.buildLeft-dt*speed);dirty=true;if(!b.buildLeft){for(let u of game.units){if(u.buildTarget===key(b.x,b.y)){u.buildTarget=null;u.job=false;u.path=[]}}if(b.t==='Cabana')game.people+=2;assignWorkers();refresh();toast('🏗️ '+b.t+' concluída!')}}}live+=dt;autosave+=dt;dayClock+=dt;workerClock+=dt;fogClock+=dt;if(fogClock>=.45){fogClock=0;updateVisibility()}if(dayClock>=120){dayClock-=120;nextDay()}if(workerClock>=8){workerClock=0;assignBuilders();assignWorkers()}if(live>=4){live=0;let gains={wood:0,food:0,stone:0,ore:0};for(let u of game.units.filter(u=>u.kind==='worker'&&!u.huntTarget&&!u.buildTarget)){let x=Math.floor(u.x),y=Math.floor(u.y),b=biome(x,y);if(Math.hypot(u.tx-u.x,u.ty-u.y)>.15)continue;if(b===3)gains.wood+=2;else if(b===4){gains.stone+=1;gains.ore+=1}else if(b===1||b===2)gains.food+=2}for(let k of Object.keys(gains))game[k]+=gains[k];if(Object.values(gains).some(Boolean))refresh();}if(autosave>12){autosave=0;save()}if(t-renderTick>=frameInterval){dirty=true;const drawStart=performance.now();try{draw();adjustRenderCadence(performance.now()-drawStart);recordRenderSample(t,performance.now()-drawStart)}catch(error){reportGameError(error,'renderização')}renderTick=t}
 if(t-minimapTick>400){redrawMinimap();drawMinimap();minimapTick=t}if(t-lightLabelTick>1200){lightLabelTick=t;const phase=(dayClock%120)/120,light=lightLevels(phase);eraLabel.textContent=(game.won?'🏆 ':'')+'Era '+eras[game.era]+' · Dia '+game.day+' · '+seasonNames[forestSeason()]+' · '+(weatherPreview?(forestSeason()===3?'❄️ Prévia de neve · ':'🌧️ Prévia · '):weatherForDay(game.day,phase)>.12?(forestSeason()===3?'❄️ Neve · ':'🌧️ Chuva · '):'')+(light.night>.28?'🌙 Noite':phase>.48?'🌇 Crepúsculo':'☀️ Dia')}
 }if(game.enemy&&game.enemy.hp>0&&game.enemyUnits.length===0){spawnEnemyGuard();spawnEnemyGuard()}updateVisibility();refresh();assignBuilders();assignWorkers();requestAnimationFrame(loop);if(!tutorialSeen())showTutorial();else toast('v6.136: juncos e taboas nas margens dos lagos');
 })();
