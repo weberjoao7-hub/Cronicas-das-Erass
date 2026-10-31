@@ -1251,6 +1251,66 @@ function drawOrchard(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now(),layer=
  return count;
 }
 
+// v6.135: carvalhos isolados nas pradarias — copas facetadas, ramos sazonais e profundidade real.
+// A escolha e deterministica; nenhuma entidade, timer ou campo novo no salvamento.
+function fieldOakAt(x,y,b){return b===2&&rnd(x,y,752)>.948}
+function drawFieldOak(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now(),layer='all',lower=-Infinity,upper=Infinity){
+ if(ww<34||hh<12)return 0;
+ const tx=px+ww*.025,ty=py+hh*.11,depth=ty;
+ const ground=layer==='all'||layer==='back';
+ const crown=layer==='all'||(layer==='range'&&depth>lower&&depth<=upper)||(layer==='front'&&depth>lower);
+ if(!ground&&!crown)return 0;
+ const wind=Math.sin(now*.00135+x*.43+y*.61)*ww*.009;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ if(ground){
+  ctx.fillStyle='#15251c73';ctx.beginPath();
+  ctx.ellipse(tx+ww*.09,ty+hh*.07,ww*.33,hh*.13,-.14,0,Math.PI*2);ctx.fill();
+  if(ww>=54){
+   ctx.strokeStyle=season===3?'#a2aca2':'#5b7541';ctx.lineWidth=Math.max(.7,ww*.011);
+   for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(tx+side*ww*.24,ty+hh*.045);
+    ctx.lineTo(tx+side*ww*.27,ty-hh*.085);ctx.stroke()}
+  }
+ }
+ if(crown){
+  // Tronco afunilado, face iluminada e forquilhas fixas ao mesmo ponto de solo.
+  ctx.fillStyle='#493a2c';ctx.beginPath();ctx.moveTo(tx-ww*.052,ty);
+  ctx.lineTo(tx-ww*.031,ty-hh*.91);ctx.lineTo(tx+ww*.013,ty-hh*1.16);
+  ctx.lineTo(tx+ww*.063,ty-hh*.87);ctx.lineTo(tx+ww*.054,ty);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#95734e';ctx.beginPath();ctx.moveTo(tx-ww*.017,ty-hh*.04);
+  ctx.lineTo(tx-ww*.013,ty-hh*.89);ctx.lineTo(tx+ww*.011,ty-hh*1.08);
+  ctx.lineTo(tx+ww*.018,ty-hh*.07);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#594331';ctx.lineWidth=Math.max(1.4,ww*.042);
+  for(const [dx,dy] of [[-.32,-1.18],[.29,-1.26],[-.15,-1.53],[.13,-1.57]]){
+   ctx.beginPath();ctx.moveTo(tx,ty-hh*.83);
+   ctx.quadraticCurveTo(tx+dx*ww*.48,ty-hh*1.13,tx+dx*ww,ty+dy*hh);ctx.stroke();
+  }
+  if(season!==3){
+   const colors=season===2?['#74542e','#9e7938','#c09a4b']:
+    season===0?['#315c3d','#57884d','#87a968']:['#254e3d','#3d7650','#61966a'];
+   const clusters=[[-.23,-1.30,.21,.27],[.22,-1.32,.23,.26],[-.015,-1.54,.29,.33]];
+   for(let i=0;i<clusters.length;i++){
+    const [ox,oy,rx,ry]=clusters[i],sx=tx+ox*ww+wind*(i===2?1:.65),sy=ty+oy*hh;
+    ctx.fillStyle=colors[0];ctx.beginPath();ctx.ellipse(sx+ww*.022,sy+hh*.065,ww*rx*1.10,hh*ry*1.04,-.12,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=colors[1];ctx.beginPath();ctx.ellipse(sx,sy-hh*.018,ww*rx,hh*ry,-.12,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=colors[2];ctx.beginPath();ctx.ellipse(sx-ww*.055,sy-hh*.095,ww*rx*.64,hh*ry*.54,-.17,Math.PI,Math.PI*2);ctx.fill();
+    if(ww>=64){
+     ctx.fillStyle=season===2?'#e0b567':'#9cba78';
+     for(let j=0;j<3;j++){const fx=sx+ww*(rnd(x+i*7+j,y,753)-.5)*rx*1.15;
+      const fy=sy+hh*(rnd(x,y+i*7+j,754)-.5)*ry*.85;
+      ctx.beginPath();ctx.ellipse(fx,fy,ww*.017,hh*.026,.3,0,Math.PI*2);ctx.fill()}
+    }
+   }
+  }else{
+   // No inverno os galhos permanecem visiveis e recebem neve apenas na face superior.
+   ctx.strokeStyle='#dce7df';ctx.lineWidth=Math.max(.8,ww*.015);
+   for(const [dx,dy] of [[-.32,-1.18],[.29,-1.26],[-.15,-1.53],[.13,-1.57]]){
+    ctx.beginPath();ctx.moveTo(tx+dx*ww*.67,ty+dy*hh+hh*.12);
+    ctx.lineTo(tx+dx*ww,ty+dy*hh);ctx.stroke();
+   }
+  }
+ }
+ ctx.restore();return crown?1:0;
+}
 function meadowDetails(px,py,ww,hh,x,y,b,now=Date.now()){
  if(ww<36)return;
  const q=rnd(x,y,31);
@@ -7142,6 +7202,18 @@ function drawQuarryWorksite(px,py,ww,hh,x,y,era=0,now=Date.now(),season=forestSe
 }
 // v6.128: pinheiros alpinos e unidades ordenados pela profundidade dos pes.
 // Sem novos objetos no save: as arvores continuam deterministicas por tile.
+// Carvalhos e tropas intercalados pela profundidade dos pes, sem sombra duplicada.
+function drawFieldOakOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,now){
+ const actors=tileActors(x,y,unitTiles,enemyTiles);
+ let lower=-Infinity;
+ for(const actor of actors){
+  const depth=point(actor.u.x,actor.u.y)[1];
+  drawFieldOak(px,py,ww,hh,x,y,forestSeason(),now,'range',lower,depth);
+  drawTileOccupants(x,y,unitTiles,enemyTiles,z,now,[actor]);
+  lower=depth;
+ }
+ drawFieldOak(px,py,ww,hh,x,y,forestSeason(),now,'front',lower);
+}
 function drawAlpineOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,now){
  const actors=tileActors(x,y,unitTiles,enemyTiles);
  let lower=-Infinity;
@@ -7265,10 +7337,13 @@ if(forestOpen){
 }
 const orchardOpen=(b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&orchardTile(x,y,b)&&!riparianMask[y*W+x];
 const orchardActors=orchardOpen?tileActors(x,y,unitTiles,enemyTiles):null;
+const fieldOakOpen=b===2&&visibleFog[y*W+x]&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&!riparianMask[y*W+x]&&!orchardOpen&&fieldOakAt(x,y,b);
+const fieldOakActors=fieldOakOpen?tileActors(x,y,unitTiles,enemyTiles):null;
 const riparianActors=(b===1||b===2)&&riparianMask[y*W+x]&&ww>=65&&rnd(x,y,183)>.72&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))?tileActors(x,y,unitTiles,enemyTiles):null;
 if((b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(riparianMask[y*W+x])drawRiparianBank(px,py,ww,hh,x,y,riparianMask[y*W+x]);
  meadowDetails(px,py,ww,hh,x,y,b,frameTime);
+  if(fieldOakOpen)drawFieldOak(px,py,ww,hh,x,y,forestSeason(),frameTime,fieldOakActors.length?'back':'all');
  if(b===1&&q>.962&&ww>=48&&visibleFog[y*W+x]&&!riparianMask[y*W+x]&&!orchardTile(x,y,b))
   drawGrazingAurochs(px,py,ww,hh,x,y,frameTime,forestSeason());
  if(orchardOpen){
@@ -7336,6 +7411,7 @@ if(forestCount)drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,f
 else if(orchardActors?.length)drawOrchardOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
 else if(riparianActors?.length)drawRiparianOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
 else if(alpineActors?.length)drawAlpineOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
+else if(fieldOakActors?.length)drawFieldOakOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
 else if(structureActors)drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime,structureActors.filter(({u})=>!unitBehindStructure(u,x,y)));
 else drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime);
 // Efeitos sazonais na frente das copas e dos atores, apenas em biomas visiveis.
