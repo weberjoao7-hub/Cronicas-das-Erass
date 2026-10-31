@@ -31,9 +31,10 @@ test('pintura integral e pintura em camadas sao geometricamente identicas',()=>{
 });
 test('sombras nao se repetem em camadas de profundidade',()=>{
  const back=make(),front=make();
- back.draw(200,180,74,37,21,32,0,1600,'back',-Infinity);
- front.draw(200,180,74,37,21,32,0,1600,'front',-Infinity);
- assert.equal(back.calls.filter(v=>v[0]==='ellipse').length,2);
+ // Zoom medio evita os cascalhos extras que tambem usam elipses.
+ back.draw(200,180,45,22.5,21,32,0,1600,'back',-Infinity);
+ front.draw(200,180,45,22.5,21,32,0,1600,'front',-Infinity);
+ assert.equal(back.calls.filter(v=>v[0]==='ellipse').length,1);
  assert.equal(front.calls.filter(v=>v[0]==='ellipse').length,0);
 });
 test('intercalacao respeita a profundidade de cada unidade',()=>{
