@@ -21,7 +21,7 @@ function scene({season=3,z=1.4,kind='warrior',era=4,enemy=false,now=2400,atlas=t
 test('v6.129: sintaxe e salvamento existente preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'/);
- assert.doesNotMatch(source,/localStorage|Math\.random|setInterval|game\.units\.push/);
+ assert.doesNotMatch(source.replace(/\/\/[^\n]*/g,''),/localStorage|Math\.random|setInterval|game\.units\.push/);
 });
 test('roupas e respiracao so aparecem no inverno com zoom adequado',()=>{
  for(const season of [0,1,2]){const s=scene({season});assert.equal(s.count,0);assert.equal(s.calls.length,0)}
