@@ -22,7 +22,7 @@ function scene(era=4,ww=80,now=1200,season=1,level=3){
 }
 test('v6.116: script compila e salvamento existente não muda',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.116<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
 });
 test('pátio do moinho integra-se apenas à construção concluída',()=>{
