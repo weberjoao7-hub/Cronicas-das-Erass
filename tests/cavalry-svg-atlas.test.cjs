@@ -42,10 +42,10 @@ test('gallop alternates frames and attack overrides movement',()=>{
  assert.equal(render(4,{moving:true,now:1160}).calls[0][1],224);
  assert.equal(render(4,{moving:true,now:1160,attackAt:1100}).calls[0][1],336);
 });
-test('fallback for zoom, failed load, and recent damage',()=>{
+test('fallback for zoom and failed load, but not for recent damage',()=>{
  assert.equal(render(4,{zoom:.7}).drawn,false);
  assert.equal(render(4,{loaded:false}).drawn,false);
- assert.equal(render(4,{hitAt:950}).drawn,false);
+ assert.equal(render(4,{hitAt:950}).drawn,true);
  assert.equal(render(4,{zoom:.82}).drawn,true);
 });
 test('mirroring, grounded hooves, and isolated canvas state',()=>{
