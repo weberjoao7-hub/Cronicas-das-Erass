@@ -20,7 +20,8 @@ test('resolução adaptativa: JavaScript válido e save anterior preservado',()=
 });
 test('Retina começa com resolução nativa limitada e usa o fator só no backing store',()=>{
  assert.match(script,/let renderResolutionScale=1;/);
- assert.match(script,/dpr=Math\.min\(devicePixelRatio\|\|1,2,Math\.sqrt\(maxPixels\/\(w\*h\)\)\)\*renderResolutionScale;/);
+ assert.match(script,/dpr=Math\.min\(devicePixelRatio\|\|1,2,Math\.sqrt\(maxPixels\/\(w\*h\)\)\)/);
+ assert.match(script,/typeof renderResolutionScale==='number'\?renderResolutionScale:1/);
  assert.match(script,/const maxPixels=mobileViewport\?2600000:6000000;/);
  assert.match(script,/if\(C\.width!==bw\)C\.width=bw;/);
  assert.match(script,/if\(C\.height!==bh\)C\.height=bh;/);
