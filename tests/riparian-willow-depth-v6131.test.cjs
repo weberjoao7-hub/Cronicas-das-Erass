@@ -20,7 +20,8 @@ function scene({season=1,layer='all',lower=-Infinity,upper=Infinity,width=90,mas
 }
 test('v6.131: sintaxe, versao e save preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/Crônicas das Eras v6\.131/);
+ const version=html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/);
+ assert.ok(version&&Number(version[1])>=131,'versao nao pode regredir abaixo da v6.131');
  assert.match(script,/cronicas-v04/);
  assert.doesNotMatch(source,/localStorage|Math\.random|requestAnimationFrame/);
 });
