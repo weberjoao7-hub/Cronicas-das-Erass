@@ -182,7 +182,7 @@ function combatTurn(){if(!game.enemy||game.enemy.hp<=0)return;let hits=false;
   if(!target)continue;
   const damage=Math.min(14,target.hp);
   target.hp=Math.max(0,target.hp-damage);
-  target.hitAt=Date.now();recordCombatHit(target.x,target.y,damage,true);
+  target.hitAt=Date.now();if(typeof recordCombatHit==='function')recordCombatHit(target.x,target.y,damage,true);
   towerShots.push({sx:b.x+.5,sy:b.y+.5,ex:target.x,ey:target.y,start:Date.now()});
   hits=true;
  }
@@ -191,10 +191,10 @@ function combatTurn(){if(!game.enemy||game.enemy.hp<=0)return;let hits=false;
   if((u.kind==='archer'||u.kind==='cannon')&&u.path&&u.path.length)continue;
   const target=game.enemyUnits.find(e=>e.hp>0&&visibleAt(e.x,e.y)&&Math.hypot(u.x-e.x,u.y-e.y)<range&&(!['archer','cannon'].includes(u.kind)||typeof hasRangedSight!=='function'||hasRangedSight(u.x,u.y,e.x,e.y)));
   if(target){
-   const damage=Math.min(target.hp,attackDamage(u.kind));target.hp=Math.max(0,target.hp-damage);target.hitAt=Date.now();recordCombatHit(target.x,target.y,damage,true);u.attackAt=Date.now();u.face=((target.x-u.x)-(target.y-u.y))>=0?1:-1;hits=true;
+   const damage=Math.min(target.hp,attackDamage(u.kind));target.hp=Math.max(0,target.hp-damage);target.hitAt=Date.now();if(typeof recordCombatHit==='function')recordCombatHit(target.x,target.y,damage,true);u.attackAt=Date.now();u.face=((target.x-u.x)-(target.y-u.y))>=0?1:-1;hits=true;
    if(u.kind==='archer'||u.kind==='cannon')towerShots.push({sx:u.x,sy:u.y,ex:target.x,ey:target.y,start:Date.now(),kind:u.kind});
   }else if(Math.hypot(u.x-(game.enemy.x+.5),u.y-(game.enemy.y+.5))<range&&visibleAt(game.enemy.x+.5,game.enemy.y+.5)&&(!['archer','cannon'].includes(u.kind)||typeof hasRangedSight!=='function'||hasRangedSight(u.x,u.y,game.enemy.x+.5,game.enemy.y+.5))){
-   const damage=Math.min(game.enemy.hp,u.kind==='cannon'?20:u.kind==='archer'?6:9);game.enemy.hp=Math.max(0,game.enemy.hp-damage);recordCombatHit(game.enemy.x+.5,game.enemy.y+.5,damage,true,Date.now(),'base');u.attackAt=Date.now();u.face=((game.enemy.x+.5-u.x)-(game.enemy.y+.5-u.y))>=0?1:-1;hits=true;
+   const damage=Math.min(game.enemy.hp,u.kind==='cannon'?20:u.kind==='archer'?6:9);game.enemy.hp=Math.max(0,game.enemy.hp-damage);if(typeof recordCombatHit==='function')recordCombatHit(game.enemy.x+.5,game.enemy.y+.5,damage,true,Date.now(),'base');u.attackAt=Date.now();u.face=((game.enemy.x+.5-u.x)-(game.enemy.y+.5-u.y))>=0?1:-1;hits=true;
    if(u.kind==='archer'||u.kind==='cannon')towerShots.push({sx:u.x,sy:u.y,ex:game.enemy.x+.5,ey:game.enemy.y+.5,start:Date.now(),kind:u.kind});
   }
  }for(let e of game.enemyUnits.filter(e=>e.hp>0)){
@@ -204,7 +204,7 @@ function combatTurn(){if(!game.enemy||game.enemy.hp<=0)return;let hits=false;
   .sort((a,b)=>(a.kind==='warrior'?0:1)-(b.kind==='warrior'?0:1))[0];
  if(target){
   const damage=Math.min(target.hp,archer?7:11);
-  target.hp=Math.max(0,target.hp-damage);recordCombatHit(target.x,target.y,damage,false);
+  target.hp=Math.max(0,target.hp-damage);if(typeof recordCombatHit==='function')recordCombatHit(target.x,target.y,damage,false);
   target.hitAt=Date.now();e.attackAt=Date.now();
   e.face=((target.x-e.x)-(target.y-e.y))>=0?1:-1;
   if(archer)towerShots.push({sx:e.x,sy:e.y,ex:target.x,ey:target.y,start:Date.now(),kind:'archer'});
