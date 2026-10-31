@@ -2798,39 +2798,55 @@ function drawWildlife(px,py,ww,hh,kind,x,y){
 }
 // Cardumes sob a superfície: recorte no losango, profundidade e movimento discreto.
  // Apenas desenho; a lógica de pesca e o salvamento permanecem intactos.
- function drawFishSchool(ww,hh,x,y,now){
-  if(ww<38)return;
-  const time=now*.001,seed=rnd(x,y,214),count=ww>=70?4:ww>=52?3:2;
-  ctx.save();
-  // drawWildlife já deslocou a origem para py-hh*.12.
-  ctx.beginPath();ctx.moveTo(0,-hh*.38);ctx.lineTo(ww*.46,hh*.12);
-  ctx.lineTo(0,hh*.62);ctx.lineTo(-ww*.46,hh*.12);ctx.closePath();ctx.clip();
-  for(let i=0;i<count;i++){
-   const depth=rnd(x+i,y,215),phase=time*.55+i*1.9+seed*7;
-   const fx=(i-(count-1)*.5)*ww*.115+Math.sin(phase*.7)*ww*.048;
-   const fy=hh*.12+(i%2?1:-1)*hh*.095+Math.cos(phase*.8)*hh*.045;
-   const len=ww*(.065+depth*.025),heading=Math.sin(time*.24+seed*6+i*.55)>0?1:-1;
-   ctx.save();ctx.translate(fx,fy);ctx.scale(heading,1);ctx.rotate(Math.sin(phase*.45)*.18);
-   ctx.globalAlpha=.27+depth*.22;
-   ctx.fillStyle=i%3===0?'#244b52':i%3===1?'#335b5c':'#405e5c';
-   ctx.beginPath();ctx.ellipse(0,0,len*.75,len*.23,-.07,0,Math.PI*2);ctx.fill();
-   const tail=Math.sin(phase*2.8)*len*.14;
-   ctx.beginPath();ctx.moveTo(-len*.61,0);
-   ctx.lineTo(-len*1.16,-len*.38+tail);
-   ctx.lineTo(-len*1.08,len*.38+tail);ctx.closePath();ctx.fill();
-   ctx.fillStyle='#7eaaa3';ctx.globalAlpha=.15+depth*.12;
-   ctx.beginPath();ctx.moveTo(-len*.13,-len*.14);
-   ctx.lineTo(-len*.35,-len*.38);ctx.lineTo(len*.20,-len*.15);ctx.closePath();ctx.fill();
-   if(ww>=70){
-    ctx.fillStyle='#a4c5b6';ctx.globalAlpha=.19;
-    ctx.beginPath();ctx.arc(len*.42,-len*.04,Math.max(.55,scale*.45),0,Math.PI*2);ctx.fill();
-   }
-   ctx.restore();
+ // v6.133: cardumes submersos com trajetorias continuas, curvas tangentes e LOD.
+// Os peixes permanecem dentro do losango da agua, sem sprites soltos ou viradas instantaneas.
+function fishSchoolPose(x,y,i,count,ww,hh,now){
+ const seed=rnd(x+i*13,y-i*7,214);
+ const phase=now*.00031*(.82+seed*.36)+seed*Math.PI*2+i*.65;
+ const drift=now*.00015+rnd(x,y,216)*Math.PI*2;
+ const orbitX=ww*(.064+seed*.023),orbitY=hh*(.056+seed*.015);
+ const fx=Math.sin(drift)*ww*.07+(i-(count-1)*.5)*ww*.075+Math.cos(phase)*orbitX;
+ const fy=Math.cos(drift*.84)*hh*.055+(i%2?1:-1)*hh*.045+Math.sin(phase)*orbitY;
+ // Tangente da orbita: a orientacao gira suavemente, inclusive nas extremidades.
+ const angle=Math.atan2(Math.cos(phase)*orbitY,-Math.sin(phase)*orbitX);
+ return {x:fx,y:fy,angle,tail:Math.sin(now*.009+seed*11+i*.8),depth:rnd(x+i,y,215)};
+}
+function drawFishSchool(ww,hh,x,y,now){
+ if(ww<38||!Number.isFinite(now))return 0;
+ const count=ww>=70?4:ww>=52?3:2;
+ ctx.save();
+ // A agua e um losango; recortar evita cardumes projetados sobre a terra.
+ ctx.beginPath();ctx.moveTo(0,-hh*.38);ctx.lineTo(ww*.46,hh*.12);
+ ctx.lineTo(0,hh*.62);ctx.lineTo(-ww*.46,hh*.12);ctx.closePath();ctx.clip();
+ for(let i=0;i<count;i++){
+  const pose=fishSchoolPose(x,y,i,count,ww,hh,now);
+  const len=ww*(.065+pose.depth*.025);
+  ctx.save();ctx.translate(pose.x,pose.y);ctx.rotate(pose.angle);
+  ctx.globalAlpha=.28+pose.depth*.20;
+  ctx.fillStyle=i%3===0?'#244b52':i%3===1?'#335b5c':'#405e5c';
+  // Silhueta fusiforme e cauda bifurcada acompanham a direcao do nado.
+  ctx.beginPath();ctx.ellipse(0,0,len*.75,len*.25,-.04,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.moveTo(-len*.59,0);
+  ctx.lineTo(-len*1.14,-len*.38+pose.tail*len*.13);
+  ctx.lineTo(-len*1.08,len*.38+pose.tail*len*.13);ctx.closePath();ctx.fill();
+  if(ww>=52){
+   ctx.fillStyle='#7eaaa3';ctx.globalAlpha=.16+pose.depth*.13;
+   ctx.beginPath();ctx.moveTo(-len*.20,-len*.18);
+   ctx.lineTo(-len*.36,-len*.43);ctx.lineTo(len*.23,-len*.18);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#9fc0b5';ctx.lineWidth=Math.max(.45,ww*.006);
+   ctx.beginPath();ctx.moveTo(len*.30,-len*.13);
+   ctx.quadraticCurveTo(len*.18,0,len*.30,len*.13);ctx.stroke();
+  }
+  if(ww>=70){
+   ctx.fillStyle='#b4d1c3';ctx.globalAlpha=.19;
+   ctx.beginPath();ctx.arc(len*.43,-len*.055,Math.max(.48,ww*.006),0,Math.PI*2);ctx.fill();
   }
   ctx.restore();
  }
- 
- // Garças nas margens: pés ancorados na água rasa, corpo articulado e reflexo.
+ ctx.restore();return count;
+}
+
+// Garças nas margens: pés ancorados na água rasa, corpo articulado e reflexo.
 // Densidade baixa e LOD: evita aves enormes ou silhuetas flutuantes sobre o mapa.
 function drawWadingBird(px,py,ww,hh,x,y,mask,now=Date.now()){
  if(!mask||ww<43||scale<.65)return;
