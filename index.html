@@ -6437,7 +6437,7 @@ function drawVillageLife(px,py,ww,hh,era=0,now=Date.now(),layer='front',season=f
     ctx.strokeStyle=late?'#6c7e7c':'#735638';ctx.lineWidth=Math.max(1,ww*.018);
     for(const dx of [-.105,.105]){ctx.beginPath();ctx.moveTo(...p(x+dx,y+.10));ctx.lineTo(...p(x+dx,y-.18));ctx.stroke()}
     if(season===3){ctx.strokeStyle='#eaf0e8';ctx.lineWidth=Math.max(1.4,ww*.025);ctx.beginPath();ctx.moveTo(...p(x-.15,y-.22));ctx.lineTo(...p(x+.09,y-.22));ctx.stroke()}
-   drawMarketCanopyDetails(px,py,ww,hh,era,now,season,i);
+   if(typeof drawMarketCanopyDetails==='function')drawMarketCanopyDetails(px,py,ww,hh,era,now,season,i);
    }else{
     // Primeiras eras: cestos e feixes, em vez de bancas com cobertura.
     ctx.fillStyle='#bda16e';ctx.beginPath();ctx.ellipse(...p(x-.04,y-.05),ww*.045,hh*.075,0,0,Math.PI*2);ctx.fill();
