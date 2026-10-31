@@ -6345,6 +6345,26 @@ function drawVillagePalisade(px,py,ww,hh,era=0,season=0,now=Date.now(),layer='ba
  }
 // v6.84: praça viva, com bancas por era e aldeões ambientais ancorados no piso.
 // Renderização em duas camadas, sem entidades, economia ou dados de salvamento novos.
+// Cidadãos da praça reutilizam o atlas vetorial dos aldeões reais.
+// Sprites com pés no solo, animação defasada por personagem e fallback Canvas.
+// O atlas só é solicitado no zoom próximo; não cria unidades nem altera saves.
+function drawVillageCitizenAtlas(px,py,ww,era,now,index){
+ if(ww<56||typeof villagerSprite!=='function'||typeof Image!=='function'||!Number.isFinite(now))return false;
+ const frame=((Math.floor(now/190+index*1.5)%4)+4)%4;
+ const img=villagerSprite('walk',frame,era);
+ if(!img||!img.complete||!img.naturalWidth)return false;
+ const width=Math.min(22,ww*.21),height=width*64/48;
+ const facing=Math.cos(now*.00045+index*2.15)>=0?1:-1;
+ ctx.save();ctx.translate(px,py);ctx.scale(facing,1);
+ ctx.drawImage(img,-width*.5,-height*.91,width,height);
+ if(index===1&&ww>=72){
+  // Cesto preso à mão do mercador, no mesmo plano do sprite.
+  ctx.fillStyle='#80603e';ctx.fillRect(width*.32,-height*.38,width*.23,height*.16);
+  ctx.strokeStyle='#d5b47c';ctx.lineWidth=Math.max(.7,ww*.009);
+  ctx.beginPath();ctx.arc(width*.435,-height*.38,width*.105,Math.PI,Math.PI*2);ctx.stroke();
+ }
+ ctx.restore();return true;
+}
 function drawVillageLife(px,py,ww,hh,era=0,now=Date.now(),layer='front',season=forestSeason(),visible=true){
  if(ww<42)return 0;
  const late=era>=6,settled=era>=2,night=lightLevels((dayClock%120)/120).night;
@@ -6396,6 +6416,7 @@ function drawVillageLife(px,py,ww,hh,era=0,now=Date.now(),layer='front',season=f
   const y=py+hh*(.29+i*.029);
   const step=Math.sin(now*.008+i*2.3),walk=Math.cos(now*.00045+i*2.15);
   const size=Math.max(5,Math.min(13,ww*.16)),head=size*.18;
+  if(typeof drawVillageCitizenAtlas==='function'&&drawVillageCitizenAtlas(x,y,ww,era,now,i))continue;
   const coat=late?(i%2?'#526d71':'#667f72'):settled?(i%2?'#a05d49':'#4e7080'):(i%2?'#b68b59':'#83664a');
   ctx.fillStyle='#132c2466';ctx.beginPath();ctx.ellipse(x,y+size*.045,size*.31,size*.095,0,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='#40392f';ctx.lineWidth=Math.max(1,ww*.019);ctx.lineCap='round';
