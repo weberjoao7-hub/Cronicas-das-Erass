@@ -1316,6 +1316,55 @@ function drawFieldOak(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now(),layer
  }
  ctx.restore();return crown?1:0;
 }
+// v6.138: flores de pradaria com caule, pétalas e sombras presas ao losango.
+// Variação determinística, estações e LOD: sem sprites flutuantes ou novos saves.
+function drawPrairieWildflowers(px,py,ww,hh,x,y,season=forestSeason(),now=Date.now()){
+ if(ww<40||hh<14||season===3||rnd(x,y,6)<=.79)return 0;
+ const close=ww>=60,count=close?3:1;
+ const petals=season===0?['#e7d8f2','#f4e9cb','#e8b5c8']:
+  season===1?['#e9b75d','#e8d5a2','#dba57e']:['#c0a267','#c7aa73','#98774c'];
+ let painted=0;
+ ctx.save();ctx.lineCap='round';
+ for(let i=0;i<count;i++){
+  const ox=(rnd(x+i*11,y,703)-.5)*ww*.47;
+  const oy=(rnd(x,y+i*13,704)-.5)*hh*.29;
+  const fx=px+ox,fy=py+oy,stalk=hh*(.11+rnd(x+i,y,705)*.045);
+  const sway=close?Math.sin(now*.0015+x*.41+y*.32+i*1.3)*ww*.009:0;
+  ctx.fillStyle='#15281a57';ctx.beginPath();
+  ctx.ellipse(fx+ww*.012,fy+hh*.017,ww*.036,hh*.025,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=season===2?'#8e8050':'#537744';
+  ctx.lineWidth=Math.max(.8,ww*.013);ctx.beginPath();ctx.moveTo(fx,fy);
+  ctx.quadraticCurveTo(fx+ww*.015,fy-stalk*.58,fx+sway,fy-stalk);ctx.stroke();
+  if(close){
+   ctx.beginPath();ctx.moveTo(fx,fy-stalk*.25);
+   ctx.quadraticCurveTo(fx-ww*.055,fy-stalk*.45,fx-ww*.046,fy-stalk*.62);
+   ctx.moveTo(fx,fy-stalk*.35);
+   ctx.quadraticCurveTo(fx+ww*.052,fy-stalk*.52,fx+ww*.049,fy-stalk*.65);ctx.stroke();
+  }
+  const topX=fx+sway,topY=fy-stalk;
+  if(season===2){
+   ctx.fillStyle=petals[i%3];ctx.beginPath();
+   ctx.ellipse(topX,topY,ww*.018,hh*.048,-.20,0,Math.PI*2);ctx.fill();
+   if(close){
+    ctx.strokeStyle='#ddc494';ctx.lineWidth=Math.max(.6,ww*.006);
+    ctx.beginPath();ctx.moveTo(topX,topY-hh*.045);
+    ctx.lineTo(topX+ww*.011,topY-hh*.06);ctx.stroke();
+   }
+  }else if(close){
+   const r=Math.max(1.3,ww*.017);ctx.fillStyle=petals[i%3];
+   for(let petal=0;petal<5;petal++){
+    const a=petal*Math.PI*2/5;ctx.beginPath();
+    ctx.ellipse(topX+Math.cos(a)*r*.77,topY+Math.sin(a)*r*.45,r*.64,r*.42,a,0,Math.PI*2);ctx.fill();
+   }
+   ctx.fillStyle='#e6ac49';ctx.beginPath();ctx.arc(topX,topY,r*.42,0,Math.PI*2);ctx.fill();
+  }else{
+   ctx.fillStyle=petals[i%3];ctx.beginPath();
+   ctx.arc(topX,topY,Math.max(1,ww*.017),0,Math.PI*2);ctx.fill();
+  }
+  painted++;
+ }
+ ctx.restore();return painted;
+}
 function meadowDetails(px,py,ww,hh,x,y,b,now=Date.now()){
  if(ww<36)return;
  const q=rnd(x,y,31);
@@ -7624,7 +7673,7 @@ if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(ruinKind)drawAncientRuin(px,py,ww,hh,ruinKind,game.ruinsExplored.includes(key(x,y)),frameTime);
  else drawLandmark(px,py,ww,hh,landmarkAt(x,y,b),x,y);
 }
-if(b===2&&q>.79&&ww>16){ctx.fillStyle='#f3bf55';for(let j=0;j<4;j++){ctx.beginPath();ctx.arc(px+(rnd(x+j,y,3)-.5)*ww*.5,py+(rnd(x,y+j,3)-.5)*hh*.45,Math.max(1,z*1.8),0,7);ctx.fill()}}
+if(b===2&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&visibleFog[y*W+x])drawPrairieWildflowers(px,py,ww,hh,x,y,forestSeason(),frameTime);
 const roadCart=roadConvoyTiles.get(key(x,y));if(roadCart&&visibleFog[y*W+x]&&!structures.has(key(x,y))&&b!==0)drawRoadConvoy(roadCart,ww,hh,game.era,frameTime);
 let animal=wildlifeAt(x,y);if(animal&&!ruinKind&&visibleFog[y*W+x]&&!game.hunted.includes(key(x,y))&&!structures.has(key(x,y))&&!(b===0&&boatTiles.has(key(x,y)))){drawWildlife(px,py,ww,hh,animal,x,y);if(activeHunts.has(key(x,y))){ctx.strokeStyle='#f3d17b';ctx.lineWidth=Math.max(1.5,z*1.7);ctx.beginPath();ctx.ellipse(px,py+hh*.12,ww*.23,hh*.18,0,0,7);ctx.stroke()}}
 if(own.has(key(x,y)))drawTerritoryEdge(px,py,ww,hh,x,y,own)
