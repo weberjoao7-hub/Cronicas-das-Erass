@@ -9,6 +9,8 @@
 const C=document.getElementById('world'),ctx=C.getContext('2d',{alpha:false}),res=document.getElementById('res'),panel=document.getElementById('panel'),eraLabel=document.getElementById('era');
 const W=160,H=160,S=34;const M=document.getElementById("minimap"),mc=M.getContext("2d");
 let dpr=1,w=0,h=0,scale=1,cx=80,cy=80,selected=null,dirty=true,dragged=false;
+// Resolução Retina completa por padrão; reduzida apenas quando o Canvas permanece caro.
+let renderResolutionScale=1;
 const eras=['Primordial','Tribal','Antiga','Clássica','Medieval','Renascença','Industrial','Contemporânea'];
 const rnd=(x,y,z=0)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
 const noise=(x,y,f)=>{let xx=x/f,yy=y/f,a=Math.floor(xx),b=Math.floor(yy),u=xx-a,v=yy-b;u=u*u*(3-2*u);v=v*v*(3-2*v);let l=(p,q)=>rnd(p,q);return (l(a,b)*(1-u)+l(a+1,b)*u)*(1-v)+(l(a,b+1)*(1-u)+l(a+1,b+1)*u)*v};
@@ -301,7 +303,7 @@ function resize(){
  // Limita a memória do backing store em tablets Retina sem reduzir a resolução do iPhone.
  const mobileViewport=w<700||(typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches);
  const maxPixels=mobileViewport?2600000:6000000;
- dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(maxPixels/(w*h)));
+ dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(maxPixels/(w*h)))*renderResolutionScale;
  const bw=Math.round(w*dpr),bh=Math.round(h*dpr);
  if(C.width!==bw)C.width=bw;
  if(C.height!==bh)C.height=bh;
@@ -8313,6 +8315,32 @@ function nextRenderInterval(averageMs,mobile){
  if(!mobile&&averageMs<10)return 16;
  return averageMs<18?30:(mobile?50:30);
 }
+// Controle adaptativo da resolução do backing store, independente do zoom e da simulação.
+// Histerese evita oscilações no Safari: duas janelas lentas para reduzir, quatro rápidas
+// para restaurar nitidez, com intervalo mínimo de 3,5 segundos entre alterações.
+// O limite inferior mantém sprites e texto legíveis mesmo em iPhones mais antigos.
+function canvasResolutionDecision(quality,avgMs,mobile,slowSamples=0,fastSamples=0,elapsedMs=Infinity){
+ const current=Math.max(.65,Math.min(1,Number.isFinite(quality)?quality:1));
+ if(!Number.isFinite(avgMs)||avgMs<0)return {quality:current,slow:0,fast:0,changed:false};
+ const slow=avgMs>(mobile?28:24),fast=avgMs<(mobile?14:11);
+ const slowCount=slow?slowSamples+1:0,fastCount=fast?fastSamples+1:0;
+ let next=current;
+ if(elapsedMs>=3500&&slowCount>=2)next=Math.max(.65,Math.round((current-.10)*100)/100);
+ else if(elapsedMs>=3500&&fastCount>=4)next=Math.min(1,Math.round((current+.08)*100)/100);
+ const changed=next!==current;
+ return {quality:next,slow:changed?0:slowCount,fast:changed?0:fastCount,changed};
+}
+let resolutionSlowSamples=0,resolutionFastSamples=0,resolutionLastChange=0;
+function adjustCanvasResolution(averageMs,now=performance.now()){
+ const next=canvasResolutionDecision(renderResolutionScale,averageMs,mobileRender,
+  resolutionSlowSamples,resolutionFastSamples,now-resolutionLastChange);
+ resolutionSlowSamples=next.slow;resolutionFastSamples=next.fast;
+ if(!next.changed)return false;
+ renderResolutionScale=next.quality;resolutionLastChange=now;
+ // Redimensiona apenas o canvas principal; minimapa, coordenadas e salvamento intactos.
+ resize();dirty=true;
+ return true;
+}
 function adjustRenderCadence(drawMs){
  if(!Number.isFinite(drawMs)||drawMs<0)return frameInterval;
  renderCostTotal+=Math.min(120,drawMs);
@@ -8320,6 +8348,7 @@ function adjustRenderCadence(drawMs){
  const average=renderCostTotal/renderSamples;
  renderSamples=0;renderCostTotal=0;
  frameInterval=nextRenderInterval(average,mobileRender);
+ adjustCanvasResolution(average,performance.now());
  return frameInterval;
 }
 addEventListener('pagehide',save);
