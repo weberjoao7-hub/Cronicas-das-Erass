@@ -5602,6 +5602,117 @@ function drawVillageSquare(px,py,ww,hh,x,y){
  ctx.restore();
 }
 
+// v6.127: muralha perimetral isometrica da aldeia, dividida por profundidade.
+// A madeira evolui para alvenaria, ameias medievais e gradis industriais.
+// Portao visual reage a tropas em movimento, sem colisao ou dados persistidos.
+function drawVillagePalisade(px,py,ww,hh,era=0,season=0,now=Date.now(),layer='back',gateOpen=false){
+ if(ww<36||hh<13||!Number.isFinite(px)||!Number.isFinite(py))return 0;
+ if(layer!=='back'&&layer!=='front')return 0;
+ const tier=era>=6?3:era>=4?2:era>=2?1:0;
+ const rise=tier===2?.43:tier===3?.34:.35;
+ const stone=tier===2?'#8d9387':tier===1?'#a49c85':'#777d77';
+ const light=tier===2?'#c3bdab':tier===1?'#c7b79b':'#b2b5a6';
+ const wood='#765239',trim=tier===3?'#4e7376':'#d1ac76';
+ const p=(x,y)=>[px+x*ww,py+y*hh];
+ const poly=(pts,color,outline)=>{
+  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...p(...pts[0]));
+  for(let i=1;i<pts.length;i++)ctx.lineTo(...p(...pts[i]));
+  ctx.closePath();ctx.fill();
+  if(outline){ctx.strokeStyle=outline;ctx.lineWidth=Math.max(.8,ww*.013);ctx.stroke()}
+ };
+ const line=(a,b,color,width=1)=>{
+  ctx.strokeStyle=color;ctx.lineWidth=Math.max(.8,ww*.014*width);
+  ctx.beginPath();ctx.moveTo(...p(...a));ctx.lineTo(...p(...b));ctx.stroke();
+ };
+ const post=(x,y)=>{
+  if(tier===0){
+   poly([[x-.018,y],[x+.018,y],[x+.018,y-rise],[x,y-rise-.10],[x-.018,y-rise]],'#65432d','#342d27');
+   line([x-.011,y-rise+.04],[x-.011,y-.02],'#b48a58',.7);
+  }else{
+   poly([[x-.035,y],[x+.035,y],[x+.035,y-rise-.035],[x-.035,y-rise-.035]],stone,'#51574f');
+   poly([[x-.05,y-rise-.035],[x+.05,y-rise-.035],[x+.045,y-rise-.12],[x-.045,y-rise-.12]],light,'#596159');
+   if(tier===3){
+    line([x,y-rise-.12],[x,y-rise-.20],trim,.8);
+    ctx.fillStyle='#b3c9c0';ctx.beginPath();ctx.arc(...p(x,y-rise-.21),Math.max(1,ww*.014),0,Math.PI*2);ctx.fill();
+   }
+  }
+ };
+ const wall=(a,b)=>{
+  const [ax,ay]=a,[bx,by]=b;
+  ctx.fillStyle='#15251f55';ctx.beginPath();
+  ctx.ellipse(...p((ax+bx)*.5+.025,(ay+by)*.5+.045),Math.abs(bx-ax)*ww*.53+ww*.025,hh*.055,-.10,0,Math.PI*2);ctx.fill();
+  if(tier===0){
+   for(let i=0;i<=7;i++){
+    const t=i/7,x=ax+(bx-ax)*t,y=ay+(by-ay)*t;
+    poly([[x-.018,y],[x+.018,y],[x+.018,y-rise*.92],[x,y-rise*1.18],[x-.018,y-rise*.92]],
+     i%2?'#6d4930':'#8b603c','#4e3627');
+   }
+   line([ax,ay-rise*.56],[bx,by-rise*.56],'#b58a5b',1.35);
+   line([ax,ay-rise*.25],[bx,by-rise*.25],'#4c3526',1.15);
+  }else if(tier===3){
+   poly([[ax,ay],[bx,by],[bx,by-rise*.24],[ax,ay-rise*.24]],'#7d8782','#485f5d');
+   line([ax,ay-rise],[bx,by-rise],trim,1.8);
+   line([ax,ay-rise*.46],[bx,by-rise*.46],'#78999b',1.0);
+   for(let i=1;i<7;i++){
+    const t=i/7,x=ax+(bx-ax)*t,y=ay+(by-ay)*t;
+    line([x,y-rise*.23],[x,y-rise],'#405c5f',1.2);
+   }
+  }else{
+   poly([[ax,ay],[bx,by],[bx,by-rise],[ax,ay-rise]],stone,'#525b55');
+   poly([[ax,ay-rise],[bx,by-rise],[bx-.012,by-rise-.055],[ax-.012,ay-rise-.055]],light);
+   if(ww>=51){
+    for(let i=1;i<5;i++){
+     const t=i/5,x=ax+(bx-ax)*t,y=ay+(by-ay)*t;
+     line([x,y-rise*.90],[x,y-rise*.54],'#62665e',.65);
+    }
+    line([ax,ay-rise*.48],[bx,by-rise*.48],'#c4c2b273',.65);
+   }
+   if(tier===2&&ww>=43)for(let i=0;i<5;i++){
+    const t=(i+.14)/5,x=ax+(bx-ax)*t,y=ay+(by-ay)*t;
+    poly([[x-.024,y-rise],[x+.024,y-rise],[x+.024,y-rise-.15],[x-.024,y-rise-.15]],light,'#676d62');
+   }
+  }
+  if(season===3){
+   line([ax,ay-rise-(tier===2?.15:0)],[bx,by-rise-(tier===2?.15:0)],'#e7efe8',1.5);
+  }
+  if(ww>=58){post(ax,ay);post(bx,by)}
+ };
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ let count=0;
+ if(layer==='back'){
+  wall([0,-.48],[-.46,-.025]);wall([0,-.48],[.46,-.025]);count=2;
+ }else{
+  wall([-.46,-.025],[-.135,.30]);wall([.46,-.025],[.135,.30]);count=2;
+  post(-.135,.30);post(.135,.30);
+  if(ww>=48){
+   const swing=gateOpen?.12:0;
+   if(tier===3){
+    line([-.135,.30-rise*.92],[.135,.30-rise*.92],'#a1b5af',1.4);
+    for(const side of [-1,1]){
+     const x=side*.135;
+     line([x,.30],[x-side*(gateOpen?.065:.12),.30-rise*.75],'#536f70',1.6);
+    }
+   }else{
+    const gate=tier===0?'#704b31':'#74553c';
+    poly([[-.125,.30],[-.012-swing,.30-swing*.30],[-.012-swing,.30-rise*.69],[-.125,.30-rise*.86]],gate,'#4a3528');
+    poly([[.125,.30],[.012+swing,.30-swing*.30],[.012+swing,.30-rise*.69],[.125,.30-rise*.86]],gate,'#4a3528');
+    for(const side of [-1,1]){
+     line([side*.122,.30-rise*.45],[side*(gateOpen?.055:.018),.30-rise*.40],'#d1ac76',.85);
+    }
+   }
+   if(tier>=1){
+    line([-.135,.30-rise-.17],[.135,.30-rise-.17],light,2.2);
+    line([-.135,.30-rise-.23],[-.135,.30-rise-.04],light,1.4);
+    line([.135,.30-rise-.23],[.135,.30-rise-.04],light,1.4);
+    const wave=Math.sin(now*.003)*.014;
+    poly([[-.043,.30-rise-.16],[.043,.30-rise-.16+wave],[.03,.30-rise+.04+wave],[0,.30-rise+.11],[-.03,.30-rise+.04]],tier===3?'#4c8892':'#48765d','#e2d1a4');
+   }
+  }
+  count+=1;
+ }
+ ctx.restore();return count;
+}
+
  // v6.88: estoques isométricos representam recursos reais, sem estado persistido.
  function drawVillageStockpiles(px,py,ww,hh,era,stocks,season=forestSeason(),visible=true){
   if(!visible||!stocks||ww<48)return 0;
@@ -6903,7 +7014,7 @@ else if(obj){
  else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmBoundary(px,py,ww,hh,game.era,obj.level,forestSeason(),frameTime,obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
  else if(obj.t==='Moinho'){drawWindmill(px,py,ww,hh,obj.level,frameTime);drawWindmillYard(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason());}
  else if(obj.t==='Mina'){drawMine(px,py,ww,hh,obj.level,game.era,frameTime);drawMineWorkers(px,py,ww,hh,game.era,frameTime);}
- else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
+ else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back');drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front',game.units.some(u=>u.hp>0&&Array.isArray(u.path)&&u.path.length&&Math.hypot(u.x-(x+.85),u.y-(y+.85))<1.35));drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
  else if(obj.t==='Cabana')drawEraResidence(px,py,ww,hh,obj.level||1,x*97+y*13,game.era);
  else house(px,py,ww*.7,obj.t);
  if(obj.t==='Torre')drawWatchtowerSentry(px,py,ww,hh,game.era,frameTime,forestSeason(),x,y);
