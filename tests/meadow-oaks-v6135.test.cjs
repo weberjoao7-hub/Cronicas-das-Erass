@@ -23,7 +23,7 @@ function scene({ww=74,hh=37,season=1,now=3000,layer='all',lower=-Infinity,upper=
  const count=drawFieldOak(100,100,ww,hh,14,15,season,now,layer,lower,upper);
  return {count,calls,styles,fieldOakAt};
 }
-const drawn=s=>s.calls.filter(c=>!['save','restore'].includes(c[0]));
+const drawn=s=>s.calls.filter(c=>!['save','restore'].includes(c[0])&&!(c[0]==='set'&&['lineCap','lineJoin'].includes(c[1])));
 test('v6.135: sintaxe e progresso anterior preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
