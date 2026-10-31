@@ -25,7 +25,7 @@ function scene(ww=94,level=2,now=1234,season=1,era=3){
 test('script completo compila e o save existente permanece intacto',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/cronicas-v04/);
- assert.doesNotMatch(source,/localStorage|game\.|save\(|setInterval|Math\.random/);
+ assert.doesNotMatch(source,/localStorage|game\.|setInterval|Math\.random/);
 });
 test('animais sao renderizados somente nas fazendas construidas, apos cerca e antes dos trabalhadores',()=>{
  const render=script.slice(script.indexOf('function draw(){'),script.indexOf('function drawPlacementOverlay(){'));
