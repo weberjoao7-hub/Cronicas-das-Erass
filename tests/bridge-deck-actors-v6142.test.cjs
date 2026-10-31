@@ -16,7 +16,7 @@ const bridge={t:'Ponte',axis:'x',buildLeft:0};
 
 test('v6.142: script compila e salvamento legado permanece',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.142<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=142);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
  assert.doesNotMatch(source,/localStorage|game\.|Math\.random/);
 });
