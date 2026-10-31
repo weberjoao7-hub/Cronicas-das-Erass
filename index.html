@@ -6365,6 +6365,54 @@ function drawVillageCitizenAtlas(px,py,ww,era,now,index){
  }
  ctx.restore();return true;
 }
+// v6.146: toldos de mercado em camadas isometricas, com tecido, costuras e vento.
+// Renderizacao sem estado persistente, com LOD para Safari em zoom distante.
+function drawMarketCanopyDetails(px,py,ww,hh,era,now,season,index){
+ if(ww<68||hh<16||era<2||![px,py,ww,hh,now].every(Number.isFinite))return 0;
+ const x=index===0?-.37:.37,y=index===0?.06:.035;
+ const modern=era>=6,medieval=era>=4,wind=Math.sin(now*.002+index*2.1)*.013;
+ const p=(a,b)=>[px+a*ww,py+b*hh];
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ // Costuras seguem os planos do telhado, em vez de linhas na tela.
+ ctx.strokeStyle=modern?'#d6e1d7':medieval?'#e7c18b':'#d7b18c';
+ ctx.lineWidth=Math.max(.8,ww*.009);
+ for(let k=1;k<=3;k++){
+  const t=k/4;
+  ctx.beginPath();ctx.moveTo(...p(x-.15+t*.24,y-.22));
+  ctx.lineTo(...p(x-.09+t*.24,y-.10));ctx.stroke();
+ }
+ // Saia frontal com quatro abas ondulando suavemente ao vento.
+ ctx.fillStyle=modern?'#456966':medieval?'#854b3d':'#967052';
+ ctx.beginPath();ctx.moveTo(...p(x-.09,y-.065));
+ for(let k=0;k<4;k++){
+  const left=x-.09+k*.06,flap=y-.025+wind*(k%2?1:-1);
+  ctx.lineTo(...p(left,flap));
+  ctx.quadraticCurveTo(...p(left+.03,flap+.027),...p(left+.06,flap));
+ }
+ ctx.lineTo(...p(x+.15,y-.065));ctx.closePath();ctx.fill();
+ ctx.strokeStyle=modern?'#b8c7c1':'#dfb980';ctx.lineWidth=Math.max(.7,ww*.007);
+ ctx.beginPath();ctx.moveTo(...p(x-.09,y-.065));
+ ctx.lineTo(...p(x+.15,y-.065));ctx.stroke();
+ if(ww>=84){
+  // Cordame e pendao presos ao poste: nao flutuam sobre a construcao.
+  ctx.strokeStyle=modern?'#9fb2af':'#c6aa7c';ctx.lineWidth=Math.max(.7,ww*.007);
+  ctx.beginPath();ctx.moveTo(...p(x+.105,y-.19));ctx.lineTo(...p(x+.105,y+.015));ctx.stroke();
+  if(era>=4){
+   ctx.fillStyle=modern?'#8ca9a4':'#c78c56';
+   ctx.beginPath();ctx.moveTo(...p(x+.105,y-.17));
+   ctx.lineTo(...p(x+.18+wind*.5,y-.145));
+   ctx.lineTo(...p(x+.14+wind*.8,y-.105));
+   ctx.lineTo(...p(x+.105,y-.12));ctx.closePath();ctx.fill();
+  }
+ }
+ if(season===3){
+  // Neve nas costuras superiores; o toldo ainda pode oscilar.
+  ctx.strokeStyle='#eaf1e9';ctx.lineWidth=Math.max(1,ww*.014);
+  ctx.beginPath();ctx.moveTo(...p(x-.15,y-.22));
+  ctx.lineTo(...p(x+.09,y-.22));ctx.stroke();
+ }
+ ctx.restore();return 1;
+}
 function drawVillageLife(px,py,ww,hh,era=0,now=Date.now(),layer='front',season=forestSeason(),visible=true){
  if(ww<42)return 0;
  const late=era>=6,settled=era>=2,night=lightLevels((dayClock%120)/120).night;
@@ -6389,6 +6437,7 @@ function drawVillageLife(px,py,ww,hh,era=0,now=Date.now(),layer='front',season=f
     ctx.strokeStyle=late?'#6c7e7c':'#735638';ctx.lineWidth=Math.max(1,ww*.018);
     for(const dx of [-.105,.105]){ctx.beginPath();ctx.moveTo(...p(x+dx,y+.10));ctx.lineTo(...p(x+dx,y-.18));ctx.stroke()}
     if(season===3){ctx.strokeStyle='#eaf0e8';ctx.lineWidth=Math.max(1.4,ww*.025);ctx.beginPath();ctx.moveTo(...p(x-.15,y-.22));ctx.lineTo(...p(x+.09,y-.22));ctx.stroke()}
+   drawMarketCanopyDetails(px,py,ww,hh,era,now,season,i);
    }else{
     // Primeiras eras: cestos e feixes, em vez de bancas com cobertura.
     ctx.fillStyle='#bda16e';ctx.beginPath();ctx.ellipse(...p(x-.04,y-.05),ww*.045,hh*.075,0,0,Math.PI*2);ctx.fill();
