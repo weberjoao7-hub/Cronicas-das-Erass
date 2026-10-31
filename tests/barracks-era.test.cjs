@@ -22,9 +22,13 @@ test('Ancient barracks retain stone towers and arched gate',()=>{
  const ops=render(2);assert.ok(ops.filter(o=>o[0]==='fillRect').length>=8);
  assert.ok(ops.some(o=>o[0]==='quadraticCurveTo'));
 });
-test('Medieval roofs and Industrial lanterns add progressive detail',()=>{
- assert.ok(render(4).length>render(2).length);assert.ok(render(6).length>render(4).length);
- assert.ok(render(6).some(o=>o[0]==='strokeRect'));
+test('Medieval roofs and Industrial lanterns add era-specific detail',()=>{
+ const ancient=render(2),medieval=render(4),industrial=render(6);
+ assert.ok(medieval.length>ancient.length);
+ assert.ok(industrial.length>ancient.length);
+ // Telhas medievais usam mais fiadas; rebites industriais usam arcos.
+ assert.ok(industrial.filter(o=>o[0]==='arc').length>medieval.filter(o=>o[0]==='arc').length);
+ assert.ok(industrial.some(o=>o[0]==='strokeRect'));
 });
 test('distant zoom removes fine details',()=>{
  assert.ok(render(4,20).length<render(4,74).length);
