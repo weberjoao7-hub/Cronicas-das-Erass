@@ -65,7 +65,7 @@ test('mobile LOD and loading fallback keep existing vector rendering available',
  assert.equal(render(4,false,{loaded:false}).drawn,false);
  assert.equal(render(4,false,{zoom:.72}).drawn,true);
  assert.ok(script.includes("typeof paintedTroops!=='undefined'"),'isolated troop renderers can use fallback');
- assert.match(script,/\(archer\|\|warrior\)&&!hit/);
+ assert.match(script,/\(archer\|\|warrior\)&&typeof paintedTroops/);
 });
 test('sprites are grounded, mirrored and isolated by save/restore',()=>{
  const r=render(6,true,{direction:-1,zoom:1});
