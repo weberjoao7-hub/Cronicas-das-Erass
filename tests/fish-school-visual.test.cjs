@@ -6,7 +6,7 @@ const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script);
-const start=script.indexOf('function drawFishSchool(');
+const start=script.indexOf('function fishSchoolPose(');
 const end=script.indexOf('// Garças nas margens:',start);
 assert.ok(start>0&&end>start);
 const source=script.slice(start,end);
