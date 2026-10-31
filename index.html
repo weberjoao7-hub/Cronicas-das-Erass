@@ -1479,18 +1479,27 @@ function drawMountain(px,py,ww,hh,x,y){
 }
 // v6.126: pinheiros alpinos facetados no sopé da cordilheira, presos ao solo.
 // Semente por ladrilho, sombra de contato e neve sazonal; nenhum estado persistido.
-function drawAlpinePines(px,py,ww,hh,x,y,season=0,now=Date.now()){
+function drawAlpinePines(px,py,ww,hh,x,y,season=0,now=Date.now(),layer='all',depthY=-Infinity,upperDepthY=Infinity){
  if(ww<39||hh<12||rnd(x,y,401)<.36)return 0;
  const near=ww>=61,count=near&&rnd(x,y,402)>.46?2:1;
  ctx.save();ctx.lineJoin='round';
+ // Sombra no solo uma unica vez, mesmo com soldados intercalados nas copas.
+ if(layer==='all'||layer==='back')for(let i=0;i<count;i++){
+  const seed=rnd(x+i*7,y-i*3,403),size=ww*(.23+seed*.045);
+  const bx=px+ww*(i===0?-.24+seed*.16:.15+seed*.11);
+  const by=py+hh*(.17+seed*.17);
+  ctx.fillStyle='rgba(13,28,24,.35)';ctx.beginPath();
+  ctx.ellipse(bx+size*.21,by+size*.10,size*.77,size*.19,-.12,0,Math.PI*2);ctx.fill();
+ }
  for(let i=0;i<count;i++){
   const seed=rnd(x+i*7,y-i*3,403),size=ww*(.23+seed*.045);
   const bx=px+ww*(i===0?-.24+seed*.16:.15+seed*.11);
   const by=py+hh*(.17+seed*.17);
+  if(layer==='back'&&by>depthY)continue;
+  if(layer==='front'&&by<=depthY)continue;
+  if(layer==='range'&&(by<=depthY||by>upperDepthY))continue;
   const sway=near?Math.sin(now*.0014+x*.7+y*.43+i*2.1)*ww*.012:0;
-  // A sombra nasce nos pés; o tronco entra sob as saias inferiores.
-  ctx.fillStyle='rgba(13,28,24,.35)';ctx.beginPath();
-  ctx.ellipse(bx+size*.21,by+size*.10,size*.77,size*.19,-.12,0,Math.PI*2);ctx.fill();
+  // Tronco e copas compartilham a profundidade dos pes do pinheiro.
   ctx.fillStyle='#594735';ctx.fillRect(bx-size*.085,by-size*.88,size*.17,size*.92);
   if(near){
    ctx.fillStyle='#b89a70';ctx.fillRect(bx-size*.055,by-size*.67,size*.036,size*.52);
@@ -6868,6 +6877,19 @@ function drawQuarryWorksite(px,py,ww,hh,x,y,era=0,now=Date.now(),season=forestSe
  ctx.restore();
  return 1;
 }
+// v6.128: pinheiros alpinos e unidades ordenados pela profundidade dos pes.
+// Sem novos objetos no save: as arvores continuam deterministicas por tile.
+function drawAlpineOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,now){
+ const actors=tileActors(x,y,unitTiles,enemyTiles);
+ let lower=-Infinity;
+ for(const actor of actors){
+  const depth=point(actor.u.x,actor.u.y)[1];
+  drawAlpinePines(px,py,ww,hh,x,y,forestSeason(),now,'range',lower,depth);
+  drawTileOccupants(x,y,unitTiles,enemyTiles,z,now,[actor]);
+  lower=depth;
+ }
+ drawAlpinePines(px,py,ww,hh,x,y,forestSeason(),now,'front',lower);
+}
 // Pomares ocupados: a profundidade dos pes define a ordem entre copas e tropas.
 function drawOrchardOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,now){
  const actors=tileActors(x,y,unitTiles,enemyTiles);
@@ -6983,7 +7005,12 @@ if(b===4&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(quarryWorkers?.some(u=>isActiveQuarryWorker(u,x,y)))
   drawQuarryWorksite(px,py,ww,hh,x,y,game.era,frameTime,forestSeason());
 }
-if(b===5&&ww>13){drawMountain(px,py,ww,hh,x,y);drawHighlandGround(px,py,ww,hh,x,y,5,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))drawAlpinePines(px,py,ww,hh,x,y,forestSeason(),frameTime);}
+const alpineActors=b===5&&ww>13&&visibleFog[y*W+x]&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))?tileActors(x,y,unitTiles,enemyTiles):null;
+if(b===5&&ww>13){drawMountain(px,py,ww,hh,x,y);drawHighlandGround(px,py,ww,hh,x,y,5,structures.has(key(x,y))||roadTiles.has(key(x,y)));
+ if(alpineActors?.length)drawAlpinePines(px,py,ww,hh,x,y,forestSeason(),frameTime,'back',-Infinity);
+ else if(visibleFog[y*W+x]&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))
+  drawAlpinePines(px,py,ww,hh,x,y,forestSeason(),frameTime);
+}
 if((b===4||b===5)&&!ruinKind&&visibleFog[y*W+x])drawHighlandWaterfall(px,py,ww,hh,x,y,b,forestSeason(),frameTime,structures.has(key(x,y))||roadTiles.has(key(x,y)));
 if(rainLevel>.17&&!structures.has(key(x,y))&&!ruinKind)drawRainPuddles(px,py,ww,hh,x,y,b,rainLevel,frameTime,roadTiles.has(key(x,y)));
 if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
@@ -7029,6 +7056,7 @@ if(game.enemy&&game.enemy.hp>0&&game.enemy.x===x&&game.enemy.y===y&&visibleFog[y
 if(b===0&&visibleFog[y*W+x])for(const boat of boatTiles.get(key(x,y))||[])drawFishingBoat(boat,px+((boat.x-x-.5)-(boat.y-y-.5))*ww*.5,py+((boat.x-x-.5)+(boat.y-y-.5))*hh*.5,ww,hh,frameTime);
 if(forestCount)drawForestOccupiedTile(x,y,px,py,ww,hh,q,unitTiles,enemyTiles,z,frameTime);
 else if(orchardActors?.length)drawOrchardOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
+else if(alpineActors?.length)drawAlpineOccupiedTile(x,y,px,py,ww,hh,unitTiles,enemyTiles,z,frameTime);
 else if(structureActors)drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime,structureActors.filter(({u})=>!unitBehindStructure(u,x,y)));
 else drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime);
 
