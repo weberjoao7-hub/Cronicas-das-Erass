@@ -7391,7 +7391,7 @@ function bridgeDeckLift(u,x,y,hh,bridge){
 }
 function drawTileOccupants(x,y,unitTiles,enemyTiles,z,now=Date.now(),actors=tileActors(x,y,unitTiles,enemyTiles),bridge=null){
  for(const {u,enemy} of actors){
-  const [px,groundY]=point(u.x,u.y),py=groundY-bridgeDeckLift(u,x,y,TH*z,bridge),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
+  const [px,groundY]=point(u.x,u.y),py=groundY-(bridge?bridgeDeckLift(u,x,y,TH*z,bridge):0),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
   drawUnitGroundShadow(u,px,py,z,now);
    if(!enemy)drawMarchDust(u,px,py,z,now);
   drawStrategicUnitMarker(u,px,py,z,enemy,!enemy&&(u===game.units[selectedUnit]||selectedGroup.has(u)));
