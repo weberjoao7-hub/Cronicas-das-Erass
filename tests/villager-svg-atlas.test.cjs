@@ -14,7 +14,7 @@ const end=script.indexOf('// Props de coleta',start);
 assert.ok(start>=0&&end>start,'renderizador de aldeão presente');
 const source=script.slice(start,end);
 
-function render(moving,now,era=0,zoom=1,job=moving?'walk':'idle'){
+function render(moving,now,era=0,zoom=1,job=moving?'walk':'idle',distance=0){
  const calls=[];
  const ctx={
   save(){},translate(){},scale(){},restore(){},
@@ -22,7 +22,8 @@ function render(moving,now,era=0,zoom=1,job=moving?'walk':'idle'){
  };
  const game={era};
  const paintedVillagers={complete:true,naturalWidth:336,naturalHeight:104};
- const draw=new Function('ctx','game','paintedVillagers',source+';return drawPaintedVillager;')(ctx,game,paintedVillagers);
+ const strideFrame=(_u,frames,step)=>Math.floor(distance/step)%frames;
+ const draw=new Function('ctx','game','paintedVillagers','strideFrame',source+';return drawPaintedVillager;')(ctx,game,paintedVillagers,strideFrame);
  return {drawn:draw({x:80,y:80},100,100,zoom,job,moving,now),calls};
 }
 
@@ -46,7 +47,7 @@ test('atlas SVG transparente contém seis quadros alinhados de 56 por 104',()=>{
 test('idle usa dois quadros, caminhada usa quatro quadros diferentes',()=>{
  assert.match(script,/paintedVillagers\.src='assets\/cronicas_aldeoes_atlas\.svg'/);
  assert.deepEqual([render(false,0),render(false,550)].map(r=>r.calls[0][1]),[0,56]);
- assert.deepEqual([0,150,300,450].map(t=>render(true,t).calls[0][1]),[112,168,224,280]);
+ assert.deepEqual([0,.17,.34,.51].map(d=>render(true,0,0,1,'walk',d).calls[0][1]),[112,168,224,280]);
 });
 test('atlas respeita LOD e troca de era, mantendo fallback procedural',()=>{
  assert.equal(render(false,0,0,.5).drawn,false);
