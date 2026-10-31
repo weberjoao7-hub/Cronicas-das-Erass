@@ -6898,6 +6898,43 @@ function unitSunShadow(u,z,phase){
  return {dx,dy,rx:r*.96+length*.43,ry:r*.33,
   angle:Math.atan2(dy,dx),opacity:Math.max(.08,(.85+dusk*.12)*(1-night*.65))};
 }
+// v6.134: indicadores táticos ancorados nos pés, legíveis em zoom distante.
+function strategicUnitMarker(u,z,enemy=false,selected=false){
+ if(!u||!(u.hp>0)||!Number.isFinite(z)||z<=0||z>=.82)return null;
+ if(!enemy&&!isMilitary(u.kind)&&!selected)return null;
+ const color=enemy?'#e77b70':u.kind==='archer'?'#b8e6a1':
+  u.kind==='cavalry'?'#f2c47e':u.kind==='cannon'?'#e3a98c':
+  u.kind==='warrior'?'#9ed1f1':'#f1dfab';
+ const target=Array.isArray(u.path)&&u.path.length?u.path[0]:null;
+ let angle=null;
+ if(target&&Number.isFinite(target.x)&&Number.isFinite(target.y)){
+  const dx=target.x-u.x,dy=target.y-u.y;
+  if(Math.hypot(dx,dy)>.08)angle=Math.atan2((dx+dy)*TH,(dx-dy)*TW);
+ }
+ return {color,radius:selected?6.8:5.3,angle,selected};
+}
+function drawStrategicUnitMarker(u,px,py,z,enemy=false,selected=false){
+ const marker=strategicUnitMarker(u,z,enemy,selected);
+ if(!marker)return false;
+ const r=marker.radius,groundY=py+3*z;
+ ctx.save();
+ ctx.fillStyle='rgba(7,26,23,.72)';
+ ctx.strokeStyle=marker.color;ctx.lineWidth=marker.selected?2:1.25;
+ ctx.beginPath();ctx.ellipse(px,groundY,r,r*.48,0,0,Math.PI*2);
+ ctx.fill();ctx.stroke();
+ if(marker.angle!==null){
+  // A seta acompanha a projeção isométrica do próximo nó da rota.
+  const dx=Math.cos(marker.angle),dy=Math.sin(marker.angle);
+  const tipX=px+dx*r*1.22,tipY=groundY+dy*r*.72;
+  const backX=px+dx*r*.34,backY=groundY+dy*r*.20;
+  ctx.fillStyle=marker.color;ctx.beginPath();
+  ctx.moveTo(tipX,tipY);
+  ctx.lineTo(backX-dy*r*.32,backY+dx*r*.22);
+  ctx.lineTo(backX+dy*r*.32,backY-dx*r*.22);
+  ctx.closePath();ctx.fill();
+ }
+ ctx.restore();return true;
+}
 // Barras de vida acima da cabeça: o atlas ocupa ~40px em zoom 1,
 // enquanto o desenho procedural distante tem uma silhueta menor.
 function unitHealthBarTop(u,py,z){
@@ -6919,6 +6956,7 @@ function drawTileOccupants(x,y,unitTiles,enemyTiles,z,now=Date.now(),actors=tile
  for(const {u,enemy} of actors){
   const [px,py]=point(u.x,u.y),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
   drawUnitGroundShadow(u,px,py,z,now);
+  drawStrategicUnitMarker(u,px,py,z,enemy,!enemy&&(u===game.units[selectedUnit]||selectedGroup.has(u)));
    if(!enemy)drawMarchDust(u,px,py,z,now);
   if(!enemy&&u===formationStandardLeader)drawFormationStandard(px,py,z,game.era,now);
   drawUnitSprite(u,px,py,z,enemy);
