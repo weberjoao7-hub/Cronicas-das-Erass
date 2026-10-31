@@ -2627,6 +2627,96 @@ function drawBarracksTraining(px,py,ww,hh,era=0,now=Date.now()){
  return 1;
 }
 
+// v6.137: cantaria em perspectiva real nas duas fachadas do quartel.
+// Juntas acompanham as arestas isometricas, sem textura plana sobre o predio.
+function drawBarracksMasonry(px,py,ww,hh,era){
+ if(era<2||ww<56||hh<=0)return 0;
+ const modern=era>=6,medieval=era>=4;
+ const faces=[
+  {top:[[-.38,-.70],[-.05,-1.04]],bottom:[[-.38,-.08],[-.05,-.42]],
+   color:modern?'#d1dcd3':medieval?'#eee1c8':'#e1c49c'},
+  {top:[[-.05,-1.04],[.37,-.69]],bottom:[[-.05,-.42],[.37,-.06]],
+   color:modern?'#465c5a':medieval?'#52615c':'#74614a'}
+ ];
+ ctx.save();ctx.lineCap='butt';ctx.lineJoin='miter';
+ for(const face of faces){
+  const xy=(edge,t)=>[px+ww*(edge[0][0]+(edge[1][0]-edge[0][0])*t),
+                       py+hh*(edge[0][1]+(edge[1][1]-edge[0][1])*t)];
+  ctx.save();ctx.beginPath();
+  ctx.moveTo(...xy(face.top,0));ctx.lineTo(...xy(face.top,1));
+  ctx.lineTo(...xy(face.bottom,1));ctx.lineTo(...xy(face.bottom,0));
+  ctx.closePath();ctx.clip();
+  ctx.strokeStyle=face.color;ctx.globalAlpha=.48;
+  ctx.lineWidth=Math.max(.6,ww*.008);
+  const courses=ww>=88?6:4;
+  for(let row=1;row<courses;row++){
+   const t=row/courses;
+   const a=xy(face.top,0),b=xy(face.top,1),c=xy(face.bottom,0),d=xy(face.bottom,1);
+   const y0=a[1]+(c[1]-a[1])*t,y1=b[1]+(d[1]-b[1])*t;
+   ctx.beginPath();ctx.moveTo(a[0],y0);ctx.lineTo(b[0],y1);ctx.stroke();
+  }
+  if(ww>=88){
+   for(let row=0;row<courses;row++){
+    const stagger=row%2?.18:0;
+    for(let col=1;col<=2;col++){
+     const t=(col+stagger)/3.3;
+     const top=xy(face.top,t),bottom=xy(face.bottom,t);
+     const a=row/courses,b=(row+1)/courses;
+     ctx.beginPath();
+     ctx.moveTo(top[0]+(bottom[0]-top[0])*a,top[1]+(bottom[1]-top[1])*a);
+     ctx.lineTo(top[0]+(bottom[0]-top[0])*b,top[1]+(bottom[1]-top[1])*b);
+     ctx.stroke();
+    }
+   }
+  }
+  ctx.restore();
+ }
+ ctx.restore();return 1;
+}
+
+// Telhas de ardósia medieval ou chapas rebitadas industriais nas torres.
+// As linhas sao recortadas pelas duas aguas do telhado; sem sobreposicao no ceu.
+function drawBarracksRoofTexture(px,py,ww,hh,era,x){
+ if(era<4||ww<48||hh<=0)return 0;
+ const modern=era>=6,y=-1.06,top=y-(modern?.52:.43);
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ for(const side of [-1,1]){
+  const p=(ax,ay)=>[px+ax*ww,py+ay*hh];
+  const apex=p(x,top),eave=p(x+side*.15,y),seam=p(x,y+.06);
+  ctx.save();ctx.beginPath();ctx.moveTo(...apex);
+  ctx.lineTo(...eave);ctx.lineTo(...seam);ctx.closePath();ctx.clip();
+  ctx.strokeStyle=modern?'#a8c0c0':'#d3a18a';
+  ctx.lineWidth=Math.max(.65,ww*(modern?.010:.008));
+  const courses=modern?3:5;
+  for(let i=1;i<=courses;i++){
+   const t=i/(courses+1);
+   ctx.beginPath();
+   ctx.moveTo(apex[0]+(eave[0]-apex[0])*t,apex[1]+(eave[1]-apex[1])*t);
+   ctx.lineTo(apex[0]+(seam[0]-apex[0])*t,apex[1]+(seam[1]-apex[1])*t);
+   ctx.stroke();
+  }
+  if(modern){
+   ctx.fillStyle='#e3d4a9';
+   for(let i=1;i<=3;i++){
+    const t=i/4;
+    const bx=apex[0]+(eave[0]-apex[0])*t*.65+(seam[0]-apex[0])*t*.35;
+    const by=apex[1]+(eave[1]-apex[1])*t*.65+(seam[1]-apex[1])*t*.35;
+    ctx.beginPath();ctx.arc(bx,by,Math.max(.65,ww*.008),0,Math.PI*2);ctx.fill();
+   }
+  }else if(ww>=74){
+   ctx.strokeStyle='#523e3d';ctx.lineWidth=Math.max(.55,ww*.006);
+   for(let i=1;i<5;i++){
+    const t=(i+.35)/6;
+    const bx=apex[0]+(eave[0]-apex[0])*t*.55+(seam[0]-apex[0])*t*.45;
+    const by=apex[1]+(eave[1]-apex[1])*t*.55+(seam[1]-apex[1])*t*.45;
+    ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+side*ww*.013,by+hh*.018);ctx.stroke();
+   }
+  }
+  ctx.restore();
+ }
+ ctx.restore();return 1;
+}
+
 /* Quartel: fortificacao isometrica com muralhas, torreoes e patio de treino. */
 function drawBarracks(px,py,ww,hh,era=2,now=Date.now()){
  if(era<2)return drawTribalBarracks(px,py,ww,hh,era,now);
@@ -2647,6 +2737,7 @@ function drawBarracks(px,py,ww,hh,era=2,now=Date.now()){
  poly([[-.38,-.08],[-.05,-.42],[-.05,-1.04],[-.38,-.70]],'#b6b8a6');
  poly([[-.05,-.42],[.37,-.06],[.37,-.69],[-.05,-1.04]],'#798783');
  poly([[-.38,-.70],[-.05,-1.04],[.37,-.69],[.04,-.38]],'#c7c8ad','#4a5d5a');
+ drawBarracksMasonry(px,py,ww,hh,era);
  // Juntas de cantaria e pequenas seteiras.
  ctx.strokeStyle='#4f635c88';ctx.lineWidth=Math.max(.6,scale*.8);
  for(let i=0;i<3;i++){let y=-.62+i*.15;ctx.beginPath();ctx.moveTo(px+ww*.04,py+hh*y);ctx.lineTo(px+ww*.31,py+hh*(y+.20));ctx.stroke()}
@@ -2692,6 +2783,7 @@ function drawFortifiedBarracksDetails(px,py,ww,hh,era=4,now=Date.now()){
   const y=-1.06,top=y-(era>=6?.52:.43);
   poly([[x-.15,y],[x,top],[x,y+.06]],era>=6?'#637984':'#96574a');
   poly([[x,y+.06],[x,top],[x+.15,y]],era>=6?'#38545e':'#633b39');
+  drawBarracksRoofTexture(px,py,ww,hh,era,x);
  }
  if(ww>=40){
   poly([[-.075,-.63],[.075,-.63],[.07,-.39],[0,-.31],[-.07,-.39]],era>=6?'#477485':'#507663');
