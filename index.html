@@ -3428,6 +3428,70 @@ function drawFarm(px,py,ww,hh,level=1,now=Date.now(),day=1,tileX=0,tileY=0){
  }
  ctx.restore();
 }
+// Animais de criação no primeiro plano da fazenda: galinhas e cabra com volume,
+// sombra de contato, pequenas animações e pelagem sazonal. Decoração efêmera:
+// não interfere em população, alimento, colisão ou formato de salvamento.
+function drawFarmLivestock(px,py,ww,hh,era=0,level=1,now=Date.now(),season=1,tileX=0,tileY=0){
+ if(ww<56||hh<16||![px,py,ww,hh,now,tileX,tileY].every(Number.isFinite))return 0;
+ const lv=Math.max(1,Math.min(3,level||1)),close=ww>=82,winter=season===3;
+ const p=(u,v)=>[px+(u-v)*ww*.38,py+(u+v-1)*hh*.36];
+ const chickens=close?3:2;
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ // Galinhas se movem dentro da lavoura, sem trocar de posição entre quadros.
+ for(let i=0;i<chickens;i++){
+  const seed=rnd(tileX+i*3,tileY+i*7,241),phase=now*.0022+seed*6.28+i*1.9;
+  const [gx,gy]=p(.52+i*.10,.83-i*.11),drift=Math.sin(phase*.65)*ww*.009;
+  const r=ww*(.039+(seed-.5)*.007),peck=Math.max(0,Math.sin(phase*1.7))*.27*r;
+  ctx.save();ctx.translate(gx+drift,gy);ctx.scale(seed>.46?1:-1,1);
+  ctx.fillStyle='#18251d65';ctx.beginPath();ctx.ellipse(r*.18,hh*.015,r*1.18,hh*.035,-.12,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#9b6e43';ctx.lineWidth=Math.max(.75,ww*.010);
+  for(const leg of [-1,1]){
+   const foot=leg*r*.34;
+   ctx.beginPath();ctx.moveTo(foot,-r*.14);ctx.lineTo(foot+Math.sin(phase*2+leg)*r*.10,r*.15);
+   ctx.lineTo(foot+r*.22,r*.16);ctx.stroke();
+  }
+  const coat=winter?'#d5c5a7':i===1?'#9b6c4c':'#d8b88a';
+  ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(0,-r*.48,r*.94,r*.59,-.16,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=winter?'#a9a092':i===1?'#6f4c3b':'#b88b63';
+  ctx.beginPath();ctx.ellipse(-r*.21,-r*.52,r*.48,r*.38,-.40,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.moveTo(-r*.65,-r*.55);ctx.lineTo(-r*1.05,-r*1.20);ctx.lineTo(-r*.28,-r*.89);ctx.closePath();ctx.fill();
+  ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(r*.64,-r*.95+peck,r*.40,r*.44,.10,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#b64838';ctx.beginPath();ctx.moveTo(r*.43,-r*1.32+peck);
+  ctx.lineTo(r*.56,-r*1.63+peck);ctx.lineTo(r*.70,-r*1.30+peck);
+  ctx.lineTo(r*.84,-r*1.48+peck);ctx.lineTo(r*.89,-r*1.19+peck);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#d5a04f';ctx.beginPath();ctx.moveTo(r*.89,-r*.96+peck);
+  ctx.lineTo(r*1.33,-r*.86+peck);ctx.lineTo(r*.90,-r*.75+peck);ctx.closePath();ctx.fill();
+  if(close){ctx.fillStyle='#302c27';ctx.beginPath();ctx.arc(r*.80,-r*1.06+peck,Math.max(.55,r*.105),0,Math.PI*2);ctx.fill();}
+  ctx.restore();
+ }
+ if(lv>=2&&ww>=74){
+  // Cabra isométrica com quatro pernas e cabeça inclinada para pastar.
+  const [gx,gy]=p(.91,.54),seed=rnd(tileX,tileY,242);
+  const phase=now*.0017+seed*6.28,swing=Math.sin(phase)*ww*.010,headDip=Math.max(0,Math.sin(phase*.78))*.16*ww;
+  const r=ww*.105,coat=winter?'#d6d5ca':era>=6?'#b1a69a':'#c2a47d';
+  ctx.save();ctx.translate(gx+swing,gy);ctx.scale(seed>.5?1:-1,1);
+  ctx.fillStyle='#14241b70';ctx.beginPath();ctx.ellipse(r*.15,hh*.015,r*1.58,hh*.052,-.13,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#66584b';ctx.lineWidth=Math.max(.9,ww*.018);
+  for(const [x,step] of [[-r*.65,-1],[-r*.35,1],[r*.48,1],[r*.72,-1]]){
+   ctx.beginPath();ctx.moveTo(x,-r*.64);ctx.lineTo(x+step*r*.10,-r*.15);
+   ctx.lineTo(x+step*r*.16,r*.12);ctx.stroke();
+  }
+  ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(0,-r*.88,r*1.06,r*.55,-.11,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=winter?'#aaa99f':'#8b755e';ctx.beginPath();ctx.ellipse(-r*.54,-r*.94,r*.47,r*.42,-.18,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=coat;ctx.lineWidth=Math.max(1,ww*.048);
+  ctx.beginPath();ctx.moveTo(r*.61,-r*.93);ctx.lineTo(r*1.12,-r*1.35+headDip);ctx.stroke();
+  ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(r*1.19,-r*1.37+headDip,r*.46,r*.37,-.22,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#8a6c58';ctx.beginPath();ctx.ellipse(r*1.49,-r*1.23+headDip,r*.22,r*.19,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#9c8062';ctx.beginPath();ctx.moveTo(r*.99,-r*1.60+headDip);
+  ctx.lineTo(r*.64,-r*1.86+headDip);ctx.lineTo(r*1.07,-r*1.77+headDip);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#d6c6a5';ctx.lineWidth=Math.max(.75,ww*.013);
+  for(const horn of [-1,1]){ctx.beginPath();ctx.moveTo(r*(1.06+horn*.16),-r*1.65+headDip);
+   ctx.lineTo(r*(.91+horn*.20),-r*2.05+headDip);ctx.stroke();}
+  if(close){ctx.fillStyle='#302c29';ctx.beginPath();ctx.arc(r*1.36,-r*1.48+headDip,Math.max(.65,r*.09),0,Math.PI*2);ctx.fill();}
+  ctx.restore();
+ }
+ ctx.restore();return chickens+(lv>=2&&ww>=74?1:0);
+}
 // v6.99: trabalhadores agrícolas com ferramentas e silhuetas ancoradas no solo.
 // O ciclo visual segue as quatro fases da lavoura; não modifica produção nem save.
 function drawFarmWorkers(px,py,ww,hh,era,now,day,tileX,tileY,level=1){
@@ -7694,7 +7758,7 @@ else if(obj){
  else if(obj.t==='Torre')drawEraWatchtower(px,py,ww,hh,obj.level,game.era,frameTime);
  else if(obj.t==='Quartel'){drawBarracks(px,py,ww,hh,game.era,frameTime);drawBarracksTraining(px,py,ww,hh,game.era,frameTime);}
  else if(obj.t==='Pesqueiro'){drawDock(px,py,ww,hh,obj.level,!!obj.boat);drawDockWorkers(px,py,ww,hh,game.era,frameTime,obj.boat,obj.level);}
- else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmBoundary(px,py,ww,hh,game.era,obj.level,forestSeason(),frameTime,obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
+ else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmBoundary(px,py,ww,hh,game.era,obj.level,forestSeason(),frameTime,obj.x,obj.y);drawFarmLivestock(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason(),obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
  else if(obj.t==='Moinho'){drawWindmill(px,py,ww,hh,obj.level,frameTime);drawWindmillYard(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason());}
  else if(obj.t==='Mina'){drawMine(px,py,ww,hh,obj.level,game.era,frameTime);drawMineWorkers(px,py,ww,hh,game.era,frameTime);}
  else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back');drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front',game.units.some(u=>u.hp>0&&Array.isArray(u.path)&&u.path.length&&Math.hypot(u.x-(x+.85),u.y-(y+.85))<1.35));drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
