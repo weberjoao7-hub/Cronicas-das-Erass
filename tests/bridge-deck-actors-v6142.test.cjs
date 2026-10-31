@@ -57,8 +57,9 @@ test('pontes nao ocultam soldados atras da propria plataforma',()=>{
 test('sombra, sprite, marcadores e barra de vida usam a mesma altura',()=>{
  const body=script.slice(end,script.indexOf('// Renderização de bosque ocupado',end));
  assert.match(body,/py=groundY-bridgeDeckLift\(u,x,y,TH\*z,bridge\)/);
- for(const fn of ['drawUnitGroundShadow','drawStrategicUnitMarker','drawUnitSprite','unitHealthBarTop']){
+ for(const fn of ['drawUnitGroundShadow','drawStrategicUnitMarker','drawUnitSprite']){
   assert.ok(body.includes(fn+'(u,px,py'),'desenho ancorado: '+fn);
  }
+ assert.match(body,/unitHealthBarTop\(u,py,z\)/);
  assert.doesNotMatch(source,/u\.x\s*=|u\.y\s*=/);
 });
