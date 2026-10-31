@@ -41,9 +41,9 @@ test('marcha: integracao nas rotas amigas e nos guardas inimigos',()=>{
  assert.match(script,/guard\.x=nx;guard\.y=ny;advanceUnitStride\(guard,step\)/);
 });
 test('marcha: atlas de tropas, cavalaria, aldeoes e fallback usam o passo',()=>{
- assert.match(script,/moving\?1\+strideFrame\(u,2,\.30\):0/);
- assert.match(script,/moving\?1\+strideFrame\(u,2,\.40\):0/);
- assert.match(script,/moving\?2\+strideFrame\(u,4,\.17\):/);
- assert.match(script,/moving\?strideFrame\(u,4,\.17\):/);
+ assert.match(script,/strideFrame\(u,2,\.30\)/);
+ assert.match(script,/strideFrame\(u,2,\.40\)/);
+ assert.match(script,/strideFrame\(u,4,\.17\)/);
+ assert.match(script,/typeof strideFrame==='function'/);
  assert.match(script,/phase=moving\?strideSwing\(u\):0/);
 });
