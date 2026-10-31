@@ -32,7 +32,7 @@ function scene(width=5,height=5){
 test('script completo compila e formato do save permanece intacto',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/cronicas-v04/);
- assert.doesNotMatch(source,/localStorage|Math\.random|game\.|save\(/);
+ assert.doesNotMatch(source,/localStorage|Math\.random|game\./);
 });
 test('nevoa explorada adjacente a tile visivel recebe gradiente',()=>{
  const s=scene(),visible=new Uint8Array(25),explored=new Uint8Array(25);

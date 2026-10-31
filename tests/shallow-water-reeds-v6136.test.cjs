@@ -21,7 +21,7 @@ function scene({ww=80,hh=40,mask=15,season=1,now=3000,seed=.6}={}){
 }
 test('v6.136: sintaxe, versao e salvamento legado preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.136<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
  assert.doesNotMatch(source,/Math\.random|localStorage|requestAnimationFrame|setInterval/);
