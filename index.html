@@ -538,6 +538,60 @@ function drawSeasonalGround(px,py,ww,hh,x,y,b,season=forestSeason()){
  }
  ctx.restore();return count;
 }
+// v6.148: micro-relevo por bioma. Pedras, serapilheira e tufos seguem
+// o losango do terreno; deterministico, com recorte e LOD para Safari.
+function drawTerrainMicroRelief(px,py,ww,hh,x,y,b,season=forestSeason()){
+ if(ww<43||hh<16||b<1||b>5||(season===3&&ww<68)||rnd(x,y,812)<.34)return 0;
+ const count=ww>=76?4:2, winter=season===3, autumn=season===2;
+ ctx.save();
+ ctx.beginPath();ctx.moveTo(px,py-hh*.49);ctx.lineTo(px+ww*.49,py);
+ ctx.lineTo(px,py+hh*.49);ctx.lineTo(px-ww*.49,py);ctx.closePath();ctx.clip();
+ for(let i=0;i<count;i++){
+  const rx=rnd(x+i*13,y-i*3,813),ry=rnd(x-i*7,y+i*11,814);
+  const sx=px+(rx-.5)*ww*.66,sy=py+(ry-.5)*hh*.50;
+  const size=ww*(.026+rnd(x+i,y-i,815)*.018);
+  if(b>=4){
+   // Cascalho em planos isometricos: face iluminada, lateral e fissura.
+   const rock=autumn?'#9c8971':winter?'#c7d0cc':'#999b8d';
+   ctx.fillStyle='#1b27263d';ctx.beginPath();
+   ctx.ellipse(sx+size*.25,sy+hh*.022,size*1.25,hh*.024,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=rock;ctx.beginPath();ctx.moveTo(sx-size,sy);
+   ctx.lineTo(sx-size*.20,sy-hh*.046);ctx.lineTo(sx+size*.86,sy-hh*.018);
+   ctx.lineTo(sx+size*.52,sy+hh*.016);ctx.closePath();ctx.fill();
+   ctx.fillStyle=winter?'#8c9c9a':'#59645c';ctx.beginPath();
+   ctx.moveTo(sx+size*.52,sy+hh*.016);ctx.lineTo(sx+size*.86,sy-hh*.018);
+   ctx.lineTo(sx+size*.68,sy+hh*.040);ctx.lineTo(sx-size*.30,sy+hh*.043);
+   ctx.lineTo(sx-size,sy);ctx.closePath();ctx.fill();
+   if(ww>=76){ctx.strokeStyle=winter?'#f0f4e6':'#4c554e';
+    ctx.lineWidth=Math.max(.65,ww*.007);ctx.beginPath();
+    ctx.moveTo(sx-size*.17,sy-hh*.028);ctx.lineTo(sx+size*.12,sy-hh*.004);ctx.stroke();}
+  }else if(b===3){
+   // Folhas e gravetos sobre a terra, sem cobrir as copas ou unidades.
+   ctx.fillStyle=winter?'#b9c4b25e':autumn?'#bf854b9c':'#9c865c91';
+   ctx.beginPath();ctx.ellipse(sx,sy,size*.86,hh*.021,(rx-.5)*.8,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle=winter?'#83968a9c':'#604b34b5';
+   ctx.lineWidth=Math.max(.7,ww*.009);ctx.beginPath();
+   ctx.moveTo(sx-size*.7,sy+hh*.010);ctx.lineTo(sx+size*.66,sy-hh*.025);ctx.stroke();
+   if(ww>=76&&!winter){ctx.fillStyle=autumn?'#d2a25a':'#78954f';
+    ctx.beginPath();ctx.ellipse(sx+size*.52,sy-hh*.018,size*.35,hh*.013,-.35,0,Math.PI*2);ctx.fill();}
+  }else{
+   // Pequenas moitas em relevo, com sombra de contato e folhas inclinadas.
+   ctx.fillStyle='#20392747';ctx.beginPath();
+   ctx.ellipse(sx+size*.2,sy+hh*.013,size*1.3,hh*.027,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=winter?'#a9b8a5':autumn?'#ac8b51':b===2?'#8da762':'#659252';
+   ctx.beginPath();ctx.ellipse(sx,sy,size,hh*.029,0,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle=winter?'#d6dfd2':autumn?'#8c7145':'#47733e';
+   ctx.lineWidth=Math.max(.75,ww*.010);ctx.lineCap='round';
+   for(let j=-1;j<=1;j++){
+    const bend=(rnd(x+i*5+j,y,816)-.5)*size*.40;
+    ctx.beginPath();ctx.moveTo(sx+j*size*.42,sy);
+    ctx.quadraticCurveTo(sx+j*size*.58+bend,sy-hh*.054,
+     sx+j*size*.64+bend,sy-hh*(.095+(j===0?.025:0)));ctx.stroke();
+   }
+  }
+ }
+ ctx.restore();return count;
+}
 // Água rasa e transições costeiras por aresta, respeitando a projeção isométrica.
 
 // Suaviza o mosaico isométrico com faixas irregulares de solo e vegetação
@@ -7981,7 +8035,7 @@ function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const ra
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 const groundTrackTiles=collectGroundTrackTiles(bounds,frameTime);
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
-ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue;if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
+ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue;if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);
 if(visibleFog[y*W+x])drawGroundTracksTile(groundTrackTiles.get(key(x,y)),z,frameTime);
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
