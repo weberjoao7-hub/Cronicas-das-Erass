@@ -119,6 +119,18 @@ tributaries:for(let y=3;y<H-3;y++)for(let x=3;x<W-3;x++){
  tributaryCount++;
 }
 
+// v6.165: fozes pré-calculadas em água, conectadas aos riachos de terra sem modificar biomas.
+const tributaryMouthMask=new Uint8Array(W*H);
+for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
+ const id=y*W+x;
+ if(terrain[id]!==0)continue;
+ for(let d=0;d<4;d++){
+  const [dx,dy]=seamDirs[d],nx=x+dx,ny=y+dy,adjacent=ny*W+nx;
+  if(terrain[adjacent]===0)continue;
+  if(tributaryMask[adjacent]&(1<<((d+2)%4)))tributaryMouthMask[id]|=1<<d;
+ }
+}
+
 let game={day:1,era:0,wood:110,food:130,stone:80,ore:25,people:5,army:2,claim:['80,80'],buildings:[{x:80,y:80,t:'Aldeia'}],units:[{x:80.4,y:80.4,tx:80.4,ty:80.4,kind:'worker'},{x:80.7,y:80.6,tx:80.7,ty:80.6,kind:'worker'},{x:80.3,y:80.75,tx:80.3,ty:80.75,kind:'warrior'}],enemy:{x:91,y:86,hp:100}};
 try{let old=JSON.parse(localStorage.getItem('cronicas-v04'));if(old&&Array.isArray(old.claim))game={...game,...old};if(!Array.isArray(game.units))game.units=[{x:80.4,y:80.4,tx:80.4,ty:80.4,kind:'worker'},{x:80.7,y:80.6,tx:80.7,ty:80.6,kind:'worker'},{x:80.3,y:80.75,tx:80.3,ty:80.75,kind:'warrior'}];if(!game.enemy)game.enemy={x:91,y:86,hp:100};if(!Array.isArray(game.enemyUnits))game.enemyUnits=[];for(let u of game.units)if(!Number.isFinite(u.hp))u.hp=100}catch(e){}
 if(!Array.isArray(game.units))game.units=[];
@@ -746,6 +758,73 @@ function drawTerrainMicroRelief(px,py,ww,hh,x,y,b,season=forestSeason()){
 // nas bordas dos biomas. Não modifica colisões nem dados da partida.
 
 // v6.164: canais e margens no plano do terreno, pontas coincidentes nas arestas.
+// v6.165: deltas isométricos alinhados com a extremidade do riacho, com sedimentos,
+// espuma de correnteza e congelamento. Recorte no losango; nenhum objeto persistente.
+function drawTributaryEstuary(px,py,ww,hh,x,y,mask,season=1,now=0){
+ if(!mask||ww<36||hh<12||![px,py,ww,hh,x,y,now].every(Number.isFinite))return 0;
+ const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
+ const frozen=season===3;
+ ctx.save();
+ ctx.beginPath();ctx.moveTo(...corners[0]);
+ for(let i=1;i<4;i++)ctx.lineTo(...corners[i]);
+ ctx.closePath();ctx.clip();
+ ctx.lineCap='round';
+ let drawn=0;
+ for(let d=0;d<4;d++){
+  if(!(mask&(1<<d)))continue;
+  const a=corners[d],b=corners[(d+1)%4];
+  const ex=(a[0]+b[0])*.5,ey=(a[1]+b[1])*.5;
+  const length=Math.hypot(b[0]-a[0],b[1]-a[1])||1;
+  const tx=(b[0]-a[0])/length,ty=(b[1]-a[1])/length;
+  const inwardX=(px-ex)*.68,inwardY=(py-ey)*.68;
+  const bank=ww*.056,fan=ww*.145;
+  // A boca do canal coincide com a aresta do terreno adjacente.
+  ctx.fillStyle=frozen?'#c4d8d6b8':'#b4a47785';
+  ctx.beginPath();
+  ctx.moveTo(ex-tx*bank,ey-ty*bank);
+  ctx.quadraticCurveTo(ex+inwardX*.60-tx*fan*.8,ey+inwardY*.60-ty*fan*.8,
+                       ex+inwardX-tx*fan,ey+inwardY-ty*fan);
+  ctx.quadraticCurveTo(ex+inwardX*1.10,ey+inwardY*1.10,
+                       ex+inwardX+tx*fan,ey+inwardY+ty*fan);
+  ctx.quadraticCurveTo(ex+inwardX*.60+tx*fan*.8,ey+inwardY*.60+ty*fan*.8,
+                       ex+tx*bank,ey+ty*bank);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle=frozen?'#b9d8de':'#4c98a2b8';
+  ctx.lineWidth=Math.max(1,ww*.072);
+  ctx.beginPath();ctx.moveTo(ex,ey);
+  ctx.quadraticCurveTo(ex+inwardX*.35,ey+inwardY*.35,
+                       ex+inwardX*.87,ey+inwardY*.87);ctx.stroke();
+  if(ww>=52){
+   // A espuma se espalha lateralmente sem cruzar a margem do losango.
+   ctx.strokeStyle=frozen?'#edf5f0c7':'#d0f0d4b8';
+   ctx.lineWidth=Math.max(.7,ww*.012);
+   const ripples=ww>=72?3:2;
+   for(let i=0;i<ripples;i++){
+    const t=.34+i*.22;
+    const wave=frozen?0:Math.sin(now*.002+x*1.31+y*.77+i*1.7)*ww*.009;
+    const mx=ex+inwardX*t+wave,my=ey+inwardY*t;
+    const half=bank*(.68+t*.75);
+    ctx.beginPath();
+    ctx.moveTo(mx-tx*half,my-ty*half);
+    ctx.quadraticCurveTo(mx+inwardX*.09,my+inwardY*.09,
+                         mx+tx*half,my+ty*half);ctx.stroke();
+   }
+  }
+  if(ww>=72){
+   // Bancos rasos nas laterais, afastados da calha central.
+   for(const side of [-1,1]){
+    ctx.fillStyle=frozen?'#f0f4e58c':'#d6bf888c';
+    ctx.beginPath();
+    ctx.ellipse(ex+inwardX*.82+tx*fan*.70*side,
+                ey+inwardY*.82+ty*fan*.70*side,
+                ww*.025,hh*.020,0,0,Math.PI*2);ctx.fill();
+   }
+  }
+  drawn++;
+ }
+ ctx.restore();return drawn;
+}
+
 function drawTributary(px,py,ww,hh,x,y,mask,season=1,now=0){
  if(!mask||ww<36||hh<12||![px,py,ww,hh,now].every(Number.isFinite))return 0;
  const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
@@ -9059,6 +9138,7 @@ if(visibleFog[y*W+x])drawGroundTracksTile(groundTrackTiles.get(key(x,y)),z,frame
 if(b===0)drawLakeDepth(px,py,ww,hh,waterDepth[y*W+x],q,frameTime);
  if(b===0&&shoreMask[y*W+x]&&ww>20){drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);drawForestWaterReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);drawWaterfrontReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],structures,visibleFog,forestSeason(),frameTime,game.era);drawShoreFoam(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime)}
 
+if(b===0&&tributaryMouthMask[y*W+x]&&visibleFog[y*W+x])drawTributaryEstuary(px,py,ww,hh,x,y,tributaryMouthMask[y*W+x],forestSeason(),frameTime);
 if(b===0)drawLakeDetails(px,py,ww,hh,x,y,q,shoreMask[y*W+x],structures.has(key(x,y)),frameTime);
 if(b===0&&shoreMask[y*W+x])drawWinterLakeIce(px,py,ww,hh,x,y,shoreMask[y*W+x],waterDepth[y*W+x],forestSeason(),structures.has(key(x,y))||boatTiles.has(key(x,y)),frameTime);
 if(b===0&&shoreMask[y*W+x]&&q>.965&&!structures.has(key(x,y))&&!boatTiles.has(key(x,y))&&visibleFog[y*W+x])drawWadingBird(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);
