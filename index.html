@@ -5380,15 +5380,19 @@ function drawEraStandard(px,py,ww,hh,type,era,now=Date.now()){
 }
 
 // v6.101: acessos isometricos ligados a estradas reais, com piso historico e LOD movel.
-function buildingApproachDirection(x,y,roads){
- if(!roads||typeof roads.has!=='function')return [1,0];
- for(const [dx,dy] of [[1,0],[0,1],[-1,0],[0,-1]]){
+function buildingApproachDirection(x,y,roads,paths=null){
+ const dirs=[[1,0],[0,1],[-1,0],[0,-1]];
+ // Estradas reais tem prioridade; caso contrario, orienta a entrada pela trilha.
+ if(roads&&typeof roads.has==='function')for(const [dx,dy] of dirs){
   if(roads.has((x+dx)+','+(y+dy)))return [dx,dy];
+ }
+ if(paths&&typeof paths.has==='function')for(const [dx,dy] of dirs){
+  if(paths.has((x+dx)+','+(y+dy)))return [dx,dy];
  }
  return [1,0];
 }
 // Caminhos de pedestres conectam edificacoes proximas sem alterar o pathfinding.
-// A busca percorre apenas os quatro vizinhos das construcoes, nao o mapa inteiro.
+// A busca limitada percorre ate quatro tiles livres, sem varrer o mapa inteiro.
 function collectSettlementPaths(structures,roads,biomeAt){
  const dirs=[[1,0],[0,1],[-1,0],[0,-1]],candidates=new Set(),paths=new Map();
  const valid=b=>b&&!b.buildLeft&&b.t!=='Ponte'&&b.t!=='Pesqueiro';
@@ -5504,10 +5508,10 @@ function drawSettlementFootpath(px,py,ww,hh,x,y,links,era=0,season=1,rain=0){
  }
  ctx.restore();return links.length;
 }
-function drawBuildingApproach(px,py,ww,hh,x,y,type,era,season=0,rain=0,roads=roadTiles){
+function drawBuildingApproach(px,py,ww,hh,x,y,type,era,season=0,rain=0,roads=roadTiles,paths=null){
  if(ww<28||!Number.isFinite(ww)||!Number.isFinite(hh)||
     ['Aldeia','Ponte','Pesqueiro','Fazenda'].includes(type))return 0;
- const [dx,dy]=buildingApproachDirection(x,y,roads);
+ const [dx,dy]=buildingApproachDirection(x,y,roads,paths);
  const ex=(dx-dy)*ww*.29,ey=(dx+dy)*hh*.29;
  const sx=px+ex*.08,sy=py+hh*.14+ey*.08;
  const tx=px+ex,ty=py+hh*.045+ey;
@@ -8839,7 +8843,7 @@ if(structureActors){
  if(behind.length)drawTileOccupants(x,y,unitTiles,enemyTiles,z,frameTime,behind);
 }
 if(obj&&!obj.buildLeft&&obj.t==='Cabana')drawResidenceYard(px,py,ww,hh,game.era,x*97+y*13);
- if(obj&&!obj.buildLeft)drawBuildingApproach(px,py,ww,hh,x,y,obj.t,game.era,forestSeason(),rainLevel,roadTiles);
+ if(obj&&!obj.buildLeft)drawBuildingApproach(px,py,ww,hh,x,y,obj.t,game.era,forestSeason(),rainLevel,roadTiles,settlementPaths);
 if(obj&&!obj.buildLeft&&obj.t!=='Ponte')drawStructureShadow(px,py,ww,hh,obj.t,frameTime);
 if(obj&&!obj.buildLeft&&obj.t==='Moinho')drawWindmillBladeShadow(px,py,ww,hh,frameTime);
 if(obj&&obj.buildLeft){drawConstructionSite(obj,px,py,ww,hh)}
