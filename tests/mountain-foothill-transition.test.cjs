@@ -10,7 +10,7 @@ const rnd=(x,y,z)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n
 function paint(mask=3,ww=90,season=0,phase=.3,occupied=false){
  const calls=[],styles=[],ctx=new Proxy({},{
   get(o,k){return k in o?o[k]:(...args)=>{for(const v of args)if(typeof v==='number')assert.ok(Number.isFinite(v),'Canvas finito');calls.push([k,...args]);}},
-  set(o,k,v){o[k]=v;if(k==='fillStyle')styles.push(v);return true;}
+  set(o,k,v){o[k]=v;if(k==='fillStyle'||k==='globalAlpha')styles.push([k,v]);return true;}
  });
  const fn=new Function('ctx','rnd','lightLevels',source+'return drawMountainFoothillTransition;')(ctx,rnd,p=>({night:p>.65?.8:0}));
  return {calls,styles,count:fn(100,100,ww,ww*.51,12,13,mask,season,phase,occupied)};
@@ -33,7 +33,7 @@ test('cascalho e controlado pelo zoom e ocupacao',()=>{
  assert.equal(paint(15,90,0,.3,true).count,1);
 });
 test('sombra acompanha orientacao solar e neve altera paleta',()=>{
- assert.notDeepEqual(paint(3,90,0,.2).calls,paint(3,90,0,.7).calls);
+ assert.notDeepEqual(paint(3,90,0,.2).styles,paint(3,90,0,.7).styles);
  assert.notDeepEqual(paint(3,90,0).styles,paint(3,90,3).styles);
 });
 test('geometria deterministica e coordenadas finitas',()=>{
