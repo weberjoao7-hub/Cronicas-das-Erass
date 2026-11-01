@@ -36,7 +36,7 @@ test('salgueiro possui copa, tronco e ramos animados',()=>{
  assert.ok(found);assert.ok(render(74,15,...found).length>render(54,15,...found).length);
 });
 test('renderização respeita construções, estradas e ruínas',()=>{
- assert.match(script,/if\(\(b===1\|\|b===2\)\&\&!ruinKind\&\&!structures\.has\(key\(x,y\)\)\&\&!roadTiles\.has\(key\(x,y\)\)\)\{/);
+ assert.ok(script.includes('if((b===1||b===2)&&!ruinKind&&!settlementPaths.has(key(x,y))&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){'));
  assert.match(script,/if\(riparianMask\[y\*W\+x\]\)drawRiparianVegetation/);
 });
 test('chave de salvamento preservada',()=>assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/));

@@ -65,7 +65,7 @@ test('outono produz espigas em vez de petalas',()=>{
  assert.ok(autumn.some(c=>c[0]==='fill'&&c[1]==='#c0a267'));
 });
 test('integracao impede flores em estradas, construcoes, ruinas e nevoa',()=>{
- const call='if(b===2&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&visibleFog[y*W+x])drawPrairieWildflowers(px,py,ww,hh,x,y,forestSeason(),frameTime);';
+ const call='if(b===2&&!ruinKind&&!settlementPaths.has(key(x,y))&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&visibleFog[y*W+x])drawPrairieWildflowers(px,py,ww,hh,x,y,forestSeason(),frameTime);';
  assert.ok(script.includes(call));
  const pos=script.indexOf(call);
  assert.ok(pos>script.indexOf('function draw(){'));

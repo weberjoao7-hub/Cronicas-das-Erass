@@ -61,7 +61,7 @@ test('a ordem de renderizacao intercala cada ator e as arvores',()=>{
  ]);
 });
 test('pomares ocupados respeitam construcoes, estradas e margens',()=>{
- assert.match(script,/const orchardOpen=\(b===1\|\|b===2\)&&!ruinKind&&!structures\.has\(key\(x,y\)\)&&!roadTiles\.has\(key\(x,y\)\)&&orchardTile\(x,y,b\)&&!riparianMask\[y\*W\+x\]/);
+ assert.ok(script.includes('const orchardOpen=(b===1||b===2)&&!settlementPaths.has(key(x,y))&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&orchardTile(x,y,b)&&!riparianMask[y*W+x]'));
  assert.match(script,/if\(orchardActors\.length\)drawOrchard\(px,py,ww,hh,x,y,forestSeason\(\),frameTime,'back',-Infinity\)/);
  assert.match(script,/else if\(orchardActors\?\.length\)drawOrchardOccupiedTile/);
  assert.match(script,/else drawTileOccupants\(x,y,unitTiles,enemyTiles,z,frameTime\);/);

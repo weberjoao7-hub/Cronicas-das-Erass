@@ -45,7 +45,7 @@ test('cascalho e brilho de margem aumentam somente em zoom próximo',()=>{
  assert.ok(render(75,1,1).calls.length>0);
 });
 test('faixa úmida é renderizada antes da vegetação e respeita ocupação',()=>{
- assert.match(script,/if\(\(b===1\|\|b===2\)\&\&!ruinKind\&\&!structures\.has\(key\(x,y\)\)\&\&!roadTiles\.has\(key\(x,y\)\)\)\{/);
+ assert.ok(script.includes('if((b===1||b===2)&&!ruinKind&&!settlementPaths.has(key(x,y))&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){'));
  const a=script.indexOf('if(riparianMask[y*W+x])drawRiparianBank(');
  const b=script.indexOf('meadowDetails(px,py,ww,hh,x,y,b,frameTime);',a);
  const c=script.indexOf('if(riparianMask[y*W+x])drawRiparianVegetation(',b);

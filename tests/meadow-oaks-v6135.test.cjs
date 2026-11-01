@@ -90,7 +90,7 @@ test('unidades intercalam com a arvore por profundidade dos pes',()=>{
  ]);
 });
 test('integracao evita estruturas, estradas, ruinas, margens, pomares e nevoa',()=>{
- assert.match(script,/const fieldOakOpen=b===2&&visibleFog\[y\*W\+x\]&&!ruinKind&&!structures\.has\(key\(x,y\)\)&&!roadTiles\.has\(key\(x,y\)\)&&!riparianMask\[y\*W\+x\]&&!orchardOpen&&fieldOakAt/);
+ assert.ok(script.includes('const fieldOakOpen=b===2&&visibleFog[y*W+x]&&!settlementPaths.has(key(x,y))&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&!riparianMask[y*W+x]&&!orchardOpen&&fieldOakAt'));
  assert.match(script,/if\(fieldOakOpen\)drawFieldOak\(/);
  assert.match(script,/else if\(fieldOakActors\?\.length\)drawFieldOakOccupiedTile\(/);
  assert.match(script,/if\(visibleFog\[y\*W\+x\]\)for\(const u of enemyTiles/);

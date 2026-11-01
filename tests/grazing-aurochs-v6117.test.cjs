@@ -29,7 +29,7 @@ test('script completo compila e o formato do salvamento continua intacto',()=>{
 test('auroques aparecem somente em pradarias livres, exploradas e visiveis',()=>{
  const render=script.slice(script.indexOf('function draw(){'),script.indexOf('function refresh(){'));
  assert.ok(render.includes('if(!exploredFog[y*W+x])continue'));
- assert.match(render,/if\(\(b===1\|\|b===2\)\&\&!ruinKind\&\&!structures\.has\(key\(x,y\)\)\&\&!roadTiles\.has\(key\(x,y\)\)\)/);
+ assert.ok(render.includes('if((b===1||b===2)&&!ruinKind&&!settlementPaths.has(key(x,y))&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))'));
  assert.match(render,/if\(b===1&&q>\.962&&ww>=48&&visibleFog\[y\*W\+x\]&&!riparianMask\[y\*W\+x\]&&!orchardTile\(x,y,b\)\)/);
  assert.ok(render.indexOf('drawGrazingAurochs(px,py')<render.lastIndexOf('drawTileOccupants(x,y'));
 });
