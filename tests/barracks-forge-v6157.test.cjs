@@ -6,7 +6,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal encontrado');
 const a=script.indexOf('function drawBarracksForge(');
-const b=script.indexOf('/* Quartel: fortificacao',a);
+const b=script.indexOf('function drawBarracks(',a);
 assert.ok(a>=0&&b>a,'forja isolada do renderizador');
 const source=script.slice(a,b);
 function render(era=4,now=1000,ww=100,season=1){
@@ -25,7 +25,7 @@ function render(era=4,now=1000,ww=100,season=1){
 test('sintaxe principal, salvamento e integração no quartel',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(script,/drawBarracksTraining\(px,py,ww,hh,game\.era,frameTime\);drawBarracksForge\(px,py,ww,hh,game\.era,frameTime,forestSeason\(\)\)/);
+ assert.match(script,/if\(obj\.t==='Quartel'\)drawBarracksForge\(px,py,ww,hh,game\.era,frameTime,forestSeason\(\)\)/);
  assert.doesNotMatch(source,/localStorage|\.push\(|setInterval|requestAnimationFrame/);
 });
 test('forja não aparece em eras tribais ou em zoom distante',()=>{
