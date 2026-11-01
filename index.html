@@ -1619,7 +1619,61 @@ function drawMountain(px,py,ww,hh,x,y){
    ctx.beginPath();ctx.ellipse(sx,sy,ww*.013,hh*.018,-.2,0,Math.PI*2);ctx.fill();
   }
  }
+ // Estratos e cornijas pertencem as faces da montanha, nao a tela.
+ drawMountainRockStrata(px,py,ww,hh,x,y,peakX,peakY,left,right,leftY,rightY,base,
+  typeof forestSeason==='function'?forestSeason():0);
  ctx.restore();
+}
+// v6.146: rochas estratificadas e cornijas sazonais no relevo isometrico.
+function drawMountainRockStrata(px,py,ww,hh,x,y,peakX,peakY,left,right,leftY,rightY,base,season=0){
+ if(ww<54||hh<=0)return 0;
+ const near=ww>=78,layers=near?4:2;
+ let details=0;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ for(const side of [-1,1]){
+  const shoulderX=side<0?left:right,shoulderY=side<0?leftY:rightY;
+  for(let i=0;i<layers;i++){
+   const seed=rnd(x+i*11,y+side*7,731);
+   const t=.27+i*.155+(seed-.5)*.035;
+   const sx=peakX+(shoulderX-peakX)*t,sy=peakY+(shoulderY-peakY)*t;
+   const reach=.21+rnd(x+side*13,y+i*5,732)*.13;
+   const ex=sx+(px-sx)*reach,ey=sy+(base-hh*.18-sy)*reach*.63;
+   ctx.strokeStyle=side<0?'#394b51b0':'#203743b8';
+   ctx.lineWidth=Math.max(.75,ww*.013);
+   ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();
+   if(near){
+    ctx.strokeStyle=side<0?'#bdc3b399':'#889a9a9c';
+    ctx.lineWidth=Math.max(.6,ww*.007);
+    ctx.beginPath();ctx.moveTo(sx+ww*.007,sy-hh*.014);
+    ctx.lineTo(sx+(ex-sx)*.70+ww*.007,sy+(ey-sy)*.70-hh*.014);ctx.stroke();
+   }
+   details++;
+  }
+  if(season===3&&ww>=64){
+   for(let i=0;i<2;i++){
+    const t=.42+i*.20,ax=peakX+(shoulderX-peakX)*t,ay=peakY+(shoulderY-peakY)*t;
+    const dx=(shoulderX-peakX)*.075,dy=(shoulderY-peakY)*.075,inset=(px-ax)*.095;
+    ctx.fillStyle='#e7eee7';ctx.beginPath();
+    ctx.moveTo(ax-dx,ay-dy);ctx.lineTo(ax+dx,ay+dy);
+    ctx.lineTo(ax+dx+inset,ay+dy+hh*.036);
+    ctx.lineTo(ax+inset*.50,ay+hh*.028);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#9ebdc3';ctx.beginPath();
+    ctx.moveTo(ax+dx,ay+dy);ctx.lineTo(ax+dx+inset,ay+dy+hh*.036);
+    ctx.lineTo(ax+inset*.50,ay+hh*.028);ctx.closePath();ctx.fill();
+    details++;
+   }
+  }
+ }
+ if(near){
+  for(let i=0;i<5;i++){
+   const ox=(rnd(x+i*7,y,733)-.5)*ww*.64,oy=(rnd(x,y+i*9,734)-.5)*hh*.19;
+   const sx=px+ox,sy=base+oy,sz=ww*(.013+rnd(x+i,y+i,735)*.012);
+   ctx.fillStyle=i%2?'#87969a':'#b6bdb3';ctx.beginPath();
+   ctx.moveTo(sx-sz,sy);ctx.lineTo(sx+sz*.18,sy-sz*.60);
+   ctx.lineTo(sx+sz,sy+sz*.18);ctx.closePath();ctx.fill();
+  }
+ }
+ ctx.restore();return details;
 }
 // v6.130: microclima dos bosques — folhas de outono em queda e vagalumes no verao.
 // Particulas deterministicas por ladrilho; LOD e nevoa sao aplicados antes da chamada.
