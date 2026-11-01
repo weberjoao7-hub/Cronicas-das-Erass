@@ -151,7 +151,8 @@ function updateVisibility(){
  for(let i=0;i<visibleFog.length;i++){
   const k=i*4;
   pixels[k]=6;pixels[k+1]=16;pixels[k+2]=23;
-  pixels[k+3]=visibleFog[i]?0:exploredFog[i]?155:238;
+  // No minimapa, areas nunca exploradas devem ocultar 100% dos biomas e marcadores.
+  pixels[k+3]=visibleFog[i]?0:exploredFog[i]?155:255;
  }
  fogCtx.putImageData(fogImage,0,0);
  fogRevision++;dirty=true;
@@ -165,7 +166,12 @@ function enemyTurn(dt){
  for(const guard of game.enemyUnits){
   guard.repath=(guard.repath||0)-dt;
   let nearest=null,dist=Infinity;
-  for(const u of game.units){if(u.hp<=0)continue;let d=Math.hypot(u.x-guard.x,u.y-guard.y);if(d<dist){dist=d;nearest=u}}
+  for(const u of game.units){
+   if(u.hp<=0||!Number.isFinite(u.x)||!Number.isFinite(u.y))continue;
+   const d=Math.hypot(u.x-guard.x,u.y-guard.y);
+   // Guardas nao detectam tropas atras de cordilheiras nem perseguem por telepatia.
+   if(d<dist&&terrainSightClear(Math.floor(guard.x),Math.floor(guard.y),Math.floor(u.x),Math.floor(u.y))){dist=d;nearest=u}
+  }
   const archer=guard.kind==='archer';
   const chasing=nearest&&dist<(archer?9:7),goal=chasing?nearest:{x:guard.homeX,y:guard.homeY};
   const clearShot=archer&&chasing&&dist<=4.3&&
