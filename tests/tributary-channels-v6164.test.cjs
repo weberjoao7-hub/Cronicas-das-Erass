@@ -28,7 +28,7 @@ function paint(mask=5,width=82,season=1,now=10000){
 
 test('v6.164 compiles without changing the persistent save format',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/Crônicas das Eras v6\.164/);
+ assert.match(html,/Crônicas das Eras v6\.\d+/); // future versions retain the stream regression
  assert.match(script,/cronicas-v04/);
  assert.doesNotMatch(networkSource+drawSource,/localStorage|Math\.random|assignRoute\(|game\.buildings/);
 });
