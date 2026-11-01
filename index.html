@@ -2431,6 +2431,89 @@ function drawEraResidence(px,py,ww,hh,level=1,seed=0,era=0){
  ctx.restore();
 }
 
+// v6.150: relevo arquitetonico nas residencias evoluidas, com volumetria
+// isometrica (sem adesivos 2D). LOD limita custo no Safari.
+// Somente desenho: nao altera construcao, populacao, rotas ou persistencia.
+function drawResidenceArchitecturalRelief(px,py,ww,hh,era=0,level=1,seed=0){
+ if(![px,py,ww,hh,era,level,seed].every(Number.isFinite)||ww<40||hh<14||era<2)return 0;
+ const modern=era>=7,industrial=era===6,medieval=era===4;
+ const fine=ww>=60,near=ww>=82,upgraded=level>=2;
+ const trim=modern?'#d9e6dd':industrial?'#d7b69c':medieval?'#d4c5a6':'#d5b991';
+ const shadow=modern?'#4c6a70':industrial?'#744a3d':medieval?'#5a554d':'#79654e';
+ const wall=modern?'#c2d4d0':industrial?'#b87a5c':medieval?'#c8bdab':'#d7c39f';
+ const roof=industrial?'#52616a':medieval?'#4b6170':era===5?'#b96d4b':'#aa684b';
+ const p=(x,y)=>[px+x*ww,py+y*hh];
+ const face=(pts,color,outline)=>{
+  ctx.beginPath();ctx.moveTo(...p(...pts[0]));
+  for(let i=1;i<pts.length;i++)ctx.lineTo(...p(...pts[i]));
+  ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  if(outline){ctx.strokeStyle=outline;ctx.lineWidth=Math.max(.7,ww*.009);ctx.stroke();}
+ };
+ const line=(a,b,color,width=.012)=>{
+  ctx.strokeStyle=color;ctx.lineWidth=Math.max(.7,ww*width);
+  ctx.beginPath();ctx.moveTo(...p(...a));ctx.lineTo(...p(...b));ctx.stroke();
+ };
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ // Embasamento segue as duas faces das paredes e nao atravessa as janelas.
+ line([-.31,-.12],[0,.13],shadow,.018);
+ line([0,.13],[.31,-.12],shadow,.018);
+ line([-.31,-.17],[0,.08],trim,.009);
+ line([0,.08],[.31,-.17],trim,.009);
+ // Molduras com peitoris projetados, apoiadas nas janelas ja existentes.
+ face([[-.255,-.47],[-.09,-.34],[-.09,-.31],[-.255,-.44]],trim,shadow);
+ face([[.105,-.40],[.265,-.53],[.265,-.49],[.105,-.36]],trim,shadow);
+ if(fine){
+  // Pedras de esquina e juntas de alvenaria em perspectiva.
+  for(let i=0;i<4;i++){
+   const y=-.23-i*.21;
+   if(!industrial){
+    face([[-.32,y],[-.275,y+.034],[-.275,y-.075],[-.32,y-.105]],i%2?trim:wall,shadow);
+    face([[.275,y+.034],[.32,y],[.32,y-.105],[.275,y-.075]],i%2?wall:trim,shadow);
+   }else{
+    line([-.31,y],[0,y+.23],'#e0a184',.007);
+    line([0,y+.23],[.31,y],'#8c5341',.007);
+   }
+  }
+  // Soleira e dois degraus pequenos ancorados no piso.
+  face([[-.115,.095],[.065,.095],[.125,.19],[-.06,.19]],era>=6?'#839997':'#b7a589',shadow);
+  face([[-.06,.19],[.125,.19],[.125,.23],[-.06,.23]],shadow);
+ }
+ if(upgraded&&fine){
+  if(modern){
+   // Unidade de climatizacao apoiada na laje, sem cobrir os paineis solares.
+   face([[.195,-1.25],[.315,-1.33],[.315,-1.52],[.195,-1.44]],'#8da5a5','#536d70');
+   face([[.315,-1.33],[.37,-1.28],[.37,-1.46],[.315,-1.52]],'#5b777b','#425d62');
+   face([[.195,-1.44],[.315,-1.52],[.37,-1.46],[.25,-1.39]],'#d6e0d8');
+   ctx.strokeStyle='#3c626b';ctx.lineWidth=Math.max(.8,ww*.009);
+   ctx.beginPath();ctx.ellipse(...p(.25,-1.40),ww*.034,hh*.038,-.25,0,Math.PI*2);ctx.stroke();
+  }else{
+   // Agua-furtada volumetrica: frontao, duas paredes e cobertura em duas aguas.
+   const offset=(Math.abs(Math.trunc(seed))%3-1)*.014;
+   const q=(x,y)=>[x+offset,y];
+   face([q(-.235,-1.23),q(-.125,-1.15),q(-.125,-1.40),q(-.235,-1.48)],wall,shadow);
+   face([q(-.125,-1.15),q(-.065,-1.21),q(-.065,-1.46),q(-.125,-1.40)],shadow);
+   face([q(-.25,-1.47),q(-.125,-1.38),q(-.06,-1.46),q(-.18,-1.59)],roof,'#483d34');
+   face([q(-.205,-1.31),q(-.145,-1.27),q(-.145,-1.40),q(-.205,-1.44)],industrial?'#547f8b':'#334946',trim);
+   line(q(-.176,-1.29),q(-.176,-1.42),trim,.009);
+  }
+ }
+ if(level>=3&&fine){
+  // Sacada de nivel 3: laje, espessura, postes e guarda-corpo na face direita.
+  const slab=modern?'#9bb6b3':industrial?'#8b9491':'#b49b75';
+  face([[.07,-.16],[.30,-.32],[.44,-.22],[.20,-.06]],slab,shadow);
+  face([[.20,-.06],[.44,-.22],[.44,-.17],[.20,-.01]],shadow);
+  for(const [x,y] of [[.20,-.06],[.32,-.14],[.44,-.22]]){
+   line([x,y],[x,y-.23],modern?'#d2e0da':'#8e7354',.014);
+  }
+  line([.20,-.29],[.44,-.45],modern?'#d2e0da':'#c8a77a',.016);
+  if(near){
+   line([.20,-.17],[.44,-.33],modern?'#8db1af':'#82694c',.008);
+   face([[.26,-.30],[.30,-.33],[.30,-.39],[.26,-.36]],modern?'#a8d4b0':'#63865d');
+  }
+ }
+ ctx.restore();return 1;
+}
+
 // v6.124: chaminés residenciais isométricas com materiais por era e fumaça sazonal.
 // A fumaça nasce na saída física do duto, sem sprites flutuantes ou dados no save.
 function drawResidenceChimney(px,py,ww,hh,era=0,seed=0,now=Date.now(),season=forestSeason(),rain=0){
@@ -8224,6 +8307,7 @@ else if(obj){
  else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back');drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front',game.units.some(u=>u.hp>0&&Array.isArray(u.path)&&u.path.length&&Math.hypot(u.x-(x+.85),u.y-(y+.85))<1.35));drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
  else if(obj.t==='Cabana')drawEraResidence(px,py,ww,hh,obj.level||1,x*97+y*13,game.era);
  else house(px,py,ww*.7,obj.t);
+ if(obj.t==='Cabana')drawResidenceArchitecturalRelief(px,py,ww,hh,game.era,obj.level||1,x*97+y*13);
  if(obj.t==='Torre')drawWatchtowerSentry(px,py,ww,hh,game.era,frameTime,forestSeason(),x,y);
  if(obj.t==='Cabana')drawResidenceChimney(px,py,ww,hh,game.era,x*97+y*13,frameTime,forestSeason(),rainLevel);
  if((obj.t==='Aldeia'||obj.t==='Quartel')&&ww>=30)drawCampfire(px,py,ww,hh,frameTime);
@@ -8423,6 +8507,7 @@ function drawPlacementOverlay(){
  else if(placing==='Mina')drawMine(px,py,ww,hh,1,game.era);
  else if(placing==='Cabana')drawEraResidence(px,py,ww,hh,1,p.x*97+p.y*13,game.era);
  else house(px,py,ww*.7,placing);
+ if(placing==='Cabana')drawResidenceArchitecturalRelief(px,py,ww,hh,game.era,1,p.x*97+p.y*13);
  if(placing==='Cabana')drawResidenceChimney(px,py,ww,hh,game.era,p.x*97+p.y*13,Date.now(),forestSeason());
  if(['Torre','Quartel','Pesqueiro'].includes(placing))drawEraStandard(px,py,ww,hh,placing,game.era);
  ctx.globalAlpha=1;
