@@ -5392,16 +5392,68 @@ function buildingApproachDirection(x,y,roads){
 function collectSettlementPaths(structures,roads,biomeAt){
  const dirs=[[1,0],[0,1],[-1,0],[0,-1]],candidates=new Set(),paths=new Map();
  const valid=b=>b&&!b.buildLeft&&b.t!=='Ponte'&&b.t!=='Pesqueiro';
+ const walkable=(x,y)=>{const t=biomeAt(x,y);return t===1||t===2};
+ // Conexoes curtas originais permanecem prioritarias (sem mudar estradas reais).
  for(const b of structures.values())if(valid(b)){
   for(const [dx,dy] of dirs)candidates.add(key(b.x+dx,b.y+dy));
  }
  for(const id of candidates){
   if(structures.has(id)||roads.has(id))continue;
   const [x,y]=id.split(',').map(Number);
-  if(biomeAt(x,y)!==1&&biomeAt(x,y)!==2)continue;
+  if(!walkable(x,y))continue;
   const links=dirs.filter(([dx,dy])=>roads.has(key(x+dx,y+dy))||valid(structures.get(key(x+dx,y+dy))));
   if(links.length>=2)paths.set(id,links);
  }
+ // Bairros mais dispersos: trilhas continuas ate 4 ladrilhos entre casa e via.
+ // BFS com vizinhanca fixa: rotas deterministicas, sem cruzar agua, relevo ou predios.
+ // Limite pequeno para nao criar ruas artificiais longas nem penalizar o Safari.
+ const maxInterior=4;
+ const attach=(id,dx,dy)=>{
+  if(!paths.has(id))paths.set(id,[]);
+  const links=paths.get(id);
+  if(!links.some(([x,y])=>x===dx&&y===dy))links.push([dx,dy]);
+ };
+ for(const building of structures.values()){
+  if(!valid(building))continue;
+  const source=key(building.x,building.y);
+  // Entrada ja ligada a uma estrada ou trilha: evita pavimentacao duplicada.
+  if(dirs.some(([dx,dy])=>{
+   const neighbor=key(building.x+dx,building.y+dy);
+   return roads.has(neighbor)||paths.has(neighbor);
+  }))continue;
+  const queue=[[building.x,building.y,0]],seen=new Set([source]),parent=new Map();
+  let found=null;
+  for(let head=0;head<queue.length&&!found;head++){
+   const [x,y,steps]=queue[head],from=key(x,y);
+   for(const [dx,dy] of dirs){
+    const nx=x+dx,ny=y+dy,id=key(nx,ny);
+    if(id===source)continue;
+    if(roads.has(id)||valid(structures.get(id))){
+     if(steps>=1){found={from,target:id};break}
+     continue;
+    }
+    if(steps>=maxInterior||seen.has(id)||structures.has(id)||!walkable(nx,ny))continue;
+    seen.add(id);parent.set(id,from);queue.push([nx,ny,steps+1]);
+   }
+  }
+  if(!found)continue;
+  const chain=[found.target];
+  for(let id=found.from;id!==source;id=parent.get(id)){
+   if(!id)throw Error('broken settlement path');
+   chain.unshift(id);
+  }
+  chain.unshift(source);
+  for(let i=1;i<chain.length-1;i++){
+   const [x,y]=chain[i].split(',').map(Number);
+   const [ax,ay]=chain[i-1].split(',').map(Number);
+   const [bx,by]=chain[i+1].split(',').map(Number);
+   attach(chain[i],ax-x,ay-y);attach(chain[i],bx-x,by-y);
+  }
+ }
+ // Ordem canonica para curvas, cruzamentos e testes independentes da insercao.
+ for(const links of paths.values())links.sort((a,b)=>
+  dirs.findIndex(([x,y])=>x===a[0]&&y===a[1])-
+  dirs.findIndex(([x,y])=>x===b[0]&&y===b[1]));
  return paths;
 }
 // Piso assentado no mesmo plano do losango; sem sprite suspenso nem colisao extra.
