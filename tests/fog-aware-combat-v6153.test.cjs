@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
 function between(a,b){
  const start=script.indexOf(a),end=script.indexOf(b,start+a.length);
@@ -30,8 +30,8 @@ function tower(visibility,los=()=>true,hostiles=[{x:83.5,y:80.5,hp:65}]){
 }
 test('script compila e formato do save permanece v04',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(script,/localStorage\\.getItem\\('cronicas-v04'\\)/);
- assert.doesNotMatch(autoSource,/localStorage|game\\.units\\s*=/);
+ assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
+ assert.doesNotMatch(autoSource,/localStorage|game\.units\s*=/);
 });
 test('patrulha nao persegue tropas ocultas e volta a agir quando avistadas',()=>{
  assert.equal(patrol(()=>false).length,0);
