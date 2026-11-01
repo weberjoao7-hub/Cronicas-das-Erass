@@ -5608,6 +5608,19 @@ function atlasIdleMotion(now,moving,striking,mount=false){
  return {sway:Math.sin(t*.76+(mount?.9:0))*(mount?.012:.032),
   stretch:1+Math.sin(t+(mount?.45:0))*(mount?.011:.021)};
 }
+// v6.156: antecipação e recuperação de ataque nos atlases, girando em torno dos pés.
+// Não altera colisão, posição, quadros SVG ou estado persistido; sem partículas por unidade.
+function atlasAttackMotion(u,now,archer=false,mounted=false){
+ if(!u||!Number.isFinite(now)||!Number.isFinite(u.attackAt)||u.attackAt<=0)return null;
+ const age=now-u.attackAt;
+ if(age<0||age>=340)return null;
+ const t=age/340;
+ // Preparação curta, avanço e recuperação suaves, sem saltos no início/fim.
+ const pulse=Math.sin(Math.PI*t);
+ const lean=(archer?.055:mounted?-.085:-.125)*pulse;
+ const stretch=1+(archer?.018:mounted?-.014:-.028)*pulse;
+ return {lean,stretch,age};
+}
 function drawPaintedCavalry(u,px,py,z){
  if(z<.82||!paintedCavalry.complete||paintedCavalry.naturalWidth!==448||paintedCavalry.naturalHeight!==448)return false;
  const now=Date.now(),visualNow=typeof unitAnimationClock==='function'?unitAnimationClock(u,now):now;
@@ -5624,6 +5637,8 @@ function drawPaintedCavalry(u,px,py,z){
  if(idle)ctx.transform(1,0,idle.sway,idle.stretch,0,0);
  const impact=typeof atlasHitRecoil==='function'?atlasHitRecoil(u,now,true):null;
  if(impact)ctx.transform(1,0,impact.lean,1,0,0);
+ const attack=typeof atlasAttackMotion==='function'?atlasAttackMotion(u,now,false,true):null;
+ if(attack)ctx.transform(1,0,attack.lean,attack.stretch,0,0);
  // Cascos na linha y=101 de 112: contato visual com o terreno isométrico.
  ctx.drawImage(paintedCavalry,frame*112,eraBand*112,112,112,-w*.5,-h*101/112,w,h);
  ctx.restore();
@@ -5832,6 +5847,8 @@ function drawPaintedTroop(u,px,py,z,archer,moving,striking,now,direction,enemy=f
   if(idle){ctx.save();ctx.transform(1,0,idle.sway,idle.stretch,0,0)}
   const impact=typeof atlasHitRecoil==='function'?atlasHitRecoil(u,Date.now(),false):null;
   if(impact)ctx.transform(1,0,impact.lean,1,0,0);
+  const attack=typeof atlasAttackMotion==='function'?atlasAttackMotion(u,Date.now(),archer,false):null;
+  if(attack)ctx.transform(1,0,attack.lean,attack.stretch,0,0);
   ctx.drawImage(paintedTroops,frame*64,(eraBand*2+(archer?1:0))*112,64,112,-w*.5,-h*.875,w,h);
   if(enemy){
    // Faixa carmesim e broche distinguem guardas rivais sem duplicar o atlas.
