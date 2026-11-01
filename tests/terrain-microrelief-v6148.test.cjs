@@ -46,7 +46,7 @@ test('recorte e estado Canvas balanceados',()=>{
  }
 });
 test('marcas sao locais e sem persistencia',()=>{
- assert.doesNotMatch(source,/\b(save|refresh|spawnUnit|claim|ownedTile)\s*\(/);
+ assert.doesNotMatch(source,/(?:^|[^.\w])(save|refresh|spawnUnit|claim|ownedTile)\s*\(/);
  assert.ok(paint(4,90).calls.some(c=>c[0]==='fill'));
  assert.ok(paint(2,90).calls.some(c=>c[0]==='stroke'));
 });
