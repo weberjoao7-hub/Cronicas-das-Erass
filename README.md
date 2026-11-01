@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.149** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.151** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Melhoria incremental — nevoa opaca e descarte de terreno desconhecido (01/11/2026)
+- Regioes nunca exploradas agora recebem cobertura completamente opaca: biomas, lagos e montanhas nao podem ser deduzidos sob a nevoa.
+- O renderizador pula o atlas de terreno, a consulta de ruinas e os efeitos por ladrilho antes da primeira exploracao, reduzindo trabalho de Canvas em mapas amplos no Safari.
+- Terrenos ja explorados continuam visiveis sob nevoa translucida, e o gradiente da fronteira foi preservado. Nao altera visibilidade, simulacao, colisao nem salvamento `cronicas-v04`.
+- Quatro testes em `tests/opaque-unexplored-fog-v6152.test.cjs`. Avaliacao em Safari fisico e medicao de FPS permanecem pendentes.
 
 ## Melhoria incremental — nascentes isométricas sazonais (01/11/2026)
 - Nascentes raras agora desaguam nas bordas de lagos em pradarias e campos: canais curvos com margem sombreada, água em camadas e pequenas ondas animadas. No inverno, o leito congela visualmente.
