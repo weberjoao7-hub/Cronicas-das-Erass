@@ -69,5 +69,6 @@ test('rendering order preserves water under roads and never decorates hidden til
  const bridge=script.indexOf('if(tributaryMask[y*W+x]&&b!==0&&roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTributaryCrossing(');
  assert.ok(water>0&&banks>water&&road>banks&&bridge>road);
  assert.match(script.slice(bridge,bridge+250),/roadLinks\.get\(key\(x,y\)\)\|\|\[\]/);
- assert.match(script.slice(water-300,water),/if\(!exploredFog\[y\*W\+x\]\)continue/);
+ const fog=script.lastIndexOf('if(!exploredFog[y*W+x])continue;',water);
+ assert.ok(fog>0&&water-fog<1100,'unexplored tiles are culled before stream drawing');
 });
