@@ -43,6 +43,14 @@ for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
   if(there!==0&&there!==here)mask|=1<<i}
  biomeSeams[y*W+x]=mask;
 }
+// Faixa de transição nas bases das montanhas, calculada uma única vez.
+const mountainFootMask=new Uint8Array(W*H);
+for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
+ const i=y*W+x,b=biome(x,y);
+ if(b===0||b===5)continue;
+ mountainFootMask[i]=(biome(x,y-1)===5?1:0)|(biome(x+1,y)===5?2:0)|
+                     (biome(x,y+1)===5?4:0)|(biome(x-1,y)===5?8:0);
+}
 // v6.70: profundidade de lagos pré-calculada por BFS, sem buscas por quadro.
 const waterDepth=new Uint8Array(W*H);
 {
@@ -1959,6 +1967,59 @@ function drawHighlandCliff(px,py,ww,hh,x,y,kind){
   }
  }
  ctx.restore();
+}
+// Transicao geologica: sombras de contato e cascalho ancorados no terreno
+// junto as montanhas. Sem sprites flutuantes, colisoes ou estado persistido.
+function drawMountainFoothillTransition(px,py,ww,hh,x,y,mask,season=0,phase=.3,occupied=false){
+ if(!mask||ww<32||hh<12||![px,py,ww,hh,x,y,phase].every(Number.isFinite))return 0;
+ const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
+ const night=Math.max(0,Math.min(1,lightLevels(phase).night));
+ const daylight=1-night*.82,winter=season===3;
+ let painted=0;
+ ctx.save();
+ ctx.beginPath();ctx.moveTo(...corners[0]);
+ for(let i=1;i<4;i++)ctx.lineTo(...corners[i]);
+ ctx.closePath();ctx.clip();
+ for(let edge=0;edge<4;edge++){
+  if(!(mask&(1<<edge)))continue;
+  const a=corners[edge],b=corners[(edge+1)%4];
+  const sun=Math.cos(phase*Math.PI*2+edge*Math.PI*.5);
+  const strength=(.16+.065*sun)*daylight;
+  const inward=.27+(ww>=62?.12:.05);
+  ctx.globalAlpha=Math.max(.045,strength);
+  ctx.fillStyle=winter?'#4e6b7b':'#102a32';
+  ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);
+  ctx.lineTo(b[0]+(px-b[0])*inward,b[1]+(py-b[1])*inward);
+  ctx.lineTo(a[0]+(px-a[0])*inward,a[1]+(py-a[1])*inward);
+  ctx.closePath();ctx.fill();
+  ctx.globalAlpha=Math.max(.025,strength*.42);
+  ctx.fillStyle=winter?'#8299a3':'#345054';
+  ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);
+  ctx.lineTo(b[0]+(px-b[0])*inward*.38,b[1]+(py-b[1])*inward*.38);
+  ctx.lineTo(a[0]+(px-a[0])*inward*.38,a[1]+(py-a[1])*inward*.38);
+  ctx.closePath();ctx.fill();
+  if(occupied||ww<56)continue;
+  ctx.globalAlpha=1;
+  const count=ww>=84?4:2;
+  for(let j=0;j<count;j++){
+   const t=(j+.6)/(count+.9)+(rnd(x+j*13,y-edge*7,831)-.5)*.075;
+   const depth=.13+rnd(x-edge*11,y+j*9,832)*.16;
+   const bx=a[0]+(b[0]-a[0])*t,by=a[1]+(b[1]-a[1])*t;
+   const sx=bx+(px-bx)*depth,sy=by+(py-by)*depth;
+   const size=ww*(.015+rnd(x+j,y+edge*5,833)*.012);
+   ctx.fillStyle=winter?'#83999e':'#46585b';
+   ctx.beginPath();ctx.moveTo(sx-size,sy);ctx.lineTo(sx,sy-size*.72);
+   ctx.lineTo(sx+size*.92,sy+size*.13);ctx.lineTo(sx,sy+size*.30);
+   ctx.closePath();ctx.fill();
+   ctx.fillStyle=winter?'#e4ece5':'#b0b5a8';
+   ctx.beginPath();ctx.moveTo(sx-size,sy);ctx.lineTo(sx,sy-size*.72);
+   ctx.lineTo(sx+size*.20,sy-size*.23);ctx.lineTo(sx,sy+size*.30);
+   ctx.closePath();ctx.fill();
+   painted++;
+  }
+ }
+ ctx.restore();
+ return painted||1;
 }
 // Encostas e colinas: afloramentos facetados, cascalho e vegetação alpina em LOD.
 // Elementos estáticos e determinísticos; não alteram obstáculos, recursos ou saves.
@@ -8266,7 +8327,7 @@ function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const ra
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 const groundTrackTiles=collectGroundTrackTiles(bounds,frameTime);
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
-ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue;if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
+ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(!exploredFog[y*W+x])continue;if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);
 if(visibleFog[y*W+x])drawGroundTracksTile(groundTrackTiles.get(key(x,y)),z,frameTime);
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
