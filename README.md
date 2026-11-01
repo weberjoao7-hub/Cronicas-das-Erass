@@ -2,6 +2,12 @@
 
 Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.151** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
 
+## Correção incremental — combate respeita névoa de guerra (01/11/2026)
+- Patrulhas deixam de perseguir inimigos e fortalezas que ainda não estão visíveis; retomam a aproximação quando o alvo é revelado.
+- Torres de vigia concluídas não atiram em guardas ocultos pela névoa e priorizam alvos realmente visíveis, mantendo a verificação de bloqueio por montanhas.
+- Seis testes de regressão em `tests/fog-aware-combat-v6153.test.cjs`. Sem mudanças na IA inimiga, no alcance de ataque, na economia ou no salvamento `cronicas-v04`.
+- Validação física no Safari iPhone e medições de FPS continuam pendentes.
+
 ## Melhoria incremental — nevoa opaca e descarte de terreno desconhecido (01/11/2026)
 - Regioes nunca exploradas agora recebem cobertura completamente opaca: biomas, lagos e montanhas nao podem ser deduzidos sob a nevoa.
 - O renderizador pula o atlas de terreno, a consulta de ruinas e os efeitos por ladrilho antes da primeira exploracao, reduzindo trabalho de Canvas em mapas amplos no Safari.

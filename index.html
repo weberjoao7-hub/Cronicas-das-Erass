@@ -217,10 +217,10 @@ function warriorAutoEngage(){
  for(const u of game.units){
   if(!isMilitary(u.kind)||u.hp<=0||(u.path&&u.path.length))continue;
   let target=null,dist=7;
-  for(const e of game.enemyUnits){if(e.hp<=0)continue;const d=Math.hypot(e.x-u.x,e.y-u.y);if(d<dist){target=e;dist=d}}
+  for(const e of game.enemyUnits){if(e.hp<=0)continue;const d=Math.hypot(e.x-u.x,e.y-u.y);if(d<dist&&visibleAt(e.x,e.y)){target=e;dist=d}}
   if(target){if(dist>attackRange(u.kind)*.85||((u.kind==='archer'||u.kind==='cannon')&&!hasRangedSight(u.x,u.y,target.x,target.y)))approachHostile(u,target.x,target.y);continue}
   const baseDist=Math.hypot(u.x-(game.enemy.x+.5),u.y-(game.enemy.y+.5));
-  if(baseDist<7&&(baseDist>attackRange(u.kind)*.85||((u.kind==='archer'||u.kind==='cannon')&&!hasRangedSight(u.x,u.y,game.enemy.x+.5,game.enemy.y+.5))))approachHostile(u,game.enemy.x+.5,game.enemy.y+.5);
+  if(baseDist<7&&visibleAt(game.enemy.x+.5,game.enemy.y+.5)&&(baseDist>attackRange(u.kind)*.85||((u.kind==='archer'||u.kind==='cannon')&&!hasRangedSight(u.x,u.y,game.enemy.x+.5,game.enemy.y+.5))))approachHostile(u,game.enemy.x+.5,game.enemy.y+.5);
  }
 }
 function combatTurn(){if(!game.enemy||game.enemy.hp<=0)return;let hits=false;
@@ -231,7 +231,7 @@ function combatTurn(){if(!game.enemy||game.enemy.hp<=0)return;let hits=false;
   for(const e of game.enemyUnits){
    if(e.hp<=0)continue;
    const dist=Math.hypot(e.x-(b.x+.5),e.y-(b.y+.5));
-   if(dist<best&&(typeof hasRangedSight!=='function'||hasRangedSight(b.x+.5,b.y+.5,e.x,e.y))){best=dist;target=e}
+   if(dist<best&&visibleAt(e.x,e.y)&&(typeof hasRangedSight!=='function'||hasRangedSight(b.x+.5,b.y+.5,e.x,e.y))){best=dist;target=e}
   }
   if(!target)continue;
   const damage=Math.min(14,target.hp);
