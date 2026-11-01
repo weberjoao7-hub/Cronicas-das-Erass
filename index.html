@@ -540,6 +540,47 @@ function drawSeasonalGround(px,py,ww,hh,x,y,b,season=forestSeason()){
 }
 // v6.148: micro-relevo por bioma. Pedras, serapilheira e tufos seguem
 // o losango do terreno; deterministico, com recorte e LOD para Safari.
+// v6.150: nascentes rasas desaguam nos lagos a partir das margens de pradarias.
+// O riacho ocupa somente o losango terrestre; nao altera bioma, colisao ou salvamento.
+function drawShoreSpring(px,py,ww,hh,x,y,mask,season=forestSeason(),now=Date.now()){
+ if(!mask||ww<44||hh<16||![px,py,ww,hh,x,y,now].every(Number.isFinite))return 0;
+ const seed=rnd(x,y,911);
+ if(seed<.76)return 0;
+ const sides=[[1,-1,-1],[2,1,-1],[4,1,1],[8,-1,1]];
+ const options=sides.filter(([bit])=>mask&bit);
+ if(!options.length)return 0;
+ const [,dx,dy]=options[Math.floor(rnd(x,y,912)*options.length)];
+ const sx=px-dx*ww*.045,sy=py-dy*hh*.045;
+ const ex=px+dx*ww*.245,ey=py+dy*hh*.245;
+ const bend=(rnd(x,y,913)-.5)*ww*.15;
+ const cx=(sx+ex)*.5+bend,cy=(sy+ey)*.5-bend*hh/ww;
+ const width=Math.max(1.5,ww*.052),winter=season===3;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.beginPath();ctx.moveTo(px,py-hh*.495);ctx.lineTo(px+ww*.495,py);
+ ctx.lineTo(px,py+hh*.495);ctx.lineTo(px-ww*.495,py);ctx.closePath();ctx.clip();
+ const channel=()=>{ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo(cx,cy,ex,ey)};
+ // Margens em tres camadas, com sombra de contato e agua mais clara ao centro.
+ channel();ctx.strokeStyle='#243d35a8';ctx.lineWidth=width*1.65;ctx.stroke();
+ channel();ctx.strokeStyle=winter?'#b5c8c3':'#628b78';ctx.lineWidth=width*1.31;ctx.stroke();
+ channel();ctx.strokeStyle=winter?'#c6dfe0':'#377d8c';ctx.lineWidth=width*.88;ctx.stroke();
+ if(ww>=59){
+  channel();ctx.strokeStyle=winter?'#e7f1e9a6':'#8ac6b8a6';ctx.lineWidth=Math.max(.7,ww*.012);ctx.stroke();
+  // Ondas percorrem o leito; a animacao e temporal e nao gera entidades.
+  if(!winter)for(let i=0;i<3;i++){
+   const t=((now*.00027+i/3+seed)%1+1)%1;
+   const qx=(1-t)*(1-t)*sx+2*(1-t)*t*cx+t*t*ex;
+   const qy=(1-t)*(1-t)*sy+2*(1-t)*t*cy+t*t*ey;
+   ctx.fillStyle='rgba(217,240,217,'+(0.15+Math.sin(t*Math.PI)*.45)+')';
+   ctx.beginPath();ctx.ellipse(qx,qy,Math.max(.65,ww*.014),Math.max(.45,hh*.018),-.3,0,Math.PI*2);ctx.fill();
+  }
+ }
+ // Nascente alimentada por uma pequena poca no inicio do leito.
+ ctx.fillStyle=winter?'#d7e7e2':'#3c8893';ctx.beginPath();
+ ctx.ellipse(sx,sy,width*.75,Math.max(1,hh*.042),-.1,0,Math.PI*2);ctx.fill();
+ if(winter&&ww>=60){ctx.strokeStyle='#f2f7efb0';ctx.lineWidth=Math.max(.7,ww*.009);
+  ctx.beginPath();ctx.moveTo(sx-width*.36,sy);ctx.lineTo(sx+width*.18,sy-hh*.023);ctx.stroke();}
+ ctx.restore();return 1;
+}
 function drawTerrainMicroRelief(px,py,ww,hh,x,y,b,season=forestSeason()){
  if(ww<43||hh<16||b<1||b>5||(season===3&&ww<68)||rnd(x,y,812)<.34)return 0;
  const count=ww>=76?4:2, winter=season===3, autumn=season===2;
@@ -8135,6 +8176,7 @@ if((b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)
   if(orchardActors.length)drawOrchard(px,py,ww,hh,x,y,forestSeason(),frameTime,'back',-Infinity);
   else drawOrchard(px,py,ww,hh,x,y,forestSeason(),frameTime);
  }
+ if(riparianMask[y*W+x]&&visibleFog[y*W+x]&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&!ruinKind)drawShoreSpring(px,py,ww,hh,x,y,riparianMask[y*W+x],forestSeason(),frameTime);
  if(riparianMask[y*W+x])drawRiparianVegetation(px,py,ww,hh,x,y,riparianMask[y*W+x],frameTime,riparianActors?.length?'back':'all',-Infinity,Infinity,forestSeason());
 }
 if(b===4&&!ruinKind)drawHighlandGround(px,py,ww,hh,x,y,4,structures.has(key(x,y))||roadTiles.has(key(x,y)));
