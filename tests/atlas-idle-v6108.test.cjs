@@ -56,6 +56,6 @@ test('distintivo rival acompanha corpo sem mover anel no chão',()=>{
 test('cavalaria: respiração, cascos ancorados, galope e LOD',()=>{
  const rest=render('cavalry'),walk=render('cavalry',{moving:true}),attack=render('cavalry',{striking:true});
  assert.equal(rest.count('transform'),1);assert.equal(walk.count('transform'),0);
- assert.equal(attack.count('transform'),0);assert.equal(rest.count('save'),rest.count('restore'));
+ assert.equal(attack.count('transform'),1,'ataque montado inclina o corpo sem deslocar cascos');assert.equal(rest.count('save'),rest.count('restore'));
  assert.equal(rest.count('drawImage'),1);assert.equal(render('cavalry',{zoom:.7}).ok,false);
 });
