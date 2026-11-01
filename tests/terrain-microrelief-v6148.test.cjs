@@ -7,7 +7,7 @@ const end=script.indexOf('// Água rasa e transições costeiras',start);
 assert.ok(start>=0&&end>start,'funcao de micro-relevo presente');
 const source=script.slice(start,end);
 const rnd=(x,y,k)=>{const n=Math.sin(x*127.1+y*311.7+k*74.7)*43758.5453;return n-Math.floor(n)};
-function paint(b=2,ww=90,season=1,x=4,y=7){
+function paint(b=2,ww=90,season=1,x=2,y=7){
  const calls=[],styles=[],ctx=new Proxy({},{
   get(o,k){return k in o?o[k]:(...args)=>{for(const a of args)if(typeof a==='number')assert.ok(Number.isFinite(a),'Canvas finito');calls.push([k,...args]);}},
   set(o,k,v){o[k]=v;if(k==='fillStyle'||k==='strokeStyle')styles.push(v);return true;}
