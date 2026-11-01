@@ -14,7 +14,7 @@ function scene(ww=74,season=1,now=10000,mask=4,x=12,y=11){
  return {count:draw(100,120,ww,ww*.514,x,y,mask,season,now),calls,styles};
 }
 test('script compila sem mudar persistencia',()=>{
- assert.doesNotThrow(()=>new Function(script));assert.match(html,/Crônicas das Eras v6\.149/);
+ assert.doesNotThrow(()=>new Function(script));assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=149);
  assert.match(script,/cronicas-v04/);assert.doesNotMatch(source,/localStorage|Math\.random|game\.|roadTiles|gameFrame/);
 });
 test('nascentes so aparecem em margens elegiveis e zoom proximo',()=>{

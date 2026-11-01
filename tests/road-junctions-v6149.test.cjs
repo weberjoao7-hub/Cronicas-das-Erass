@@ -12,7 +12,7 @@ function scene(era=4,ww=74,links=triple){
  const draw=new Function('ctx','rnd',source+'return drawRoadJunction;')(ctx,rnd);
  return {calls,styles,count:draw(100,120,ww,ww*.514,80,80,links,era,ww*(era>=6?.18:.15))};
 }
-test('script v6.149 compila sem mudar persistencia',()=>{assert.doesNotThrow(()=>new Function(script));assert.match(html,/Crônicas das Eras v6\.149/);assert.match(script,/cronicas-v04/);assert.doesNotMatch(source,/localStorage|Math\.random|setInterval|game\./)});
+test('script v6.149 compila sem mudar persistencia',()=>{assert.doesNotThrow(()=>new Function(script));assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=149);assert.match(script,/cronicas-v04/);assert.doesNotMatch(source,/localStorage|Math\.random|setInterval|game\./)});
 test('cruzamentos em T e X possuem meio-fio somente no ramal ausente',()=>{
  const t=scene(),x=scene(4,74,quad);assert.equal(t.count,3);assert.equal(x.count,4);
  assert.ok(t.calls.filter(c=>c[0]==='stroke').length>x.calls.filter(c=>c[0]==='stroke').length);
