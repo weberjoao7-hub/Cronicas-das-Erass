@@ -3194,6 +3194,73 @@ function drawBarracksRoofTexture(px,py,ww,hh,era,x){
  ctx.restore();return 1;
 }
 
+// Oficina de campanha integrada ao quartel: fornalha, bigorna e fagulhas
+// acompanham a perspectiva do piso. Sem entidades novas, timers ou dados no save.
+// LOD evita partículas e fumaça em zoom distante no Safari móvel.
+function drawBarracksForge(px,py,ww,hh,era=game.era,now=Date.now(),season=forestSeason()){
+ if(era<2||ww<44||hh<12||![px,py,ww,hh,now].every(Number.isFinite))return 0;
+ const industrial=era>=6,winter=season===3;
+ const bx=px+ww*.215,by=py+hh*.21;
+ const p=(x,y)=>[bx+x*ww,by+y*hh];
+ const poly=(pts,color)=>{
+  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...p(...pts[0]));
+  for(let i=1;i<pts.length;i++)ctx.lineTo(...p(...pts[i]));
+  ctx.closePath();ctx.fill();
+ };
+ const flicker=.5+.5*Math.sin(now*.016+px*.031);
+ ctx.save();
+ ctx.fillStyle='rgba(13,26,23,.42)';
+ ctx.beginPath();ctx.ellipse(bx+ww*.025,by+hh*.065,ww*.19,hh*.095,-.12,0,Math.PI*2);ctx.fill();
+ // Faces da bancada e aro superior: espessura real sobre o losango do pátio.
+ poly([[0,-.17],[.15,-.045],[0,.075],[-.15,-.045]],industrial?'#748589':'#998d78');
+ poly([[-.15,-.045],[0,.075],[0,.145],[-.15,.025]],industrial?'#3d555c':'#665447');
+ poly([[0,.075],[.15,-.045],[.15,.025],[0,.145]],industrial?'#52676b':'#80654c');
+ poly([[0,-.125],[.105,-.045],[0,.035],[-.105,-.045]],'#252a28');
+ const glow=.62+flicker*.38;
+ ctx.fillStyle='rgba(241,115,43,'+glow.toFixed(3)+')';
+ ctx.beginPath();ctx.ellipse(bx,by-hh*.045,ww*.075,hh*.044,-.12,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#ffe0a0';ctx.beginPath();
+ ctx.ellipse(bx+ww*.012,by-hh*.055,ww*(.025+flicker*.012),hh*.020,0,0,Math.PI*2);ctx.fill();
+ // Exaustor/chaminé atrás do fogo, sem sobrepor o portão central.
+ const sx=bx+ww*.095,sy=by-hh*.19;
+ ctx.fillStyle=industrial?'#34474e':'#695b4b';
+ ctx.fillRect(sx-ww*.027,sy-hh*.34,ww*.054,hh*.35);
+ ctx.fillStyle=industrial?'#91a8a9':'#c0aa85';
+ ctx.fillRect(sx-ww*.035,sy-hh*.35,ww*.07,Math.max(1,hh*.045));
+ ctx.fillStyle='#1f2929';
+ ctx.fillRect(sx-ww*.025,sy-hh*.34,ww*.05,Math.max(1,hh*.018));
+ if(ww>=60){
+  // Bigorna facetada e martelo pousado na bancada lateral.
+  const ax=bx-ww*.19,ay=by+hh*.11;
+  ctx.fillStyle='#303c40';ctx.fillRect(ax-ww*.038,ay-hh*.08,ww*.077,hh*.105);
+  poly([[-.27,-.06],[-.19,-.125],[-.095,-.065],[-.18,.005]],industrial?'#a9bdc1':'#aab0a6');
+  ctx.strokeStyle='#73583d';ctx.lineWidth=Math.max(1,ww*.014);
+  ctx.beginPath();ctx.moveTo(bx-ww*.24,by-hh*.10);
+  ctx.lineTo(bx-ww*.13,by-hh*.22);ctx.stroke();
+  ctx.strokeStyle='#bac3bf';ctx.lineWidth=Math.max(1.5,ww*.028);
+  ctx.beginPath();ctx.moveTo(bx-ww*.17,by-hh*.24);
+  ctx.lineTo(bx-ww*.10,by-hh*.18);ctx.stroke();
+ }
+ if(ww>=70){
+  // Fumaça sobe da chaminé, fagulhas acompanham a pulsação da brasa.
+  for(let i=0;i<3;i++){
+   const rise=((now*.00028+i/3)%1+1)%1;
+   ctx.globalAlpha=(1-rise)*(winter?.32:.22);
+   ctx.fillStyle=winter?'#d5e3e0':'#c2b9a7';
+   ctx.beginPath();ctx.ellipse(sx+Math.sin(i*2.1+now*.001)*ww*.018,
+    sy-hh*(.39+rise*.65),ww*(.018+rise*.022),hh*(.045+rise*.035),-.15,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=.4+flicker*.45;ctx.strokeStyle='#f9c36e';
+  ctx.lineWidth=Math.max(.8,ww*.009);
+  for(let i=0;i<3;i++){
+   const lift=((now*.002+i*.37)%1+1)%1;
+   ctx.beginPath();ctx.moveTo(bx+ww*(i-1)*.024,by-hh*(.08+lift*.15));
+   ctx.lineTo(bx+ww*(i-1)*.030,by-hh*(.13+lift*.21));ctx.stroke();
+  }
+ }
+ ctx.restore();return 1;
+}
+
 /* Quartel: fortificacao isometrica com muralhas, torreoes e patio de treino. */
 function drawBarracks(px,py,ww,hh,era=2,now=Date.now()){
  if(era<2)return drawTribalBarracks(px,py,ww,hh,era,now);
@@ -8522,7 +8589,7 @@ if(obj&&obj.buildLeft){drawConstructionSite(obj,px,py,ww,hh)}
 else if(obj){
  if(obj.t==='Ponte')drawBridge(px,py,ww,hh,obj.axis||'x',1,game.era);
  else if(obj.t==='Torre')drawEraWatchtower(px,py,ww,hh,obj.level,game.era,frameTime);
- else if(obj.t==='Quartel'){drawBarracks(px,py,ww,hh,game.era,frameTime);drawBarracksTraining(px,py,ww,hh,game.era,frameTime);}
+ else if(obj.t==='Quartel'){drawBarracks(px,py,ww,hh,game.era,frameTime);drawBarracksTraining(px,py,ww,hh,game.era,frameTime);drawBarracksForge(px,py,ww,hh,game.era,frameTime,forestSeason());}
  else if(obj.t==='Pesqueiro'){drawDock(px,py,ww,hh,obj.level,!!obj.boat);drawDockWorkers(px,py,ww,hh,game.era,frameTime,obj.boat,obj.level);}
  else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmBoundary(px,py,ww,hh,game.era,obj.level,forestSeason(),frameTime,obj.x,obj.y);drawFarmLivestock(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason(),obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
  else if(obj.t==='Moinho'){drawWindmill(px,py,ww,hh,obj.level,frameTime);drawWindmillYard(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason());}
