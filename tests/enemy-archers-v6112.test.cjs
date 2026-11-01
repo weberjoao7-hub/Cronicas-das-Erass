@@ -17,9 +17,9 @@ function makeSpawn(game){
   ';return spawnEnemyGuard;')(game,()=>true);
 }
 function makeEnemyTurn(game,hasSight,approach){
- return new Function('game','assignRoute','passable','approachHostile','hasRangedSight','dirty',
+ return new Function('game','assignRoute','passable','approachHostile','hasRangedSight','terrainSightClear','dirty',
   between('function enemyTurn(dt){','const isMilitary=')+';return enemyTurn;')(
-   game,()=>true,()=>true,approach,hasSight,false);
+   game,()=>true,()=>true,approach,hasSight,()=>true,false);
 }
 function makeCombat(game,shots,hasSight){
  return new Function('game','towerShots','refresh','toast','menu','panel','document','key',
