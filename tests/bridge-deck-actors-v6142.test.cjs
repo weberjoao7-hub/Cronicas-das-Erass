@@ -8,7 +8,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
 const start=script.indexOf('function bridgeDeckLift(');
-const end=script.indexOf('function drawTileOccupants(',start);
+const end=script.indexOf('\n}\n',start)+2; // isola apenas o helper da ponte
 assert.ok(start>=0&&end>start,'helper de elevacao da ponte presente');
 const source=script.slice(start,end);
 const lift=new Function(source+'return bridgeDeckLift;')();
