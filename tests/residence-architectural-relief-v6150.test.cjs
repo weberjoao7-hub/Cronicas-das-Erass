@@ -48,8 +48,9 @@ test('geometria finita, deterministica e estados Canvas balanceados',()=>{
 test('integracao somente em cabanas concluidas e na previa de construcao',()=>{
  const render=script.slice(script.indexOf('function draw(){'),script.indexOf('function refresh(){'));
  assert.match(render,/if\(obj&&obj\.buildLeft\)\{drawConstructionSite/);
- assert.match(render,/if\(obj\.t==='Cabana'\)drawResidenceArchitecturalRelief/);
- assert.match(script,/if\(placing==='Cabana'\)drawResidenceArchitecturalRelief/);
- assert.ok(render.indexOf('drawResidenceArchitecturalRelief(px,py,ww,hh,game.era,obj.level')<
-  render.indexOf('drawWinterRoofSnow(px,py,ww,hh'));
+ const residence=script.slice(script.indexOf('function drawEraResidence('),script.indexOf('// v6.150:',script.indexOf('function drawEraResidence(')));
+ assert.match(residence,/drawResidenceArchitecturalRelief\(px,py,ww,hh,era,level,seed\)/);
+ assert.match(render,/else if\(obj\.t==='Cabana'\)drawEraResidence/);
+ assert.match(script,/else if\(placing==='Cabana'\)drawEraResidence/);
+ assert.doesNotMatch(render,/if\(obj\.t==='Cabana'\)drawResidenceArchitecturalRelief/);
 });

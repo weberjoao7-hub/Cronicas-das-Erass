@@ -2428,6 +2428,7 @@ function drawEraResidence(px,py,ww,hh,level=1,seed=0,era=0){
   for(let i=0;i<3;i++){const x=-.46+i*.09;line([[x,.18],[x,-.10]],modern?'#a9c7c3':'#9e7d54',1)}
   line([[-.46,-.06],[-.28,.05]],modern?'#a9c7c3':'#9e7d54',1);
  }
+ drawResidenceArchitecturalRelief(px,py,ww,hh,era,level,seed);
  ctx.restore();
 }
 
@@ -8307,7 +8308,6 @@ else if(obj){
  else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back');drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front',game.units.some(u=>u.hp>0&&Array.isArray(u.path)&&u.path.length&&Math.hypot(u.x-(x+.85),u.y-(y+.85))<1.35));drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
  else if(obj.t==='Cabana')drawEraResidence(px,py,ww,hh,obj.level||1,x*97+y*13,game.era);
  else house(px,py,ww*.7,obj.t);
- if(obj.t==='Cabana')drawResidenceArchitecturalRelief(px,py,ww,hh,game.era,obj.level||1,x*97+y*13);
  if(obj.t==='Torre')drawWatchtowerSentry(px,py,ww,hh,game.era,frameTime,forestSeason(),x,y);
  if(obj.t==='Cabana')drawResidenceChimney(px,py,ww,hh,game.era,x*97+y*13,frameTime,forestSeason(),rainLevel);
  if((obj.t==='Aldeia'||obj.t==='Quartel')&&ww>=30)drawCampfire(px,py,ww,hh,frameTime);
@@ -8507,7 +8507,6 @@ function drawPlacementOverlay(){
  else if(placing==='Mina')drawMine(px,py,ww,hh,1,game.era);
  else if(placing==='Cabana')drawEraResidence(px,py,ww,hh,1,p.x*97+p.y*13,game.era);
  else house(px,py,ww*.7,placing);
- if(placing==='Cabana')drawResidenceArchitecturalRelief(px,py,ww,hh,game.era,1,p.x*97+p.y*13);
  if(placing==='Cabana')drawResidenceChimney(px,py,ww,hh,game.era,p.x*97+p.y*13,Date.now(),forestSeason());
  if(['Torre','Quartel','Pesqueiro'].includes(placing))drawEraStandard(px,py,ww,hh,placing,game.era);
  ctx.globalAlpha=1;
