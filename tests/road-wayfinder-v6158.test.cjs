@@ -21,7 +21,7 @@ function scene(era=4,ww=90,season=1,x=6,y=0,links=roads){
 test('script principal compila e preserva o save',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(script,/drawRoadWayfinder\(px,py,ww,hh,x,y,links,era,forestSeason\(\)\)/);
+ assert.match(script,/drawRoadWayfinder\(px,py,ww,hh,x,y,links,era,typeof forestSeason/);
  assert.doesNotMatch(source,/localStorage|setInterval|Math\.random|game\.|roadTiles\.(?:add|delete)/);
 });
 test('marcos aparecem apenas em entroncamentos detalhados e eras compativeis',()=>{

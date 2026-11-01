@@ -6641,7 +6641,7 @@ function drawRoad(px,py,ww,hh,x,y){
   }
  }
  drawWinterRoadSnow(px,py,ww,hh,x,y,links,width);
- drawRoadWayfinder(px,py,ww,hh,x,y,links,era,forestSeason());
+ drawRoadWayfinder(px,py,ww,hh,x,y,links,era,typeof forestSeason==='function'?forestSeason():1);
  ctx.restore();
 }
 
