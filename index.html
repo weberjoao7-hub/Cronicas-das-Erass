@@ -5563,6 +5563,121 @@ function drawSettlementPlaza(px,py,ww,hh,x,y,links,era=0,season=1,rain=0){
  }
  ctx.restore();return pieces;
 }
+
+// v6.162: marcos civicos tridimensionais nos cruzamentos das trilhas.
+// Fogueira cerimonial, poco de pedra e fonte publica evoluem com as eras.
+// Apenas desenho, sem colisao, entidades extras ou alteracao do salvamento.
+function drawSettlementLandmark(px,py,ww,hh,x,y,links,era=0,season=1,now=Date.now()){
+ if(!Array.isArray(links)||links.length<3||ww<66||hh<=0||
+    ![px,py,ww,hh,now].every(Number.isFinite))return 0;
+ const primitive=era<2,modern=era>=6,medieval=era>=4&&!modern;
+ const baseY=py+hh*.015,r=ww*(modern?.103:.082),ry=hh*(modern?.158:.133);
+ const phase=now*.003+x*.73+y*.47;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ // Sombra de contato: o marco nasce do pavimento e nao flutua.
+ ctx.fillStyle='#14251d8c';ctx.beginPath();
+ ctx.ellipse(px+ww*.015,baseY+hh*.038,r*1.32,ry*1.20,0,0,Math.PI*2);ctx.fill();
+ if(primitive){
+  // Circulo de pedras e cinzas, com fogo oscilando independentemente da camera.
+  ctx.fillStyle='#4b4439';ctx.beginPath();
+  ctx.ellipse(px,baseY,r,ry,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#382c25';ctx.beginPath();
+  ctx.ellipse(px,baseY-hh*.013,r*.68,ry*.63,0,0,Math.PI*2);ctx.fill();
+  const stones=ww>=90?10:7;
+  for(let i=0;i<stones;i++){
+   const a=i*2*Math.PI/stones,ox=Math.cos(a)*r*.85,oy=Math.sin(a)*ry*.83;
+   ctx.fillStyle=i%3===0?'#b9a586':i%2?'#786e60':'#9d8c72';
+   ctx.beginPath();ctx.ellipse(px+ox,baseY+oy,ww*.016,hh*.027,a,0,Math.PI*2);ctx.fill();
+  }
+  const flame=hh*(.16+.025*Math.sin(phase*1.7));
+  ctx.fillStyle='#8b3c24';ctx.beginPath();
+  ctx.ellipse(px,baseY-hh*.016,r*.47,ry*.37,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f1a547';ctx.beginPath();ctx.moveTo(px-r*.38,baseY-hh*.015);
+  ctx.quadraticCurveTo(px-r*.38,baseY-flame*.55,px+Math.sin(phase)*r*.16,baseY-flame);
+  ctx.quadraticCurveTo(px+r*.42,baseY-flame*.48,px+r*.38,baseY-hh*.015);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='#ffe2a0';ctx.beginPath();ctx.moveTo(px-r*.16,baseY-hh*.012);
+  ctx.quadraticCurveTo(px,baseY-flame*.48,px+r*.06,baseY-flame*.65);
+  ctx.quadraticCurveTo(px+r*.22,baseY-flame*.24,px+r*.18,baseY-hh*.012);
+  ctx.closePath();ctx.fill();
+  if(ww>=86){
+   ctx.fillStyle='#b3b1a47a';
+   for(let i=0;i<2;i++){
+    const drift=Math.sin(phase*.6+i)*ww*.017;
+    ctx.beginPath();ctx.ellipse(px+drift+i*r*.23,baseY-flame-hh*(.055+i*.065),
+      r*(.16+i*.08),ry*.25,0,0,Math.PI*2);ctx.fill();
+   }
+  }
+ }else{
+  // Base cilindrica: parede frontal sombreada e borda eliptica em perspectiva.
+  const basinR=modern?r*1.10:r,basinY=baseY-hh*.032;
+  ctx.fillStyle=modern?'#5e777b':'#776e60';ctx.beginPath();
+  ctx.moveTo(px-basinR,basinY);ctx.lineTo(px-basinR,basinY+hh*.11);
+  ctx.quadraticCurveTo(px,basinY+hh*.11+ry,px+basinR,basinY+hh*.11);
+  ctx.lineTo(px+basinR,basinY);ctx.closePath();ctx.fill();
+  ctx.fillStyle=modern?'#b4c4c1':'#b3a68c';ctx.beginPath();
+  ctx.ellipse(px,basinY,basinR,ry,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=modern?'#315b6a':'#294a50';ctx.beginPath();
+  ctx.ellipse(px,basinY-hh*.004,basinR*.73,ry*.66,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=modern?'#e0e6dc':'#d5c4a2';ctx.lineWidth=Math.max(1,ww*.013);
+  ctx.beginPath();ctx.ellipse(px,basinY,basinR*.95,ry*.91,0,Math.PI*.03,Math.PI*.98);ctx.stroke();
+  if(modern){
+   // Fonte publica: pedestal, bocal e jatos com queda animada no tanque.
+   ctx.fillStyle='#728f91';ctx.fillRect(px-ww*.016,basinY-hh*.25,ww*.032,hh*.24);
+   ctx.fillStyle='#c9d6cf';ctx.beginPath();
+   ctx.ellipse(px,basinY-hh*.26,ww*.041,hh*.035,0,0,Math.PI*2);ctx.fill();
+   const sway=Math.sin(phase*1.2)*ww*.012;
+   ctx.strokeStyle='#a6e0e5c9';ctx.lineWidth=Math.max(1,ww*.012);
+   for(const side of [-1,1]){
+    ctx.beginPath();ctx.moveTo(px+side*ww*.013,basinY-hh*.245);
+    ctx.quadraticCurveTo(px+side*ww*.12+sway,basinY-hh*.35,
+      px+side*basinR*.66,basinY-hh*.015);ctx.stroke();
+   }
+   ctx.fillStyle='#d3f0edb8';
+   ctx.beginPath();ctx.ellipse(px+sway*.5,basinY,ww*.022,hh*.018,0,0,Math.PI*2);ctx.fill();
+  }else{
+   // Travessa, corda e balde do poco, com cobertura de telhas nas eras medievais.
+   const postTop=basinY-hh*(medieval?.46:.31);
+   ctx.strokeStyle=medieval?'#71523b':'#866a47';ctx.lineWidth=Math.max(2,ww*.028);
+   for(const side of [-1,1]){
+    ctx.beginPath();ctx.moveTo(px+side*r*.72,basinY);
+    ctx.lineTo(px+side*r*.72,postTop);ctx.stroke();
+   }
+   ctx.strokeStyle='#c19b68';ctx.lineWidth=Math.max(1.5,ww*.022);
+   ctx.beginPath();ctx.moveTo(px-r*.85,postTop+hh*.03);
+   ctx.lineTo(px+r*.85,postTop+hh*.03);ctx.stroke();
+   ctx.strokeStyle='#c6ad7b';ctx.lineWidth=Math.max(.8,ww*.008);
+   ctx.beginPath();ctx.moveTo(px,postTop+hh*.03);
+   ctx.lineTo(px,basinY+hh*.016);ctx.stroke();
+   ctx.fillStyle='#8d6242';ctx.fillRect(px-ww*.017,basinY+hh*.005,ww*.034,hh*.044);
+   if(medieval){
+    const roofY=postTop-hh*.11;
+    ctx.fillStyle='#563f36';ctx.beginPath();
+    ctx.moveTo(px-r*1.30,postTop+hh*.015);
+    ctx.lineTo(px,roofY-hh*.065);
+    ctx.lineTo(px+r*1.30,postTop+hh*.015);
+    ctx.lineTo(px,roofY+hh*.015);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#a36d49';ctx.beginPath();
+    ctx.moveTo(px-r*1.30,postTop+hh*.015);
+    ctx.lineTo(px,roofY-hh*.065);
+    ctx.lineTo(px,roofY+hh*.015);
+    ctx.lineTo(px-r*.92,postTop+hh*.062);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#d5ad78';ctx.lineWidth=Math.max(.9,ww*.011);
+    ctx.beginPath();ctx.moveTo(px-r*1.30,postTop+hh*.015);
+    ctx.lineTo(px,roofY-hh*.065);ctx.lineTo(px+r*1.30,postTop+hh*.015);ctx.stroke();
+   }
+  }
+  if(season===3){
+   ctx.strokeStyle='#edf2e6df';ctx.lineWidth=Math.max(1.2,ww*.021);
+   ctx.beginPath();ctx.ellipse(px,basinY,basinR*.98,ry*.96,0,Math.PI*1.06,Math.PI*1.94);ctx.stroke();
+  }
+ }
+ if(season===3&&primitive){
+  ctx.fillStyle='#e5eae0b8';ctx.beginPath();
+  ctx.ellipse(px-r*.85,baseY-ry*.17,r*.29,ry*.28,0,0,Math.PI*2);ctx.fill();
+ }
+ ctx.restore();return 1;
+}
 function drawBuildingApproach(px,py,ww,hh,x,y,type,era,season=0,rain=0,roads=roadTiles,paths=null){
  if(ww<28||!Number.isFinite(ww)||!Number.isFinite(hh)||
     ['Aldeia','Ponte','Pesqueiro','Fazenda'].includes(type))return 0;
@@ -8827,6 +8942,11 @@ let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
 ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);
  if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y)))drawSettlementFootpath(px,py,ww,hh,x,y,settlementPaths.get(key(x,y)),game.era,forestSeason(),rainLevel);
+if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y))){
+ const pathLinks=settlementPaths.get(key(x,y));
+ if(pathLinks.length>=3&&(pathLinks.length===4||rnd(x,y,423)>.55))
+  drawSettlementLandmark(px,py,ww,hh,x,y,pathLinks,game.era,forestSeason(),frameTime);
+}
 if(visibleFog[y*W+x])drawGroundTracksTile(groundTrackTiles.get(key(x,y)),z,frameTime);
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
 if(b===0)drawLakeDepth(px,py,ww,hh,waterDepth[y*W+x],q,frameTime);
