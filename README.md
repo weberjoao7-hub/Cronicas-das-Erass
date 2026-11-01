@@ -1,6 +1,12 @@
 # Crônicas das Eras ⚔️
 
-Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.116** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+Jogo de estratégia em tempo real (RTS) isométrico para navegador desktop e celular. **Versão experimental v6.149** — ainda em desenvolvimento; a qualidade gráfica e a compatibilidade com Safari físico não estão validadas.
+
+## Melhoria incremental — nascentes isométricas sazonais (01/11/2026)
+- Nascentes raras agora desaguam nas bordas de lagos em pradarias e campos: canais curvos com margem sombreada, água em camadas e pequenas ondas animadas. No inverno, o leito congela visualmente.
+- Geometria recortada ao losango do terreno, somente em áreas visíveis e livres de estradas, construções e ruínas. Zoom distante omite os riachos para reduzir chamadas Canvas no Safari.
+- Mudança estritamente visual: não modifica biomas, colisões, economia, rotas ou salvamento `cronicas-v04`. Testes em `tests/shore-springs-v6150.test.cjs`.
+- Sintaxe JavaScript validada no V8 e seis verificações isoladas da geometria/LOD executadas; execução completa do CI e teste em Safari físico ainda não confirmados.
 
 ## Melhoria incremental — rebanhos de auroques nas pradarias (30/10/2026)
 - Adicionados rebanhos raros de dois a três auroques em pradarias abertas, com corpos volumétricos, chifres curvos, patas articuladas, cabeça que abaixa para pastar, cauda animada e sombras ancoradas ao terreno.
