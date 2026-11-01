@@ -20,7 +20,7 @@ function paint(mask=5,width=82,season=1,now=10000){
  const ctx=new Proxy({},{get(o,k){return k in o?o[k]:(...args)=>{
   for(const value of args)if(typeof value==='number')assert.ok(Number.isFinite(value),'Canvas '+k);
   calls.push([k,...args]);
- }},set(o,k,v){o[k]=v;if(k==='strokeStyle'||k==='fillStyle')styles.push(v);return true;}});
+ }},set(o,k,v){o[k]=v;if(k==='strokeStyle'||k==='fillStyle')styles.push(v);if(k==='globalAlpha')calls.push(['alpha',v]);return true;}});
  const draw=new Function('ctx','rnd',drawSource+'return drawTributary;')(ctx,rnd);
  const count=draw(100,120,width,width*.51,12,18,mask,season,now);
  return {count,calls,styles};
