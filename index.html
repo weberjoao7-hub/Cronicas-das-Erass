@@ -3194,6 +3194,7 @@ function drawBarracksRoofTexture(px,py,ww,hh,era,x){
  ctx.restore();return 1;
 }
 
+/* Quartel: fortificacao isometrica com muralhas, torreoes e patio de treino. */
 // Oficina de campanha integrada ao quartel: fornalha, bigorna e fagulhas
 // acompanham a perspectiva do piso. Sem entidades novas, timers ou dados no save.
 // LOD evita partículas e fumaça em zoom distante no Safari móvel.
@@ -3261,7 +3262,7 @@ function drawBarracksForge(px,py,ww,hh,era=game.era,now=Date.now(),season=forest
  ctx.restore();return 1;
 }
 
-/* Quartel: fortificacao isometrica com muralhas, torreoes e patio de treino. */
+
 function drawBarracks(px,py,ww,hh,era=2,now=Date.now()){
  if(era<2)return drawTribalBarracks(px,py,ww,hh,era,now);
  const t=now*.002,poly=(pts,color,stroke)=>{
@@ -8589,7 +8590,7 @@ if(obj&&obj.buildLeft){drawConstructionSite(obj,px,py,ww,hh)}
 else if(obj){
  if(obj.t==='Ponte')drawBridge(px,py,ww,hh,obj.axis||'x',1,game.era);
  else if(obj.t==='Torre')drawEraWatchtower(px,py,ww,hh,obj.level,game.era,frameTime);
- else if(obj.t==='Quartel'){drawBarracks(px,py,ww,hh,game.era,frameTime);drawBarracksTraining(px,py,ww,hh,game.era,frameTime);drawBarracksForge(px,py,ww,hh,game.era,frameTime,forestSeason());}
+ else if(obj.t==='Quartel'){drawBarracks(px,py,ww,hh,game.era,frameTime);drawBarracksTraining(px,py,ww,hh,game.era,frameTime);}
  else if(obj.t==='Pesqueiro'){drawDock(px,py,ww,hh,obj.level,!!obj.boat);drawDockWorkers(px,py,ww,hh,game.era,frameTime,obj.boat,obj.level);}
  else if(obj.t==='Fazenda'){drawFarm(px,py,ww,hh,obj.level,frameTime,game.day,obj.x,obj.y);drawFarmBoundary(px,py,ww,hh,game.era,obj.level,forestSeason(),frameTime,obj.x,obj.y);drawFarmLivestock(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason(),obj.x,obj.y);drawFarmWorkers(px,py,ww,hh,game.era,frameTime,game.day,obj.x,obj.y,obj.level);}
  else if(obj.t==='Moinho'){drawWindmill(px,py,ww,hh,obj.level,frameTime);drawWindmillYard(px,py,ww,hh,game.era,obj.level,frameTime,forestSeason());}
@@ -8597,6 +8598,7 @@ else if(obj){
  else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back');drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front',game.units.some(u=>u.hp>0&&Array.isArray(u.path)&&u.path.length&&Math.hypot(u.x-(x+.85),u.y-(y+.85))<1.35));drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
  else if(obj.t==='Cabana')drawEraResidence(px,py,ww,hh,obj.level||1,x*97+y*13,game.era);
  else house(px,py,ww*.7,obj.t);
+  if(obj.t==='Quartel')drawBarracksForge(px,py,ww,hh,game.era,frameTime,forestSeason());
  if(obj.t==='Torre')drawWatchtowerSentry(px,py,ww,hh,game.era,frameTime,forestSeason(),x,y);
  if(obj.t==='Cabana')drawResidenceChimney(px,py,ww,hh,game.era,x*97+y*13,frameTime,forestSeason(),rainLevel);
  if((obj.t==='Aldeia'||obj.t==='Quartel')&&ww>=30)drawCampfire(px,py,ww,hh,frameTime);
