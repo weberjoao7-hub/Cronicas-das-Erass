@@ -5387,6 +5387,71 @@ function buildingApproachDirection(x,y,roads){
  }
  return [1,0];
 }
+// Caminhos de pedestres conectam edificacoes proximas sem alterar o pathfinding.
+// A busca percorre apenas os quatro vizinhos das construcoes, nao o mapa inteiro.
+function collectSettlementPaths(structures,roads,biomeAt){
+ const dirs=[[1,0],[0,1],[-1,0],[0,-1]],candidates=new Set(),paths=new Map();
+ const valid=b=>b&&!b.buildLeft&&b.t!=='Ponte'&&b.t!=='Pesqueiro';
+ for(const b of structures.values())if(valid(b)){
+  for(const [dx,dy] of dirs)candidates.add(key(b.x+dx,b.y+dy));
+ }
+ for(const id of candidates){
+  if(structures.has(id)||roads.has(id))continue;
+  const [x,y]=id.split(',').map(Number);
+  if(biomeAt(x,y)!==1&&biomeAt(x,y)!==2)continue;
+  const links=dirs.filter(([dx,dy])=>roads.has(key(x+dx,y+dy))||valid(structures.get(key(x+dx,y+dy))));
+  if(links.length>=2)paths.set(id,links);
+ }
+ return paths;
+}
+// Piso assentado no mesmo plano do losango; sem sprite suspenso nem colisao extra.
+function drawSettlementFootpath(px,py,ww,hh,x,y,links,era=0,season=1,rain=0){
+ if(ww<38||!Array.isArray(links)||links.length<2)return 0;
+ const primitive=era<2,industrial=era>=6;
+ const base=primitive?'#9c8158':industrial?'#858b84':'#a69b7d';
+ const rim=primitive?'#665238':industrial?'#444c4a':'#6d6555';
+ const highlight=primitive?'#c2a679':industrial?'#bfc5b8':'#d5c6a6';
+ const width=ww*(industrial?.16:.135);
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ for(const [dx,dy] of links){
+  const vx=(dx-dy)*ww*.25,vy=(dx+dy)*hh*.25;
+  ctx.strokeStyle='#1b2a2380';ctx.lineWidth=width*1.48;
+  ctx.beginPath();ctx.moveTo(px,py+hh*.025);ctx.lineTo(px+vx,py+vy+hh*.025);ctx.stroke();
+  ctx.strokeStyle=rim;ctx.lineWidth=width*1.18;
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+vx,py+vy);ctx.stroke();
+  ctx.strokeStyle=base;ctx.lineWidth=width;
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+vx,py+vy);ctx.stroke();
+  if(ww>=56){
+   const len=Math.hypot(vx,vy)||1,nx=-vy/len,ny=vx/len;
+   for(let i=1;i<=3;i++){
+    const t=i/4,j=(rnd(x+i*5,y+dx*7+dy*3,191)-.5)*.07;
+    const sx=px+vx*(t+j),sy=py+vy*(t+j);
+    ctx.strokeStyle=i%2?rim:highlight;ctx.lineWidth=Math.max(.7,ww*.009);
+    ctx.beginPath();ctx.moveTo(sx-nx*width*.38,sy-ny*width*.38);
+    ctx.lineTo(sx+nx*width*.38,sy+ny*width*.38);ctx.stroke();
+   }
+  }
+  if(season===3){
+   ctx.strokeStyle='#e6eee4bb';ctx.lineWidth=Math.max(.9,ww*.014);
+   ctx.beginPath();ctx.moveTo(px,py);
+   ctx.lineTo(px+vx,py+vy);ctx.stroke();
+  }
+ }
+ ctx.fillStyle=rim;ctx.beginPath();ctx.ellipse(px,py,width*.72,hh*.115,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=base;ctx.beginPath();ctx.ellipse(px,py,width*.57,hh*.09,0,0,Math.PI*2);ctx.fill();
+ if(ww>=56){
+  for(let i=0;i<6;i++){
+   const angle=i*Math.PI/3,ox=Math.cos(angle)*width*.35,oy=Math.sin(angle)*hh*.06;
+   ctx.fillStyle=i%2?highlight:rim;ctx.beginPath();
+   ctx.ellipse(px+ox,py+oy,ww*.011,hh*.016,0,0,Math.PI*2);ctx.fill();
+  }
+ }
+ if(rain>.35&&season!==3){
+  ctx.strokeStyle='#d1ded086';ctx.lineWidth=Math.max(.7,ww*.008);
+  ctx.beginPath();ctx.ellipse(px,py,width*.43,hh*.064,0,0,Math.PI);ctx.stroke();
+ }
+ ctx.restore();return links.length;
+}
 function drawBuildingApproach(px,py,ww,hh,x,y,type,era,season=0,rain=0,roads=roadTiles){
  if(ww<28||!Number.isFinite(ww)||!Number.isFinite(hh)||
     ['Aldeia','Ponte','Pesqueiro','Fazenda'].includes(type))return 0;
@@ -8643,12 +8708,14 @@ function drawFogFrontier(px,py,ww,hh,x,y,visible,explored){
 function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const rainLevel=forestSeason()===3?0:(weatherPreview ? .82 : weatherForDay(game.day,(dayClock%120)/120));renderRainLevel=rainLevel;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#19362d';ctx.fillRect(0,0,w,h);updateRoads();let z=scale,ww=TW*z,hh=TH*z,bounds=visibleTileBounds();let own=claimed();const structures=new Map(game.buildings.map(b=>[key(b.x,b.y),b]));const roadConvoyTiles=new Map();if(ww>=37){for(const cart of roadConvoyPositions(frameTime,roadCartRoutes,ww>=54?3:1)){const id=key(Math.floor(cart.x),Math.floor(cart.y));if(!roadConvoyTiles.has(id))roadConvoyTiles.set(id,cart)}}const unitTiles=new Map(),enemyTiles=new Map(),boatTiles=new Map(),activeHunts=new Set();for(const dock of game.buildings){if(dock.t!=='Pesqueiro'||dock.buildLeft||!dock.boat)continue;const boat=dock.boat,x=Math.floor(boat.x),y=Math.floor(boat.y);if(x<0||y<0||x>=W||y>=H)continue;const k=key(x,y);if(!boatTiles.has(k))boatTiles.set(k,[]);boatTiles.get(k).push(boat)}for(const u of game.units){const k=key(Math.floor(u.x),Math.floor(u.y));if(!unitTiles.has(k))unitTiles.set(k,[]);unitTiles.get(k).push(u);if(u.huntTarget)activeHunts.add(u.huntTarget)}for(const e of game.enemyUnits||[]){const k=key(Math.floor(e.x),Math.floor(e.y));if(!enemyTiles.has(k))enemyTiles.set(k,[]);enemyTiles.get(k).push(e)}
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 const groundTrackTiles=collectGroundTrackTiles(bounds,frameTime);
+ const settlementPaths=ww>=38?collectSettlementPaths(structures,roadTiles,biome):new Map();
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;
 // Nevoa nao explorada: sem atlas, ruinas ou efeitos sob a cobertura opaca.
 if(!exploredFog[y*W+x])continue;
 let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
 ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);
+ if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y)))drawSettlementFootpath(px,py,ww,hh,x,y,settlementPaths.get(key(x,y)),game.era,forestSeason(),rainLevel);
 if(visibleFog[y*W+x])drawGroundTracksTile(groundTrackTiles.get(key(x,y)),z,frameTime);
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
 if(b===0)drawLakeDepth(px,py,ww,hh,waterDepth[y*W+x],q,frameTime);
@@ -8672,12 +8739,12 @@ if(forestOpen){
  if(forestFriendlies?.some(u=>isActiveForestWorker(u,x,y)))
   drawForestWorksite(px,py,ww,hh,x,y,game.era,frameTime,forestSeason());
 }
-const orchardOpen=(b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&orchardTile(x,y,b)&&!riparianMask[y*W+x];
+const orchardOpen=(b===1||b===2)&&!settlementPaths.has(key(x,y))&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&orchardTile(x,y,b)&&!riparianMask[y*W+x];
 const orchardActors=orchardOpen?tileActors(x,y,unitTiles,enemyTiles):null;
-const fieldOakOpen=b===2&&visibleFog[y*W+x]&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&!riparianMask[y*W+x]&&!orchardOpen&&fieldOakAt(x,y,b);
+const fieldOakOpen=b===2&&visibleFog[y*W+x]&&!settlementPaths.has(key(x,y))&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&!riparianMask[y*W+x]&&!orchardOpen&&fieldOakAt(x,y,b);
 const fieldOakActors=fieldOakOpen?tileActors(x,y,unitTiles,enemyTiles):null;
 const riparianActors=(b===1||b===2)&&riparianMask[y*W+x]&&ww>=65&&rnd(x,y,183)>.72&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))?tileActors(x,y,unitTiles,enemyTiles):null;
-if((b===1||b===2)&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
+if((b===1||b===2)&&!ruinKind&&!settlementPaths.has(key(x,y))&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(riparianMask[y*W+x])drawRiparianBank(px,py,ww,hh,x,y,riparianMask[y*W+x]);
  meadowDetails(px,py,ww,hh,x,y,b,frameTime);
   if(fieldOakOpen)drawFieldOak(px,py,ww,hh,x,y,forestSeason(),frameTime,fieldOakActors.length?'back':'all');
@@ -8708,7 +8775,7 @@ if(!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){
  if(ruinKind)drawAncientRuin(px,py,ww,hh,ruinKind,game.ruinsExplored.includes(key(x,y)),frameTime);
  else drawLandmark(px,py,ww,hh,landmarkAt(x,y,b),x,y);
 }
-if(b===2&&!ruinKind&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&visibleFog[y*W+x])drawPrairieWildflowers(px,py,ww,hh,x,y,forestSeason(),frameTime);
+if(b===2&&!ruinKind&&!settlementPaths.has(key(x,y))&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))&&visibleFog[y*W+x])drawPrairieWildflowers(px,py,ww,hh,x,y,forestSeason(),frameTime);
 const roadCart=roadConvoyTiles.get(key(x,y));if(roadCart&&visibleFog[y*W+x]&&!structures.has(key(x,y))&&b!==0)drawRoadConvoy(roadCart,ww,hh,game.era,frameTime);
 let animal=wildlifeAt(x,y);if(animal&&!ruinKind&&visibleFog[y*W+x]&&!game.hunted.includes(key(x,y))&&!structures.has(key(x,y))&&!(b===0&&boatTiles.has(key(x,y)))){drawWildlife(px,py,ww,hh,animal,x,y);if(activeHunts.has(key(x,y))){ctx.strokeStyle='#f3d17b';ctx.lineWidth=Math.max(1.5,z*1.7);ctx.beginPath();ctx.ellipse(px,py+hh*.12,ww*.23,hh*.18,0,0,7);ctx.stroke()}}
 if(own.has(key(x,y)))drawTerritoryEdge(px,py,ww,hh,x,y,own)
