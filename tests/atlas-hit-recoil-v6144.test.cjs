@@ -30,7 +30,7 @@ function render(kind,{now=1100,hitAt=1000,zoom=1.2,loaded=true,enemy=false}={}){
 test('script completo compila e mantém salvamento legado',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(html,/<title>Crônicas das Eras v6\.144<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=144);
 });
 test('recuo não extrapola janela, não move os pés e não altera dados persistidos',()=>{
  assert.equal(recoil(null,1000),null);

@@ -11,7 +11,8 @@ const b=script.indexOf('// Caminhos isométricos:',a);
 const c=script.indexOf('function drawRoad(');
 const d=script.indexOf('// Praça central',c);
 assert.ok(a>0&&b>a&&c>b&&d>c,'road cache and renderer');
-const cache=script.slice(a,b),renderer=script.slice(c,d);
+const junction=script.indexOf('function drawRoadJunction(');
+const cache=script.slice(a,b),renderer=script.slice(junction>=0&&junction<c?junction:c,d);
 const key=(x,y)=>x+','+y;
 function roads(buildings,routeFor){
  const game={buildings};
