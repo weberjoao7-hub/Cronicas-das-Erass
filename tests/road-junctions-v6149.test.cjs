@@ -39,3 +39,6 @@ test('integracao preserva rotas, unidades e salvamento',()=>{
  assert.match(draw,/roadLinks\.get\(key\(x,y\)\)/);
  assert.doesNotMatch(source,/roadTiles\.(?:add|delete)|roadLinks\.(?:set|delete)/);
 });
+test('ramais diagonais preservam o cruzamento original sem meio-fio falso',()=>{
+ assert.equal(scene(4,74,[[1,1],[-1,-1],[1,0]]).count,0);
+});

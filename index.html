@@ -6131,7 +6131,8 @@ function drawRoadLantern(px,py,ww,hh,x,y,era=game.era,now=Date.now()){
 }
 // v6.149: cruzamentos isometricos com pavimento, juntas e meio-fio sem bloquear os ramais.
 function drawRoadJunction(px,py,ww,hh,x,y,links,era,width){
- if(!Array.isArray(links)||links.length<3||ww<38||hh<12)return 0;
+ if(!Array.isArray(links)||links.length<3||ww<38||hh<12||
+    links.some(([dx,dy])=>Math.abs(dx)+Math.abs(dy)!==1))return 0;
  const modern=era>=7,industrial=era===6,primitive=era<2;
  const rx=Math.min(ww*.235,width*1.06),ry=Math.min(hh*.34,width*.58);
  const p=[[px,py-ry],[px+rx,py],[px,py+ry],[px-rx,py]];
