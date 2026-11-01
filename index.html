@@ -7996,6 +7996,94 @@ function bridgeDeckLift(u,x,y,hh,bridge){
  const ramp=Math.max(0,Math.min(1,t/.18,(1-t)/.18));
  return hh*.11*ramp*ramp*(3-2*ramp);
 }
+// v6.155: equipamento de viagem acompanha o aldeao em movimento.
+// Mochila, ferramentas e cesta mudam conforme o destino; sem sprites soltos
+// nem novos campos de estado. LOD e primitivas Canvas 2D compativeis com Safari.
+function drawWorkerTravelKit(u,px,py,z,now=Date.now(),era=game.era){
+ if(!u||u.kind!=='worker'||!(u.hp>0)||!Array.isArray(u.path)||!u.path.length||
+    z<.88||![px,py,z,now].every(Number.isFinite))return 0;
+ const target=u.path[0];
+ if(!target||!Number.isFinite(target.x)||!Number.isFinite(target.y))return 0;
+ const tx=Number.isFinite(u.tx)?Math.floor(u.tx):Math.floor(u.x);
+ const ty=Number.isFinite(u.ty)?Math.floor(u.ty):Math.floor(u.y);
+ const terrain=biome(tx,ty);
+ const role=u.buildTarget?'build':u.huntTarget?'hunt':
+   u.job?(terrain===3?'wood':terrain===4?'stone':'farm'):'travel';
+ const direction=((target.x-u.x)-(target.y-u.y))>=0?1:-1;
+ const gait=Math.sin(now*.012+u.x*1.9+u.y*.7);
+ const bob=Math.max(0,gait)*z*.85;
+ const modern=era>=6;
+ const leather=modern?'#586a65':era>=3?'#866344':'#956b42';
+ const side=modern?'#344a4b':'#5c432f';
+ ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
+ // Sombra da mochila no ombro, sem deslocar a base do personagem.
+ ctx.fillStyle='#14221d99';ctx.beginPath();
+ ctx.ellipse(-6.7*z,-18*z+bob,5.6*z,8.1*z,-.12,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=side;ctx.beginPath();
+ ctx.moveTo(-10.9*z,-24*z+bob);ctx.lineTo(-4.1*z,-25.4*z+bob);
+ ctx.lineTo(-2.7*z,-13.4*z+bob);ctx.lineTo(-10.3*z,-12.8*z+bob);
+ ctx.closePath();ctx.fill();
+ ctx.fillStyle=leather;ctx.beginPath();
+ ctx.moveTo(-10.9*z,-24*z+bob);ctx.lineTo(-6.3*z,-26*z+bob);
+ ctx.lineTo(-4.6*z,-14.4*z+bob);ctx.lineTo(-10.3*z,-12.8*z+bob);
+ ctx.closePath();ctx.fill();
+ ctx.strokeStyle=modern?'#b4bfc0':'#c8a36c';ctx.lineWidth=Math.max(.7,z*.9);
+ ctx.beginPath();ctx.moveTo(-10.1*z,-19.2*z+bob);ctx.lineTo(-5.1*z,-19.9*z+bob);ctx.stroke();
+ ctx.fillStyle=modern?'#d0d7ce':'#e0bd76';
+ ctx.fillRect(-7.7*z,-20.7*z+bob,Math.max(.8,z),Math.max(.9,z*1.3));
+ // Cada profissao possui silhueta de ferramenta propria.
+ if(role==='wood'||role==='stone'||role==='build'){
+  ctx.strokeStyle=modern?'#758b8e':'#ad895b';ctx.lineWidth=Math.max(1.1,z*1.7);
+  ctx.lineCap='round';ctx.beginPath();
+  ctx.moveTo(-9.5*z,-17*z+bob);ctx.lineTo(-12.1*z,-30*z+bob);ctx.stroke();
+  if(role==='wood'){
+   ctx.fillStyle=modern?'#b7c9cb':'#b7b7a8';ctx.beginPath();
+   ctx.moveTo(-12.2*z,-30.2*z+bob);ctx.lineTo(-17.2*z,-31.1*z+bob);
+   ctx.lineTo(-18.4*z,-27.1*z+bob);ctx.lineTo(-11.4*z,-26.7*z+bob);
+   ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#566467';ctx.lineWidth=Math.max(.7,z*.7);
+   ctx.beginPath();ctx.moveTo(-17.1*z,-30.7*z+bob);ctx.lineTo(-17.9*z,-27.4*z+bob);ctx.stroke();
+  }else if(role==='stone'){
+   ctx.strokeStyle=modern?'#c4d3d1':'#b9b9a9';ctx.lineWidth=Math.max(1.6,z*2.5);
+   ctx.beginPath();ctx.moveTo(-18.2*z,-29.3*z+bob);
+   ctx.lineTo(-11.9*z,-31.3*z+bob);ctx.lineTo(-7.7*z,-30.1*z+bob);ctx.stroke();
+   ctx.strokeStyle='#6d7774';ctx.lineWidth=Math.max(.7,z*.7);
+   ctx.beginPath();ctx.moveTo(-18.3*z,-29.3*z+bob);ctx.lineTo(-20.1*z,-27.6*z+bob);ctx.stroke();
+  }else{
+   ctx.fillStyle=modern?'#a9bdc0':'#b6afa0';
+   ctx.fillRect(-17.7*z,-32*z+bob,9*z,3.4*z);
+   ctx.fillStyle='#4a5553';ctx.fillRect(-10.4*z,-32*z+bob,1.6*z,3.4*z);
+  }
+ }else if(role==='hunt'){
+  ctx.fillStyle=modern?'#5a6b68':'#765035';ctx.beginPath();
+  ctx.moveTo(-13.6*z,-27*z+bob);ctx.lineTo(-9*z,-28*z+bob);
+  ctx.lineTo(-8*z,-15*z+bob);ctx.lineTo(-12.2*z,-15*z+bob);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#cbb99a';ctx.lineWidth=Math.max(.7,z*.8);
+  for(let i=0;i<3;i++){
+   ctx.beginPath();ctx.moveTo((-12.5+i*1.4)*z,-28*z+bob);
+   ctx.lineTo((-13.1+i*1.4)*z,-33*z+bob);ctx.stroke();
+  }
+ }else if(role==='farm'){
+  ctx.fillStyle=modern?'#8e9d8c':'#b48a53';ctx.beginPath();
+  ctx.moveTo(-13*z,-15*z+bob);ctx.lineTo(-4*z,-16*z+bob);
+  ctx.lineTo(-5.5*z,-10*z+bob);ctx.lineTo(-11.5*z,-10*z+bob);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle=modern?'#c4d3bd':'#d8b778';ctx.lineWidth=Math.max(.8,z);
+  ctx.beginPath();ctx.arc(-8.5*z,-16*z+bob,4.2*z,Math.PI,Math.PI*2);ctx.stroke();
+  for(let i=0;i<3;i++){
+   ctx.strokeStyle=i===1?'#d9bd73':'#83a663';ctx.lineWidth=Math.max(.9,z*1.1);
+   ctx.beginPath();ctx.moveTo((-11+i*2.1)*z,-15*z+bob);
+   ctx.lineTo((-11.7+i*2.1)*z,-21*z+bob);ctx.stroke();
+  }
+ }
+ if(z>=1.3){
+  ctx.strokeStyle=modern?'#d0d8cf':'#d5b58a';ctx.lineWidth=Math.max(.65,z*.55);
+  ctx.beginPath();ctx.moveTo(-9.8*z,-13.9*z+bob);
+  ctx.lineTo(-5.2*z,-15.1*z+bob);ctx.stroke();
+ }
+ ctx.restore();return 1;
+}
 function drawTileOccupants(x,y,unitTiles,enemyTiles,z,now=Date.now(),actors=tileActors(x,y,unitTiles,enemyTiles),bridge=null){
  for(const {u,enemy} of actors){
   const [px,groundY]=point(u.x,u.y),py=groundY-(bridge?bridgeDeckLift(u,x,y,TH*z,bridge):0),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
@@ -8004,6 +8092,7 @@ function drawTileOccupants(x,y,unitTiles,enemyTiles,z,now=Date.now(),actors=tile
   drawStrategicUnitMarker(u,px,py,z,enemy,!enemy&&(u===game.units[selectedUnit]||selectedGroup.has(u)));
   if(!enemy&&u===formationStandardLeader)drawFormationStandard(px,py,z,game.era,now);
   drawUnitSprite(u,px,py,z,enemy);
+  drawWorkerTravelKit(u,px,py,z,now,game.era);
   drawWinterTroopGear(u,px,py,z,now,forestSeason(),enemy);
   drawCombatFeedback(u,px,py,z,now,enemy);
   if(enemy){
