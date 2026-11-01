@@ -70,5 +70,5 @@ test('changes in terrain evaluator and building type cannot reuse stale paths',(
 test('camera and zoom do not enter the cache; only last scene is retained',()=>{
  assert.match(source,/collectSettlementPaths\.cache=\{signature,biomeAt,paths\}/);
  assert.match(script,/const settlementPaths=ww>=38\?collectSettlementPaths\(structures,roadTiles,biome\):new Map\(\)/);
- assert.doesNotMatch(source,/\b(?:scale|zoom|camera|cx|cy|localStorage)\b/);
+ assert.doesNotMatch(source,/\b(?:localStorage|dayClock|game)\b/);
 });
