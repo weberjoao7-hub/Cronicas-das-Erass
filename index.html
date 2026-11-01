@@ -6511,6 +6511,74 @@ function drawRoadJunction(px,py,ww,hh,x,y,links,era,width){
  }
  ctx.restore();return links.length;
 }
+// Cruceiros: marcos de pedra, placas de madeira e sinalizacao metalica
+// evoluem com a era. Objetos fixos ao terreno, sem entidades nem estado salvo.
+// Um em cada tres entroncamentos, com LOD para preservar o Safari movel.
+function drawRoadWayfinder(px,py,ww,hh,x,y,links,era,season=1){
+ if(era<2||ww<66||hh<18||!Array.isArray(links)||links.length<3||
+    (Math.abs(x*7+y*11)%3)!==0||
+    ![px,py,ww,hh,x,y].every(Number.isFinite))return 0;
+ const stone=era<4,metal=era>=6,winter=season===3;
+ const bx=px-ww*.285,by=py+hh*.045,top=by-hh*(metal?1.52:stone?1.20:1.42);
+ const dark=stone?'#64675e':metal?'#334b50':'#513b29';
+ const face=stone?'#b7b4a1':metal?'#769196':'#b78b56';
+ const trim=stone?'#e0d8bb':metal?'#d5e4df':'#e5c38a';
+ const poly=(points,color)=>{
+  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...points[0]);
+  for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);
+  ctx.closePath();ctx.fill();
+ };
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.fillStyle='#12251d72';ctx.beginPath();
+ ctx.ellipse(bx+ww*.065,by+hh*.055,ww*.115,hh*.060,-.12,0,Math.PI*2);ctx.fill();
+ if(stone){
+  // Monolito com tres faces e entalhes: eras da pedra e do bronze.
+  poly([[bx-ww*.036,by],[bx+ww*.034,by-hh*.04],
+        [bx+ww*.027,top],[bx-ww*.027,top+hh*.065]],dark);
+  poly([[bx-ww*.027,top+hh*.065],[bx+ww*.027,top],
+        [bx+ww*.062,top+hh*.080],[bx+ww*.008,top+hh*.145]],trim);
+  poly([[bx+ww*.034,by-hh*.04],[bx+ww*.062,by-hh*.12],
+        [bx+ww*.062,top+hh*.080],[bx+ww*.027,top]],face);
+  ctx.strokeStyle='#6c6557';ctx.lineWidth=Math.max(.8,ww*.010);
+  for(let k=0;k<2;k++){
+   const yy=top+hh*(.34+k*.23);
+   ctx.beginPath();ctx.moveTo(bx-ww*.010,yy);
+   ctx.lineTo(bx+ww*.024,yy-hh*.020);ctx.stroke();
+  }
+ }else{
+  // Mastro com volume e brilho lateral, nunca um sprite plano.
+  ctx.strokeStyle=dark;ctx.lineWidth=Math.max(2.2,ww*(metal?.037:.046));
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,top);ctx.stroke();
+  ctx.strokeStyle=face;ctx.lineWidth=Math.max(.8,ww*.011);
+  ctx.beginPath();ctx.moveTo(bx-ww*.010,by-hh*.12);
+  ctx.lineTo(bx-ww*.010,top+hh*.08);ctx.stroke();
+  const arms=metal?[[-1,.17],[1,.40]]:[[-1,.19],[1,.46]];
+  for(let i=0;i<arms.length;i++){
+   const [dir,offset]=arms[i],yy=top+hh*offset,reach=ww*(metal?.21:.19);
+   const tip=bx+dir*reach,depth=hh*(metal?.14:.17);
+   poly([[bx,yy],[tip-dir*ww*.036,yy-hh*.045],
+         [tip,yy+depth*.45],[tip-dir*ww*.036,yy+depth],
+         [bx,yy+depth*.70]],dark);
+   poly([[bx,yy-hh*.025],[tip-dir*ww*.040,yy-hh*.065],
+         [tip,yy+depth*.31],[tip-dir*ww*.040,yy+depth*.79],
+         [bx,yy+depth*.57]],i===0?face:trim);
+   ctx.strokeStyle=metal?'#e3eeeb':'#6a4b30';
+   ctx.lineWidth=Math.max(.8,ww*.009);
+   ctx.beginPath();ctx.moveTo(bx+dir*ww*.040,yy+depth*.27);
+   ctx.lineTo(bx+dir*reach*.67,yy+depth*.21);ctx.stroke();
+  }
+  if(metal){
+   ctx.fillStyle=era>=7?'#c5e5e6':'#d7bb83';
+   ctx.beginPath();ctx.arc(bx,top,Math.max(1.5,ww*.024),0,Math.PI*2);ctx.fill();
+  }
+ }
+ if(winter){
+  ctx.strokeStyle='#e6f0e9';ctx.lineWidth=Math.max(1,ww*.018);
+  ctx.beginPath();ctx.moveTo(bx-ww*.029,top+hh*.054);
+  ctx.lineTo(bx+ww*.032,top+hh*.012);ctx.stroke();
+ }
+ ctx.restore();return 1;
+}
 function drawRoad(px,py,ww,hh,x,y){
  const dirs=[[1,0],[0,1],[-1,0],[0,-1]];
  const links=typeof roadLinks==='undefined'?dirs.filter(([dx,dy])=>roadTiles.has(key(x+dx,y+dy))):(roadLinks.get(key(x,y))||[]);
@@ -6573,6 +6641,7 @@ function drawRoad(px,py,ww,hh,x,y){
   }
  }
  drawWinterRoadSnow(px,py,ww,hh,x,y,links,width);
+ drawRoadWayfinder(px,py,ww,hh,x,y,links,era,forestSeason());
  ctx.restore();
 }
 
