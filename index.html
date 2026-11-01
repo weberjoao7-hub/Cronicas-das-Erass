@@ -1777,6 +1777,8 @@ function drawMountain(px,py,ww,hh,x,y){
  // Estratos e cornijas pertencem as faces da montanha, nao a tela.
  drawMountainRockStrata(px,py,ww,hh,x,y,peakX,peakY,left,right,leftY,rightY,base,
   typeof forestSeason==='function'?forestSeason():0);
+ drawMountainOreSeams(px,py,ww,hh,x,y,peakX,peakY,left,right,leftY,rightY,base,
+  typeof forestSeason==='function'?forestSeason():0,typeof dayClock==='number'?dayClock:0);
  ctx.restore();
 }
 // v6.146: rochas estratificadas e cornijas sazonais no relevo isometrico.
@@ -1829,6 +1831,72 @@ function drawMountainRockStrata(px,py,ww,hh,x,y,peakX,peakY,left,right,leftY,rig
   }
  }
  ctx.restore();return details;
+}
+// Veios minerais nas faces da cordilheira: cristais facetados, relevo e brilho discreto.
+// Coordenadas locais ao macico, distribuicao deterministica e LOD para Safari.
+// Decoracao visual: nao modifica mineracao, biomas, colisao ou salvamento.
+function drawMountainOreSeams(px,py,ww,hh,x,y,peakX,peakY,left,right,leftY,rightY,base,season=0,clock=0){
+ if(ww<56||hh<=0||rnd(x,y,802)<.46)return 0;
+ const near=ww>=82,side=rnd(x,y,803)<.5?-1:1;
+ const shoulderX=side<0?left:right,shoulderY=side<0?leftY:rightY;
+ const t=.46+rnd(x,y,804)*.13;
+ const sx=peakX+(shoulderX-peakX)*t+(px-peakX)*.15;
+ const sy=peakY+(shoulderY-peakY)*t+(base-peakY)*.10;
+ const palette=rnd(x,y,805);
+ const ore=palette<.36?'#c6a77b':palette<.7?'#93b7ae':'#b6c3c8';
+ const bright=palette<.36?'#f0d29a':palette<.7?'#d0e4c6':'#e0e9e8';
+ const dark=palette<.36?'#564536':palette<.7?'#334c4a':'#43525b';
+ const count=near?2:1;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ for(let branch=0;branch<count;branch++){
+  const bx=sx+side*ww*(branch*.085),by=sy+hh*(branch*.075);
+  const points=[];
+  for(let i=0;i<4;i++){
+   const offset=(rnd(x+branch*7+i*3,y+i*5,806)-.5)*ww*.045;
+   points.push([bx+side*ww*i*.024+offset,by+hh*i*.11]);
+  }
+  ctx.beginPath();ctx.moveTo(...points[0]);
+  for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);
+  ctx.strokeStyle=dark;ctx.lineWidth=Math.max(1.3,ww*.044);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(...points[0]);
+  for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);
+  ctx.strokeStyle=ore;ctx.lineWidth=Math.max(.9,ww*.020);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(points[0][0]-side*ww*.009,points[0][1]-hh*.014);
+  ctx.lineTo(points[1][0]-side*ww*.009,points[1][1]-hh*.014);
+  ctx.strokeStyle=bright;ctx.lineWidth=Math.max(.65,ww*.007);ctx.stroke();
+  const [cx,cy]=points[branch?2:1],size=ww*(near?.031:.024);
+  // Tres facetas no mesmo volume, ancoradas diretamente a rocha.
+  ctx.fillStyle=dark;ctx.beginPath();
+  ctx.moveTo(cx-size*.90,cy);ctx.lineTo(cx-size*.15,cy-size*.9);
+  ctx.lineTo(cx+size*.9,cy-size*.25);ctx.lineTo(cx+size*.55,cy+size*.45);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle=ore;ctx.beginPath();
+  ctx.moveTo(cx-size*.15,cy-size*.9);ctx.lineTo(cx+size*.9,cy-size*.25);
+  ctx.lineTo(cx+size*.08,cy+size*.12);ctx.closePath();ctx.fill();
+  ctx.fillStyle=bright;ctx.beginPath();
+  ctx.moveTo(cx-size*.90,cy);ctx.lineTo(cx-size*.15,cy-size*.9);
+  ctx.lineTo(cx+size*.08,cy+size*.12);ctx.lineTo(cx+size*.55,cy+size*.45);
+  ctx.closePath();ctx.fill();
+  if(season===3){
+   ctx.fillStyle='#e5ede7';ctx.beginPath();
+   ctx.moveTo(cx-size*.9,cy);ctx.lineTo(cx-size*.15,cy-size*.9);
+   ctx.lineTo(cx+size*.9,cy-size*.25);ctx.lineTo(cx+size*.42,cy-size*.12);
+   ctx.lineTo(cx-size*.12,cy-size*.56);ctx.closePath();ctx.fill();
+  }
+  if(near&&branch===0){
+   const pulse=Math.max(0,Math.sin(clock*1.7+rnd(x,y,807)*6.28));
+   if(pulse>.62){
+    ctx.globalAlpha=(pulse-.62)*1.45;
+    ctx.strokeStyle='#f6f4d7';ctx.lineWidth=Math.max(.75,ww*.010);
+    ctx.beginPath();ctx.moveTo(cx-size*.7,cy-size*.32);
+    ctx.lineTo(cx+size*.9,cy-size*.32);
+    ctx.moveTo(cx+size*.1,cy-size*1.1);
+    ctx.lineTo(cx+size*.1,cy+size*.4);ctx.stroke();
+    ctx.globalAlpha=1;
+   }
+  }
+ }
+ ctx.restore();return count;
 }
 // v6.130: microclima dos bosques — folhas de outono em queda e vagalumes no verao.
 // Particulas deterministicas por ladrilho; LOD e nevoa sao aplicados antes da chamada.
