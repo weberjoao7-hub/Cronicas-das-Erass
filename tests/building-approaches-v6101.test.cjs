@@ -66,5 +66,5 @@ test('acesso desenhado antes das sombras e apenas para edificios concluidos',()=
  const shadow=render.indexOf("if(obj&&!obj.buildLeft&&obj.t!=='Ponte')drawStructureShadow(");
  const building=render.indexOf('if(obj&&obj.buildLeft){drawConstructionSite(');
  assert.ok(approach>0&&shadow>approach&&building>shadow);
- assert.match(render,/drawBuildingApproach\(px,py,ww,hh,x,y,obj\.t,game\.era,forestSeason\(\),rainLevel,roadTiles\)/);
+ assert.match(render,/drawBuildingApproach\(px,py,ww,hh,x,y,obj\.t,game\.era,forestSeason\(\),rainLevel,roadTiles,settlementPaths\)/);
 });
