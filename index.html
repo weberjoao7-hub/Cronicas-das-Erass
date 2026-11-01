@@ -4345,12 +4345,46 @@ function drawFishingCrew(r,beam,ww,now,era,moving){
  ctx.restore();
 }
 
+// Reflexos do casco e ondulacoes ancoradas na superficie, com LOD para Safari.
+function drawFishingBoatReflection(r,beam,ww,now,era,moving){
+ if(ww<37)return 0;
+ const wave=Math.sin(now*.0014+r*.7)*beam*.11;
+ ctx.save();ctx.globalAlpha=.17;
+ ctx.fillStyle=era>=6?'#77999b':era>=3?'#c6a97c':'#a48a6c';
+ ctx.beginPath();ctx.moveTo(-r*.87,beam*.75+wave);
+ ctx.quadraticCurveTo(0,beam*1.8+wave,r*.91,beam*.78+wave);
+ ctx.quadraticCurveTo(r*.32,beam*2.2+wave,-r*.87,beam*.75+wave);ctx.fill();
+ if(ww>=59){
+  ctx.globalAlpha=.11;ctx.strokeStyle='#b4d7d5';ctx.lineWidth=Math.max(.7,ww*.012);
+  for(let i=0;i<3;i++){
+   const ripple=Math.sin(now*.0019+i*1.8+era*.31)*beam*.1;
+   ctx.beginPath();ctx.moveTo(-r*(.74-i*.14),beam*(1.25+i*.36)+ripple);
+   ctx.quadraticCurveTo(0,beam*(1.5+i*.36)+ripple,r*(.72-i*.13),beam*(1.25+i*.36)+ripple);ctx.stroke();
+  }
+  if(era>=3&&era<6){
+   ctx.globalAlpha=.12;ctx.fillStyle='#d3c7ab';
+   ctx.beginPath();ctx.moveTo(-r*.06,beam*.87);ctx.lineTo(r*.35,beam*1.35);
+   ctx.lineTo(-r*.06,beam*1.8);ctx.closePath();ctx.fill();
+  }
+ }
+ if(moving&&ww>=48){
+  ctx.globalAlpha=.19;ctx.strokeStyle='#bfe4de';ctx.lineWidth=Math.max(.7,ww*.01);
+  for(let i=0;i<2;i++){
+   const ripple=Math.sin(now*.002+i*2.1)*beam*.12;
+   ctx.beginPath();ctx.moveTo(-r*(1.15+i*.2),beam*(.65+i*.4)+ripple);
+   ctx.quadraticCurveTo(0,beam*(1.1+i*.4)+ripple,r*(1.12+i*.2),beam*(.65+i*.4)+ripple);ctx.stroke();
+  }
+ }
+ ctx.restore();return 1;
+}
+
 function drawFishingBoat(boat,px,py,ww,hh,now){
  if(ww<19)return;
  const h=boat.heading||{x:1,y:0},angle=Math.atan2((h.x+h.y)*TH,(h.x-h.y)*TW);
  const moving=boat.state==='outbound'||boat.state==='returning',r=ww*(game.era>=6?.29:.245),beam=hh*.24;
  ctx.save();ctx.translate(px,py+Math.sin(now*.002+boat.x)*hh*.014);ctx.rotate(angle);
  if(boat.state==='fishing')drawFishingNet(r,beam,ww,now,game.era);
+ drawFishingBoatReflection(r,beam,ww,now,game.era,moving);
  if(moving)drawBoatWake(r,beam,ww,now);
  ctx.fillStyle='#0a29336b';ctx.beginPath();ctx.ellipse(0,beam*.43,r*1.18,beam*.85,0,0,Math.PI*2);ctx.fill();
  ctx.beginPath();ctx.moveTo(r,0);ctx.quadraticCurveTo(r*.45,beam*1.12,-r*.7,beam*.87);
