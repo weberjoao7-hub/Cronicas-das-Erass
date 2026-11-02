@@ -527,6 +527,8 @@ function minimapSelectionMarkers(units,selection,leader,isVisible,limit=24){
  return markers;
 }
 function drawMinimapSelectionOverlay(){
+ // O minimapa também é executado isoladamente pelos testes de cartografia.
+ if(typeof selectedGroup==='undefined'||typeof selectedUnit==='undefined'||typeof visibleAt!=='function')return 0;
  const markers=minimapSelectionMarkers(game.units,selectedGroup,game.units[selectedUnit],visibleAt,24);
  if(!markers.length)return 0;
  const targets=new Set();
