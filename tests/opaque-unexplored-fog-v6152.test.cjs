@@ -26,8 +26,10 @@ test('nevoa desconhecida e opaca; explorada conserva translucidez',()=>{
  const calls=[];
  const bounds={minX:0,maxX:1,minY:0,maxY:1},visibleFog=new Uint8Array(4);
  const exploredFog=new Uint8Array(4);exploredFog[1]=1;visibleFog[2]=1;
- const fogPass=new Function('bounds','visibleFog','exploredFog','W','point','ww','hh','w','h','diamond',draw.slice(a,b));
- fogPass(bounds,visibleFog,exploredFog,2,()=>[100,100],74,38,400,300,(...args)=>calls.push(args));
+ const fogPass=new Function('bounds','visibleFog','exploredFog','W','point','ww','hh','w','h','diamond',
+  'fogRevealAt','fogRevealWasExplored','fogRevealAlpha','frameTime',draw.slice(a,b));
+ fogPass(bounds,visibleFog,exploredFog,2,()=>[100,100],74,38,400,300,(...args)=>calls.push(args),
+  new Float64Array(4),new Uint8Array(4),()=>0,1000);
  assert.equal(calls.length,3);
  assert.equal(calls.filter(c=>c[4]==='#06111d').length,2,'sem vazamento de bioma desconhecido');
  assert.equal(calls.filter(c=>c[4]==='#081722a6').length,1,'historico visivel sob sombra');

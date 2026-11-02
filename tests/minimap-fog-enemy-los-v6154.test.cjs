@@ -17,10 +17,10 @@ function fogScene(){
  let updates=0;
  const game={buildings:[],units:[{x:2.5,y:.5,hp:100,kind:'worker'}]};
  const factory=new Function('W','H','visibleFog','exploredFog','fogImage','fogCtx',
-   'sightCells','game','ownedRegions','REGION_SIZE','dirty','fogRevision',
-   visibility+';return updateVisibility;');
+   'sightCells','game','ownedRegions','REGION_SIZE','dirty','fogRevision','fogRevealAt','fogRevealWasExplored',
+   'let fogInitialized=false;'+visibility+';return updateVisibility;');
  const update=factory(W,H,visibleFog,exploredFog,fogImage,{putImageData:()=>updates++},
-   ()=>[2],game,()=>new Set(),12,false,0);
+   ()=>[2],game,()=>new Set(),12,false,0,new Float64Array(W*H),new Uint8Array(W*H));
  update();
  return {alpha:[fogImage.data[3],fogImage.data[7],fogImage.data[11]],updates};
 }
