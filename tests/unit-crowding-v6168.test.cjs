@@ -55,14 +55,16 @@ test('crowds larger than eight use bounded rings and remain deterministic',()=>{
 });
 test('rendering and both desktop and touch selection use matching visual anchors',()=>{
  assert.match(script,/visualUnitScreenPoint\(u,enemy\?enemyTiles\.get\(key\(x,y\)\):unitTiles\.get\(key\(x,y\)\),z\)/);
- assert.match(script,/const u=game\.units\[i\],\[ux,uy\]=visualUnitScreenPoint\(u,game\.units,scale\)/);
+ assert.match(script,/return pickVisibleUnitIndex\(game\.units,px,py,scale,visualUnitScreenPoint,visibleAt\)/);
  assert.match(script,/function selectGroupInRect\([\s\S]*?visualUnitScreenPoint\(u,game\.units,scale\)/);
  assert.match(script,/function selectVisibleTroops\([\s\S]*?visualUnitScreenPoint\(u,game\.units,scale\)/);
- const units=squad(2),start=script.indexOf('function pickUnitAtScreen(');
- const end=script.indexOf('// Seleção de tropas',start);
+ const units=squad(2),start=script.indexOf('function pickVisibleUnitIndex(');
+ const end=script.indexOf('\nfunction selectGroupInRect(',start);
  assert.ok(start>=0&&end>start);
- const pick=new Function('game','scale','visualUnitScreenPoint',
-  script.slice(start,end)+'return pickUnitAtScreen;')({units},1,visualUnitScreenPoint);
+ const factory=new Function('game','scale','visualUnitScreenPoint','visibleAt',
+  script.slice(start,end)+'\nreturn pickUnitAtScreen;');
+ const pick=factory({units},1,visualUnitScreenPoint,()=>true);
  const [x,y]=visualUnitScreenPoint(units[0],units,1);
  assert.equal(pick(x,y-15*.45),0);
+ assert.equal(factory({units},1,visualUnitScreenPoint,()=>false)(x,y-15*.45),-1);
 });
