@@ -64,7 +64,7 @@ test('botão e tecla F alternam o modo; ações manuais interrompem',()=>{
  assert.match(script,/else if\(k==='f'\)/);
  assert.match(script,/function panMinimap\(clientX,clientY\)\{\s*cameraFollowUnit=null/);
  assert.match(script,/function applyDesktopEdgePan\(dt\)[\s\S]*?cameraFollowUnit=null;cx=nextX/);
- assert.match(script,/if\(Math\.hypot\(e\.clientX-down\.x,e\.clientY-down\.y\)>5\)\{dragged=true;cameraFollowUnit=null\}/);
+ assert.ok(script.includes('if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>(touchSelect.id===e.pointerId&&!touchSelect.active?12:5)){dragged=true;cameraFollowUnit=null}'));
 });
 test('intervalos inválidos não alteram a câmera; coordenadas ficam nos limites do mapa',()=>{
  const s=scene({x:1000,y:-200,hp:100});s.camera.setCameraFollow(s.unit);
