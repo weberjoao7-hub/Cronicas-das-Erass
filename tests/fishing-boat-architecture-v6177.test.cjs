@@ -8,7 +8,7 @@ const source=script.slice(a,b);
 function scene(era=4,width=80,now=1500,moving=true){
  const calls=[],styles=[],ctx=new Proxy({},{get(o,k){return k in o?o[k]:(...args)=>{
   for(const v of args)if(typeof v==='number')assert.ok(Number.isFinite(v),'Canvas '+k);
-  calls.push(k);
+  calls.push([k,...args]);
  }},set(o,k,v){o[k]=v;if(k==='fillStyle'||k==='strokeStyle')styles.push(v);return true;}});
  const fn=new Function('ctx','game','scale','TW','TH','drawFishingNet',source+'return drawFishingBoat;')(ctx,{era},1,32,16,()=>{});
  fn({heading:{x:1,y:0},state:moving?'outbound':'ready',x:8,y:9,cargo:0},0,0,width,width*.5,now);
@@ -40,7 +40,7 @@ test('animated sail and engine exhaust respond to time and movement',()=>{
 test('Canvas state balanced and coordinates finite across eight eras and zooms',()=>{
  for(let era=0;era<8;era++)for(const width of [19,29,36,42,68,80,150]){
   const {calls}=scene(era,width);
-  assert.equal(calls.filter(c=>c==='save').length,calls.filter(c=>c==='restore').length);
+  assert.equal(calls.filter(c=>c[0]==='save').length,calls.filter(c=>c[0]==='restore').length);
  }
  assert.deepEqual(scene(5,80,1500),scene(5,80,1500));
  assert.ok(!source.includes('localStorage'));
