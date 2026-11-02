@@ -5,7 +5,8 @@ const fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.slice(html.indexOf('<script>')+8,html.indexOf('</script>'));
 const cache=script.slice(script.indexOf('// v6.70: profundidade'),script.indexOf('const colors=',script.indexOf('// v6.70: profundidade')));
-const source=script.slice(script.indexOf('function drawLakeDepth('),script.indexOf('function drawForestWaterReflections('));
+// Keep the lake-depth fixture isolated from later shoreline reflection renderers.
+const source=script.slice(script.indexOf('function drawLakeDepth('),script.indexOf('const SHORE_UNIT_REFLECTION_EDGES='));
 assert.ok(cache.includes('waterDepth')&&source.includes('function drawLakeDepth'));
 function depthMap(){
  const W=7,H=7,terrain=new Uint8Array(W*H).fill(2),shoreMask=new Uint8Array(W*H);
