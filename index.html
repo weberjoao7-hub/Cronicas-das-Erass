@@ -5370,6 +5370,93 @@ function drawFishingBoatReflection(r,beam,ww,now,era,moving){
  ctx.restore();return 1;
 }
 
+// v6.177: three-dimensional fishing-boat silhouettes and era-specific deck architecture.
+// Canvas-only visuals, anchored to the boat's isometric heading; no persisted state.
+function drawFishingBoatArchitecture(r,beam,ww,hh,era,now,moving){
+ if(ww<36)return 0;
+ const modern=era>=6,medieval=era>=3,close=ww>=68;
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ if(ww>=42){
+  // Lower hull strake, curved plank seams and carved bow create volume.
+  ctx.fillStyle=modern?'#29414a':medieval?'#493222':'#382a20';
+  ctx.beginPath();ctx.moveTo(-r*.91,beam*.2);
+  ctx.quadraticCurveTo(-r*.25,beam*1.18,r*.73,beam*.55);
+  ctx.lineTo(r*.88,beam*.12);
+  ctx.quadraticCurveTo(-r*.10,beam*.87,-r*.91,beam*.2);ctx.fill();
+  ctx.strokeStyle=modern?'#8aa7ad':medieval?'#c4a076':'#a98458';
+  ctx.lineWidth=Math.max(.8,ww*.012);
+  for(let i=0;i<2;i++){
+   ctx.beginPath();ctx.moveTo(-r*.82,beam*(.28+i*.17));
+   ctx.quadraticCurveTo(-r*.06,beam*(.91+i*.09),r*.74,beam*(.43+i*.1));ctx.stroke();
+  }
+  ctx.fillStyle=modern?'#c1d0c9':'#c8a16d';
+  ctx.beginPath();ctx.moveTo(r*.74,-beam*.32);ctx.lineTo(r*1.02,-beam*.04);
+  ctx.lineTo(r*.91,beam*.23);ctx.lineTo(r*.76,beam*.12);ctx.closePath();ctx.fill();
+  if(close){
+   ctx.strokeStyle='#d4bf91';ctx.lineWidth=Math.max(.7,ww*.009);
+   for(let i=0;i<3;i++){
+    ctx.beginPath();ctx.ellipse(-r*.60,-beam*.07,r*(.17-i*.04),
+     beam*(.30-i*.06),-.15,0,Math.PI*2);ctx.stroke();
+   }
+  }
+ }
+ if(modern){
+  // Angled engine cabin with two planes of glazing and an overhanging roof.
+  ctx.fillStyle='#2e4853';ctx.beginPath();ctx.moveTo(-r*.40,-beam*.4);
+  ctx.lineTo(-r*.40,-beam*1.65);ctx.lineTo(-r*.08,-beam*2.03);
+  ctx.lineTo(r*.25,-beam*1.69);ctx.lineTo(r*.25,-beam*.4);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#b9c7c1';ctx.beginPath();ctx.moveTo(-r*.45,-beam*1.71);
+  ctx.lineTo(-r*.09,-beam*2.12);ctx.lineTo(r*.30,-beam*1.73);
+  ctx.lineTo(r*.21,-beam*1.60);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#71949e';ctx.beginPath();ctx.moveTo(-r*.30,-beam*1.43);
+  ctx.lineTo(-r*.30,-beam*1.05);ctx.lineTo(-r*.06,-beam*1.20);
+  ctx.lineTo(-r*.06,-beam*1.56);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#9ac1c4';ctx.fillRect(r*.04,-beam*1.47,r*.14,beam*.33);
+  ctx.strokeStyle='#b2c5c1';ctx.lineWidth=Math.max(.8,ww*.012);
+  ctx.beginPath();ctx.moveTo(r*.33,-beam*.36);ctx.lineTo(r*.33,-beam*.94);
+  ctx.lineTo(r*.66,-beam*.94);ctx.stroke();
+  if(close&&moving){
+   for(let i=0;i<2;i++){
+    const t=((now*.0003+i*.5)%1+1)%1;
+    ctx.globalAlpha=.25*(1-t);ctx.fillStyle='#d2ded7';
+    ctx.beginPath();ctx.ellipse(-r*.17-r*t*.7,-beam*(2.52+t*.55),
+     r*(.11+t*.08),beam*(.17+t*.12),-.2,0,Math.PI*2);ctx.fill();
+   }
+   ctx.globalAlpha=1;
+  }
+ }else if(medieval){
+  // Curved, animated sail with rigging, seams and shaded cloth folds.
+  const wind=Math.sin(now*.0012+era*.4)*(moving?.085:.045),top=-hh*.89;
+  ctx.strokeStyle='#63482e';ctx.lineWidth=Math.max(1,ww*.019);
+  ctx.beginPath();ctx.moveTo(-r*.07,-beam*.08);ctx.lineTo(-r*.07,top);ctx.stroke();
+  ctx.strokeStyle='#c4ac82';ctx.lineWidth=Math.max(.7,ww*.009);
+  ctx.beginPath();ctx.moveTo(-r*.79,-beam*.28);ctx.lineTo(-r*.07,top);
+  ctx.lineTo(r*.79,-beam*.26);ctx.stroke();
+  ctx.fillStyle=era>=5?'#c9c1ad':era>=4?'#e1d5b7':'#d6bd91';
+  ctx.beginPath();ctx.moveTo(-r*.07,top+hh*.04);
+  ctx.quadraticCurveTo(r*(.29+wind),-hh*.66,r*(.61+wind),-hh*.23);
+  ctx.quadraticCurveTo(r*(.28+wind*.5),-hh*.26,-r*.07,-hh*.30);
+  ctx.closePath();ctx.fill();
+  ctx.fillStyle='#6e584766';ctx.beginPath();ctx.moveTo(-r*.07,top+hh*.04);
+  ctx.quadraticCurveTo(r*(.08+wind),-hh*.54,-r*.07,-hh*.30);ctx.closePath();ctx.fill();
+  if(close){
+   ctx.strokeStyle='#998770';ctx.lineWidth=Math.max(.7,ww*.008);
+   for(const t of [.37,.70]){
+    const y=top+hh*.59*t;
+    ctx.beginPath();ctx.moveTo(-r*.07,y);
+    ctx.quadraticCurveTo(r*(.17+wind)*t,y+hh*.02,r*(.61+wind)*t,y+hh*.07);ctx.stroke();
+   }
+  }
+ }else{
+  // Primitive dugout: net bundle and raised bow, without anachronistic sails.
+  ctx.strokeStyle='#b49565';ctx.lineWidth=Math.max(1,ww*.017);
+  ctx.beginPath();ctx.moveTo(r*.75,-beam*.24);ctx.lineTo(r*.84,-beam*1.13);ctx.stroke();
+  ctx.fillStyle='#b5a17b';ctx.beginPath();
+  ctx.ellipse(-r*.36,-beam*.12,r*.20,beam*.26,.16,0,Math.PI*2);ctx.fill();
+ }
+ ctx.restore();return 1;
+}
+
 function drawFishingBoat(boat,px,py,ww,hh,now){
  if(ww<19)return;
  const h=boat.heading||{x:1,y:0},angle=Math.atan2((h.x+h.y)*TH,(h.x-h.y)*TW);
@@ -5387,14 +5474,7 @@ function drawFishingBoat(boat,px,py,ww,hh,now){
  ctx.strokeStyle='#533d2b';ctx.lineWidth=Math.max(.7,scale*.8);ctx.stroke();
  for(const x of [-.36,.20]){ctx.beginPath();ctx.moveTo(x*r,-beam*.54);ctx.lineTo((x+.1)*r,beam*.54);ctx.stroke()}
  drawFishingCrew(r,beam,ww,now,game.era,moving);
- if(game.era>=6){
-  ctx.fillStyle='#c4c9b8';ctx.fillRect(-r*.30,-beam*.7,r*.47,beam*1.1);
-  ctx.fillStyle='#385b69';ctx.fillRect(-r*.21,-beam*.48,r*.25,beam*.45);
- }else if(game.era>=3){
-  ctx.strokeStyle='#55412a';ctx.lineWidth=Math.max(1,scale*1.1);
-  ctx.beginPath();ctx.moveTo(0,-beam*.1);ctx.lineTo(0,-hh*.85);ctx.stroke();
-  ctx.fillStyle='#e3d6b2e0';ctx.beginPath();ctx.moveTo(0,-hh*.83);ctx.lineTo(r*.58,-hh*.20);ctx.lineTo(0,-hh*.24);ctx.closePath();ctx.fill();
- }
+ drawFishingBoatArchitecture(r,beam,ww,hh,game.era,now,moving);
  if(boat.cargo>0){
   ctx.fillStyle='#a67c4e';ctx.beginPath();ctx.ellipse(-r*.52,0,r*.23,beam*.49,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#8fc1bc';for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(-r*.6+i*r*.1,-beam*.1,r*.08,beam*.13,-.3,0,Math.PI*2);ctx.fill()}
