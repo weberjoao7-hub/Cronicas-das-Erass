@@ -20,7 +20,7 @@ function preview(type,era){
  const a=script.indexOf('function drawPlacementOverlay('),b=script.indexOf('function buildMenu(',a);
  assert.ok(a>=0&&b>a,'prévia isolável');
  const mocks={ctx,placing:type,hoverTile:{x:80,y:80},cx:80,cy:80,W:160,H:160,TW:74,TH:38,scale:1,game:{era,day:1},buildValidation:()=>null,point:()=>[200,150],diamond:()=>{},at:()=>null,bridgeAxis:()=> 'x',forestSeason:()=>1};
- for(const name of ['drawBridge','drawWatchtower','drawEraWatchtower','drawBarracks','drawDock','drawFarm','drawWindmill','drawMine','drawCottage','drawEraResidence','drawResidenceChimney','drawEraStandard','house'])mocks[name]=(...args)=>calls.push([name,...args]);
+ for(const name of ['drawBridge','drawWatchtower','drawEraWatchtower','drawBarracks','drawDock','drawFarm','drawWindmill','drawMine','drawCottage','drawEraResidence','drawResidenceChimney','drawResidenceStreetProps','drawEraStandard','house'])mocks[name]=(...args)=>calls.push([name,...args]);
  const keys=Object.keys(mocks);
  new Function(...keys,script.slice(a,b)+';drawPlacementOverlay();')(...keys.map(k=>mocks[k]));
  return calls;
