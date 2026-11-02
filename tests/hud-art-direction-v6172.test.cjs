@@ -7,7 +7,7 @@ const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1]||'';
 test('v6.172: HTML mantém o motor JavaScript válido e o save existente',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
- assert.match(html,/<title>Crônicas das Eras v6\.172<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
 });
 test('HUD utiliza superfícies e contornos de leitura RTS sem imagens externas',()=>{
  assert.match(css,/--rts-gold:/);
