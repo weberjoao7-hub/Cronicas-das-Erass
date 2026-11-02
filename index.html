@@ -8882,9 +8882,35 @@ function drawWorkerTravelKit(u,px,py,z,now=Date.now(),era=game.era){
  }
  ctx.restore();return 1;
 }
+// v6.168: deslocamento apenas visual para tropas paradas no mesmo ponto.
+// As posicoes reais, rotas, colisoes e dados salvos permanecem inalterados.
+function unitCrowdOffset(u,peers,z){
+ if(!u||!Array.isArray(peers)||peers.length<2||!Number.isFinite(z)||z<.72||
+    !Number.isFinite(u.x)||!Number.isFinite(u.y)||
+    (Array.isArray(u.path)&&u.path.length))return [0,0];
+ const near=[];
+ for(const other of peers){
+  if(!other||!(other.hp>0)||!Number.isFinite(other.x)||!Number.isFinite(other.y)||
+     (Array.isArray(other.path)&&other.path.length)||
+     Math.floor(other.x)!==Math.floor(u.x)||Math.floor(other.y)!==Math.floor(u.y)||
+     Math.abs(other.x-u.x)>.16||Math.abs(other.y-u.y)>.16)continue;
+  near.push(other);
+ }
+ if(near.length<2)return [0,0];
+ const index=near.indexOf(u);
+ if(index<0)return [0,0];
+ const ring=Math.floor(index/8),count=Math.min(8,near.length-ring*8);
+ const radius=Math.min(24,8+Math.max(0,count-2)*1.1+ring*6)*z;
+ const angle=(index%8)*Math.PI*2/count;
+ return [Math.cos(angle)*radius,Math.sin(angle)*radius*.46];
+}
+function visualUnitScreenPoint(u,peers,z){
+ const [px,py]=point(u.x,u.y),[ox,oy]=unitCrowdOffset(u,peers,z);
+ return [px+ox,py+oy];
+}
 function drawTileOccupants(x,y,unitTiles,enemyTiles,z,now=Date.now(),actors=tileActors(x,y,unitTiles,enemyTiles),bridge=null){
  for(const {u,enemy} of actors){
-  const [px,groundY]=point(u.x,u.y),py=groundY-(bridge?bridgeDeckLift(u,x,y,TH*z,bridge):0),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
+  const [px,groundY]=visualUnitScreenPoint(u,enemy?enemyTiles.get(key(x,y)):unitTiles.get(key(x,y)),z),py=groundY-(bridge?bridgeDeckLift(u,x,y,TH*z,bridge):0),r=Math.max(5.5,8.2*z),barY=unitHealthBarTop(u,py,z);
   drawUnitGroundShadow(u,px,py,z,now);
    if(!enemy)drawMarchDust(u,px,py,z,now);
   drawStrategicUnitMarker(u,px,py,z,enemy,!enemy&&(u===game.units[selectedUnit]||selectedGroup.has(u)));
@@ -9662,7 +9688,7 @@ function assignRoute(u,x,y){let path=routeFor(u,x,y);if(!path)return false;u.pat
 function pickUnitAtScreen(px,py){
  let best=-1,score=Infinity;
  for(let i=0;i<game.units.length;i++){
-  const u=game.units[i],[ux,uy]=point(u.x,u.y),r=Math.max(u.kind==='cavalry'||u.kind==='cannon'?22:15,(u.kind==='cavalry'||u.kind==='cannon'?17:11)*scale);
+  const u=game.units[i],[ux,uy]=visualUnitScreenPoint(u,game.units,scale),r=Math.max(u.kind==='cavalry'||u.kind==='cannon'?22:15,(u.kind==='cavalry'||u.kind==='cannon'?17:11)*scale);
   const nx=(px-ux)/r,ny=(py-(uy-r*.45))/(r*1.65),d=nx*nx+ny*ny;
   if(d<1&&d<score){best=i;score=d}
  }
@@ -9675,7 +9701,7 @@ function selectGroupInRect(x0,y0,x1,y1,append=false){
  if(!append)selectedGroup.clear();
  for(const u of game.units){
   if(!isMilitary(u.kind)||u.hp<=0||!visibleAt(u.x,u.y))continue;
-  const [sx,sy]=point(u.x,u.y);
+  const [sx,sy]=visualUnitScreenPoint(u,game.units,scale);
   if(sx>=left&&sx<=right&&sy>=top&&sy<=bottom)selectedGroup.add(u);
  }
  const first=[...selectedGroup][0];
@@ -9687,7 +9713,7 @@ function selectVisibleTroops(){
  selectedGroup.clear();
  for(const u of game.units){
   if(!isMilitary(u.kind)||u.hp<=0||!visibleAt(u.x,u.y))continue;
-  const [sx,sy]=point(u.x,u.y);
+  const [sx,sy]=visualUnitScreenPoint(u,game.units,scale);
   if(sx>=0&&sx<=w&&sy>=0&&sy<=h)selectedGroup.add(u);
  }
  const first=[...selectedGroup][0];
