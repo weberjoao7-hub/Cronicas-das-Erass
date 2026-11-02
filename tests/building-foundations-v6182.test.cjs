@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const script=html.match(/<script>([\\s\\S]*?)<\\/script>/)?.[1];
+const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'script principal');
 const start=script.indexOf('function drawBuildingFoundation(');
 const end=script.indexOf('function drawStructureShadow(',start);
@@ -17,9 +17,9 @@ function scene(era=3,ww=80,season=1,rain=0,type='Quartel'){
 }
 test('v6.182: sintaxe JavaScript e chave de save preservadas',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.ok(Number(html.match(/<title>Crônicas das Eras v6\\.(\\d+)<\\/title>/)?.[1])>=182);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=182);
  assert.match(script,/cronicas-v04/);
- assert.doesNotMatch(source,/localStorage|setInterval|Math\\.random|game\\./);
+ assert.doesNotMatch(source,/localStorage|setInterval|Math\.random|game\./);
 });
 test('fundacoes usam madeira pedra e concreto metal conforme era',()=>{
  assert.ok(scene(0).styles.includes('#a28b63'));
@@ -48,8 +48,8 @@ test('geometria finita e pilha Canvas equilibrada em oito eras',()=>{
  }
 });
 test('fundacao integra render de edificios concluidos sem mudar colisoes',()=>{
- assert.match(script,/if\\(obj&&!obj\\.buildLeft\\)drawBuildingFoundation\\(px,py,ww,hh,obj\\.t,game\\.era,forestSeason\\(\\),rainLevel,x\\*97\\+y\\*13\\)/);
+ assert.match(script,/if\(obj&&!obj\.buildLeft\)drawBuildingFoundation\(px,py,ww,hh,obj\.t,game\.era,forestSeason\(\),rainLevel,x\*97\+y\*13\)/);
  assert.ok(script.indexOf('drawBuildingFoundation(px,py,ww,hh,obj.t')<script.indexOf('drawBuildingApproach(px,py,ww,hh,x,y,obj.t'));
  assert.deepEqual(scene(3,80,1,.2),scene(3,80,1,.2));
- assert.doesNotMatch(source,/save\\(|passable\\(|assignRoute\\(/);
+ assert.doesNotMatch(source,/save\(|passable\(|assignRoute\(/);
 });
