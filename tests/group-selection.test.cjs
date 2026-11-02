@@ -22,9 +22,9 @@ function setup(){
   {kind:'warrior',hp:100,x:3,y:3},
  ];
  const game={units},selectedGroup=new Set(),messages=[];
- const deps=['game','selectedGroup','isMilitary','visibleAt','point','w','h','toast','dirty','selectedUnit','visualUnitScreenPoint'];
+ const deps=['game','selectedGroup','isMilitary','visibleAt','point','w','h','toast','dirty','selectedUnit','visualUnitScreenPoint','scale'];
  // The isolated selection contract uses ground anchors; crowd separation has dedicated tests.
- const values=[game,selectedGroup,military,x=>x!==3,(x,y)=>[x*10,y*10],100,100,x=>messages.push(x),false,0,(u)=>[u.x*10,u.y*10]];
+ const values=[game,selectedGroup,military,x=>x!==3,(x,y)=>[x*10,y*10],100,100,x=>messages.push(x),false,0,(u)=>[u.x*10,u.y*10],1];
  const rect=new Function(...deps,between('function selectGroupInRect(','function selectVisibleTroops(){')+';return selectGroupInRect;')(...values);
  const visible=new Function(...deps,between('function selectVisibleTroops(){','function drawSelectionMarquee(){')+';return selectVisibleTroops;')(...values);
  return {units,game,selectedGroup,messages,rect,visible};
