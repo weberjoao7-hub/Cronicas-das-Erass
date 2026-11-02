@@ -20,7 +20,7 @@ function scene(era=4,ww=80,level=2,now=1400){
 test('v6.176: script compila e salvamento anterior permanece',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.ok(script.includes("localStorage.getItem('cronicas-v04'"));
- assert.ok(html.includes('Crônicas das Eras v6.176'));
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
 });
 test('fachadas distinguem madeira, pedra, tijolo e metal',()=>{
  for(const [era,color] of [[0,'#785738'],[3,'#d3c09a'],[5,'#9c7161'],[7,'#829ba5']])
