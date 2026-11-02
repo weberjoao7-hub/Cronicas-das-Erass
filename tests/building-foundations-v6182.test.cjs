@@ -51,5 +51,5 @@ test('fundacao integra render de edificios concluidos sem mudar colisoes',()=>{
  assert.match(script,/if\(obj&&!obj\.buildLeft\)drawBuildingFoundation\(px,py,ww,hh,obj\.t,game\.era,forestSeason\(\),rainLevel,x\*97\+y\*13\)/);
  assert.ok(script.indexOf('drawBuildingFoundation(px,py,ww,hh,obj.t')<script.indexOf('drawBuildingApproach(px,py,ww,hh,x,y,obj.t'));
  assert.deepEqual(scene(3,80,1,.2),scene(3,80,1,.2));
- assert.doesNotMatch(source,/save\(|passable\(|assignRoute\(/);
+ assert.doesNotMatch(source,/\b(?:assignRoute|passable|localStorage)\s*\(/);
 });
