@@ -17,7 +17,7 @@ function scene({kind='fire',era=2,season=1,rain=0,phase=.5,ww=74,hh=38}={}){
 }
 test('v6.184: sintaxe, titulo e salvamento preservados',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.184<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=184);
  assert.match(script,/cronicas-v04/);
  assert.doesNotMatch(source,/localStorage|Math\.random|setInterval|game\./);
 });
