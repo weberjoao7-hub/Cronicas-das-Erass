@@ -2,11 +2,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const between=(a,b)=>{const s=html.indexOf(a),e=html.indexOf(b,s+a.length);assert.ok(s>=0&&e>s);return html.slice(s,e)};
-const code=between('function drawFarm(','function drawMine(');
+const code=between('// v6.204: o ciclo agricola','function drawMine(');
+const forestSeason=day=>Math.floor(((((Math.floor(day)-1)%32)+32)%32)/8);
 function render(zoom,level,now=2500){
  const ops=[],ctx=new Proxy({},{get:(o,k)=>k in o?o[k]:(...args)=>{ops.push([k,...args])},set:(o,k,v)=>(o[k]=v,true)});
- const draw=new Function('ctx','scale',code+';return drawFarm')(ctx,zoom);
- draw(200,180,34*zoom,18*zoom,level,now);
+ const draw=new Function('ctx','scale','forestSeason',code+';return drawFarm')(ctx,zoom,forestSeason);
+ draw(200,180,34*zoom,18*zoom,level,now,15);
  return ops;
 }
 test('main browser script parses',()=>assert.doesNotThrow(()=>new Function(html.split('<script>')[1].split('</script>')[0])));
