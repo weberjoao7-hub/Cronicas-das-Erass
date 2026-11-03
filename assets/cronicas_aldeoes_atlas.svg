@@ -30,6 +30,16 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <!-- v6.198: layered diagonal harness, embroidered hem and brass fastening. -->
+ <path d="M22 44 Q28 48 35 60" stroke="#3c2c22" stroke-width="4.1" fill="none" stroke-linecap="round"/>
+ <path d="M22 44 Q28 48 35 60" stroke="#b28b5b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+ <path d="M23 46 L25 47 M27 49 L29 50 M31 53 L33 55" stroke="#e4c390" stroke-width=".7" fill="none" opacity=".8"/>
+ <path d="M20.8 67 Q29 71 37.6 66" stroke="#e3c38c" stroke-width=".9" fill="none" opacity=".76"/>
+ <path d="M23 68 L24 66 M27 69 L28 67 M31 69 L32 67 M35 68 L36 66" stroke="#d1ae77" stroke-width=".75"/>
+ <rect x="32.4" y="56.6" width="4.4" height="4.1" rx=".8" fill="#cba660" stroke="#604b31" stroke-width=".75"/>
+ <path d="M33.5 58.6 L35.6 58.6" stroke="#fff0b3" stroke-width=".75"/>
+ <!-- Slightly offset tunic fold follows each walking pose. -->
+ <path d="M24 52 Q26 59 24.5 65" stroke="#f0d8a6" stroke-width=".8" fill="none" opacity=".52"/>
  <!-- Wood-handled hatchet strapped to the pack, safely behind the head. -->
  <path d="M13 42 L8 29" stroke="#8d5c37" stroke-width="2.3" stroke-linecap="round"/>
  <path d="M6 27 Q11 23 15 26 L14 31 Q10 28 7 33Z" fill="url(#metal)" stroke="#51616a" stroke-width=".8"/>
@@ -45,6 +55,12 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <!-- v6.198: woven hat crown, leather band, individual stitch marks. -->
+ <path d="M22 20 Q29 17 38 21" stroke="#4e3526" stroke-width="2.3" fill="none"/>
+ <path d="M22 20 Q29 17 38 21" stroke="#d3a46b" stroke-width=".95" fill="none"/>
+ <path d="M24 16 L25 19 M28 15 L29 18 M32 16 L33 19" stroke="#d8af78" stroke-width=".65" opacity=".85"/>
+ <path d="M18 26 Q27 28 40 26" stroke="#e0b57b" stroke-width=".8" fill="none" opacity=".7"/>
+ <rect x="31.5" y="18.2" width="2.5" height="2.5" rx=".45" fill="#d4b272" stroke="#64482e" stroke-width=".5"/>
  </g>
 <g transform="translate(56 1)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -71,6 +87,16 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <!-- v6.198: layered diagonal harness, embroidered hem and brass fastening. -->
+ <path d="M22 44 Q28 48 35.25 60" stroke="#3c2c22" stroke-width="4.1" fill="none" stroke-linecap="round"/>
+ <path d="M22 44 Q28 48 35.25 60" stroke="#b28b5b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+ <path d="M23 46 L25 47 M27 49 L29 50 M31 53 L33 55" stroke="#e4c390" stroke-width=".7" fill="none" opacity=".8"/>
+ <path d="M20.8 67 Q29 71 37.6 66" stroke="#e3c38c" stroke-width=".9" fill="none" opacity=".76"/>
+ <path d="M23 68 L24 66 M27 69 L28 67 M31 69 L32 67 M35 68 L36 66" stroke="#d1ae77" stroke-width=".75"/>
+ <rect x="32.65" y="56.6" width="4.4" height="4.1" rx=".8" fill="#cba660" stroke="#604b31" stroke-width=".75"/>
+ <path d="M33.75 58.6 L35.85 58.6" stroke="#fff0b3" stroke-width=".75"/>
+ <!-- Slightly offset tunic fold follows each walking pose. -->
+ <path d="M24.25 52 Q26.25 59 24.75 65" stroke="#f0d8a6" stroke-width=".8" fill="none" opacity=".52"/>
  <!-- Wood-handled hatchet strapped to the pack, safely behind the head. -->
  <path d="M13 42 L8 29" stroke="#8d5c37" stroke-width="2.3" stroke-linecap="round"/>
  <path d="M6 27 Q11 23 15 26 L14 31 Q10 28 7 33Z" fill="url(#metal)" stroke="#51616a" stroke-width=".8"/>
@@ -86,6 +112,12 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <!-- v6.198: woven hat crown, leather band, individual stitch marks. -->
+ <path d="M22 20 Q29 17 38 21" stroke="#4e3526" stroke-width="2.3" fill="none"/>
+ <path d="M22 20 Q29 17 38 21" stroke="#d3a46b" stroke-width=".95" fill="none"/>
+ <path d="M24.3 16 L25.3 19 M28.3 15 L29.3 18 M32.3 16 L33.3 19" stroke="#d8af78" stroke-width=".65" opacity=".85"/>
+ <path d="M18 26 Q27 28 40 26" stroke="#e0b57b" stroke-width=".8" fill="none" opacity=".7"/>
+ <rect x="31.8" y="18.2" width="2.5" height="2.5" rx=".45" fill="#d4b272" stroke="#64482e" stroke-width=".5"/>
  </g>
 <g transform="translate(112 -1)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -112,6 +144,16 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <!-- v6.198: layered diagonal harness, embroidered hem and brass fastening. -->
+ <path d="M22 44 Q28 48 35.7 60" stroke="#3c2c22" stroke-width="4.1" fill="none" stroke-linecap="round"/>
+ <path d="M22 44 Q28 48 35.7 60" stroke="#b28b5b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+ <path d="M23 46 L25 47 M27 49 L29 50 M31 53 L33 55" stroke="#e4c390" stroke-width=".7" fill="none" opacity=".8"/>
+ <path d="M20.8 67 Q29 71 37.6 66" stroke="#e3c38c" stroke-width=".9" fill="none" opacity=".76"/>
+ <path d="M23 68 L24 66 M27 69 L28 67 M31 69 L32 67 M35 68 L36 66" stroke="#d1ae77" stroke-width=".75"/>
+ <rect x="33.1" y="56.6" width="4.4" height="4.1" rx=".8" fill="#cba660" stroke="#604b31" stroke-width=".75"/>
+ <path d="M34.2 58.6 L36.300000000000004 58.6" stroke="#fff0b3" stroke-width=".75"/>
+ <!-- Slightly offset tunic fold follows each walking pose. -->
+ <path d="M24.7 52 Q26.7 59 25.2 65" stroke="#f0d8a6" stroke-width=".8" fill="none" opacity=".52"/>
  <!-- Wood-handled hatchet strapped to the pack, safely behind the head. -->
  <path d="M13 42 L8 29" stroke="#8d5c37" stroke-width="2.3" stroke-linecap="round"/>
  <path d="M6 27 Q11 23 15 26 L14 31 Q10 28 7 33Z" fill="url(#metal)" stroke="#51616a" stroke-width=".8"/>
@@ -127,6 +169,12 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <!-- v6.198: woven hat crown, leather band, individual stitch marks. -->
+ <path d="M22 20 Q29 17 38 21" stroke="#4e3526" stroke-width="2.3" fill="none"/>
+ <path d="M22 20 Q29 17 38 21" stroke="#d3a46b" stroke-width=".95" fill="none"/>
+ <path d="M24.7 16 L25.7 19 M28.7 15 L29.7 18 M32.7 16 L33.7 19" stroke="#d8af78" stroke-width=".65" opacity=".85"/>
+ <path d="M18 26 Q27 28 40 26" stroke="#e0b57b" stroke-width=".8" fill="none" opacity=".7"/>
+ <rect x="32.2" y="18.2" width="2.5" height="2.5" rx=".45" fill="#d4b272" stroke="#64482e" stroke-width=".5"/>
  </g>
 <g transform="translate(168 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -153,6 +201,16 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <!-- v6.198: layered diagonal harness, embroidered hem and brass fastening. -->
+ <path d="M22 44 Q28 48 34.55 60" stroke="#3c2c22" stroke-width="4.1" fill="none" stroke-linecap="round"/>
+ <path d="M22 44 Q28 48 34.55 60" stroke="#b28b5b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+ <path d="M23 46 L25 47 M27 49 L29 50 M31 53 L33 55" stroke="#e4c390" stroke-width=".7" fill="none" opacity=".8"/>
+ <path d="M20.8 67 Q29 71 37.6 66" stroke="#e3c38c" stroke-width=".9" fill="none" opacity=".76"/>
+ <path d="M23 68 L24 66 M27 69 L28 67 M31 69 L32 67 M35 68 L36 66" stroke="#d1ae77" stroke-width=".75"/>
+ <rect x="31.95" y="56.6" width="4.4" height="4.1" rx=".8" fill="#cba660" stroke="#604b31" stroke-width=".75"/>
+ <path d="M33.05 58.6 L35.15 58.6" stroke="#fff0b3" stroke-width=".75"/>
+ <!-- Slightly offset tunic fold follows each walking pose. -->
+ <path d="M23.55 52 Q25.55 59 24.05 65" stroke="#f0d8a6" stroke-width=".8" fill="none" opacity=".52"/>
  <!-- Wood-handled hatchet strapped to the pack, safely behind the head. -->
  <path d="M13 42 L8 29" stroke="#8d5c37" stroke-width="2.3" stroke-linecap="round"/>
  <path d="M6 27 Q11 23 15 26 L14 31 Q10 28 7 33Z" fill="url(#metal)" stroke="#51616a" stroke-width=".8"/>
@@ -168,6 +226,12 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <!-- v6.198: woven hat crown, leather band, individual stitch marks. -->
+ <path d="M22 20 Q29 17 38 21" stroke="#4e3526" stroke-width="2.3" fill="none"/>
+ <path d="M22 20 Q29 17 38 21" stroke="#d3a46b" stroke-width=".95" fill="none"/>
+ <path d="M23.5 16 L24.5 19 M27.5 15 L28.5 18 M31.5 16 L32.5 19" stroke="#d8af78" stroke-width=".65" opacity=".85"/>
+ <path d="M18 26 Q27 28 40 26" stroke="#e0b57b" stroke-width=".8" fill="none" opacity=".7"/>
+ <rect x="31" y="18.2" width="2.5" height="2.5" rx=".45" fill="#d4b272" stroke="#64482e" stroke-width=".5"/>
  </g>
 <g transform="translate(224 -1)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -194,6 +258,16 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <!-- v6.198: layered diagonal harness, embroidered hem and brass fastening. -->
+ <path d="M22 44 Q28 48 34.2 60" stroke="#3c2c22" stroke-width="4.1" fill="none" stroke-linecap="round"/>
+ <path d="M22 44 Q28 48 34.2 60" stroke="#b28b5b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+ <path d="M23 46 L25 47 M27 49 L29 50 M31 53 L33 55" stroke="#e4c390" stroke-width=".7" fill="none" opacity=".8"/>
+ <path d="M20.8 67 Q29 71 37.6 66" stroke="#e3c38c" stroke-width=".9" fill="none" opacity=".76"/>
+ <path d="M23 68 L24 66 M27 69 L28 67 M31 69 L32 67 M35 68 L36 66" stroke="#d1ae77" stroke-width=".75"/>
+ <rect x="31.599999999999998" y="56.6" width="4.4" height="4.1" rx=".8" fill="#cba660" stroke="#604b31" stroke-width=".75"/>
+ <path d="M32.7 58.6 L34.800000000000004 58.6" stroke="#fff0b3" stroke-width=".75"/>
+ <!-- Slightly offset tunic fold follows each walking pose. -->
+ <path d="M23.2 52 Q25.2 59 23.7 65" stroke="#f0d8a6" stroke-width=".8" fill="none" opacity=".52"/>
  <!-- Wood-handled hatchet strapped to the pack, safely behind the head. -->
  <path d="M13 42 L8 29" stroke="#8d5c37" stroke-width="2.3" stroke-linecap="round"/>
  <path d="M6 27 Q11 23 15 26 L14 31 Q10 28 7 33Z" fill="url(#metal)" stroke="#51616a" stroke-width=".8"/>
@@ -209,6 +283,12 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <!-- v6.198: woven hat crown, leather band, individual stitch marks. -->
+ <path d="M22 20 Q29 17 38 21" stroke="#4e3526" stroke-width="2.3" fill="none"/>
+ <path d="M22 20 Q29 17 38 21" stroke="#d3a46b" stroke-width=".95" fill="none"/>
+ <path d="M23.2 16 L24.2 19 M27.2 15 L28.2 18 M31.2 16 L32.2 19" stroke="#d8af78" stroke-width=".65" opacity=".85"/>
+ <path d="M18 26 Q27 28 40 26" stroke="#e0b57b" stroke-width=".8" fill="none" opacity=".7"/>
+ <rect x="30.7" y="18.2" width="2.5" height="2.5" rx=".45" fill="#d4b272" stroke="#64482e" stroke-width=".5"/>
  </g>
 <g transform="translate(280 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -235,6 +315,16 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <!-- v6.198: layered diagonal harness, embroidered hem and brass fastening. -->
+ <path d="M22 44 Q28 48 35.15 60" stroke="#3c2c22" stroke-width="4.1" fill="none" stroke-linecap="round"/>
+ <path d="M22 44 Q28 48 35.15 60" stroke="#b28b5b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+ <path d="M23 46 L25 47 M27 49 L29 50 M31 53 L33 55" stroke="#e4c390" stroke-width=".7" fill="none" opacity=".8"/>
+ <path d="M20.8 67 Q29 71 37.6 66" stroke="#e3c38c" stroke-width=".9" fill="none" opacity=".76"/>
+ <path d="M23 68 L24 66 M27 69 L28 67 M31 69 L32 67 M35 68 L36 66" stroke="#d1ae77" stroke-width=".75"/>
+ <rect x="32.55" y="56.6" width="4.4" height="4.1" rx=".8" fill="#cba660" stroke="#604b31" stroke-width=".75"/>
+ <path d="M33.65 58.6 L35.75 58.6" stroke="#fff0b3" stroke-width=".75"/>
+ <!-- Slightly offset tunic fold follows each walking pose. -->
+ <path d="M24.15 52 Q26.15 59 24.65 65" stroke="#f0d8a6" stroke-width=".8" fill="none" opacity=".52"/>
  <!-- Wood-handled hatchet strapped to the pack, safely behind the head. -->
  <path d="M13 42 L8 29" stroke="#8d5c37" stroke-width="2.3" stroke-linecap="round"/>
  <path d="M6 27 Q11 23 15 26 L14 31 Q10 28 7 33Z" fill="url(#metal)" stroke="#51616a" stroke-width=".8"/>
@@ -250,5 +340,11 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <!-- v6.198: woven hat crown, leather band, individual stitch marks. -->
+ <path d="M22 20 Q29 17 38 21" stroke="#4e3526" stroke-width="2.3" fill="none"/>
+ <path d="M22 20 Q29 17 38 21" stroke="#d3a46b" stroke-width=".95" fill="none"/>
+ <path d="M24.2 16 L25.2 19 M28.2 15 L29.2 18 M32.2 16 L33.2 19" stroke="#d8af78" stroke-width=".65" opacity=".85"/>
+ <path d="M18 26 Q27 28 40 26" stroke="#e0b57b" stroke-width=".8" fill="none" opacity=".7"/>
+ <rect x="31.7" y="18.2" width="2.5" height="2.5" rx=".45" fill="#d4b272" stroke="#64482e" stroke-width=".5"/>
  </g>
 </svg>
