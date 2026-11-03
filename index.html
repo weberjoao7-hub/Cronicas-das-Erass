@@ -5264,7 +5264,69 @@ function drawFisheryHut(px,py,ww,hh,era,level){
   ctx.beginPath();ctx.moveTo(...p(.08,-.76));ctx.lineTo(...p(.08,-1.38));ctx.stroke();
   face([[.08,-1.37],[.27,-1.30],[.08,-1.20]],e>=6?'#e9c973':'#e0a760');
  }
+ drawFisheryCraftDetails(px,py,ww,hh,e,lv);
  ctx.restore();
+}
+
+// v6.191: acabamento da casa de pesca — telhas, rede estendida e boias no cais.
+// Detalhes locais ao Canvas, sem estado persistente nem chamadas de rede.
+function drawFisheryCraftDetails(px,py,ww,hh,era=0,level=1){
+ if(ww<42||hh<=0)return 0;
+ const e=Math.max(0,Math.min(7,era|0)),modern=e>=6;
+ const p=(x,y)=>[px+x*ww,py+y*hh];
+ const stroke=(a,b,color,width)=>{
+  ctx.strokeStyle=color;ctx.lineWidth=width;
+  ctx.beginPath();ctx.moveTo(...p(...a));ctx.lineTo(...p(...b));ctx.stroke();
+ };
+ ctx.save();ctx.lineCap='round';
+ const seam=modern?'#b3d0d2':e>=4?'#d4b99c':'#e2c48c';
+ const edge=modern?'#3a535b':e>=4?'#513b30':'#675338';
+ // Fileiras de telhas acompanham as duas aguas da cobertura isometrica.
+ for(let row=1;row<=3;row++){
+  const t=row/4;
+  stroke([-.50,-.78-.39*t],[-.17,-.52-.43*t],seam,Math.max(.6,ww*.009));
+  stroke([-.17,-.52-.43*t],[.15,-.78-.39*t],seam,Math.max(.6,ww*.009));
+ }
+ stroke([-.50,-1.17],[-.17,-.95],edge,Math.max(1,ww*.024));
+ stroke([-.17,-.95],[.15,-1.17],edge,Math.max(1,ww*.024));
+ if(ww>=64){
+  // Juntas desencontradas: mantem leitura de telhas sem textura externa.
+  for(let row=0;row<3;row++){
+   const t=(row+.5)/4;
+   for(let col=1;col<=3;col++){
+    const u=(col+(row%2)*.5)/4;
+    if(u>=1)continue;
+    const x=-.50+.33*u,y=-.78+.26*u-(.39+.04*u)*t;
+    stroke([x,y],[x-.006,y-.062],edge,Math.max(.55,ww*.006));
+    const xr=-.17+.32*u,yr=-.52-.26*u-(.43-.04*u)*t;
+    stroke([xr,yr],[xr+.006,yr-.062],edge,Math.max(.55,ww*.006));
+   }
+  }
+ }
+ // Cavalete lateral e rede suspensa: o pescador usa a estrutura de verdade.
+ const timber=modern?'#6f8588':'#6c4d30',rope=modern?'#b2c7c7':'#c6ad7d';
+ stroke([.15,.34],[.15,-.14],timber,Math.max(1.1,ww*.025));
+ stroke([.45,.42],[.45,-.04],timber,Math.max(1.1,ww*.025));
+ stroke([.15,-.14],[.45,-.04],timber,Math.max(1,ww*.018));
+ const net=modern?'#8db2b3':'#b8aa84';
+ for(let i=0;i<=5;i++){
+  const t=i/5,x=.15+.30*t,y=-.09+.10*t;
+  stroke([x,y],[x+.018,y+.31],net,Math.max(.55,ww*.007));
+ }
+ for(let j=1;j<=3;j++){
+  const t=j/4;
+  stroke([.15+.018*t,-.09+.31*t],[.45+.018*t,.01+.31*t],net,Math.max(.55,ww*.007));
+ }
+ if(ww>=55){
+  const buoy=modern?'#e8aa48':'#d46f42';
+  ctx.fillStyle=buoy;
+  for(let i=0;i<(level>=2?3:2);i++){
+   const [bx,by]=p(.19+i*.10,.025+i*.032);
+   ctx.beginPath();ctx.ellipse(bx,by,Math.max(1.3,ww*.021),Math.max(1.1,hh*.043),0,0,Math.PI*2);ctx.fill();
+  }
+  stroke([.18,.01],[.19,.07],rope,Math.max(.6,ww*.007));
+ }
+ ctx.restore();return 1;
 }
 
 // v6.100: atividade portuaria em perspectiva, ligada ao ciclo real da embarcacao.
