@@ -23,6 +23,8 @@ test('each of four professions has one workwear layer per animation pose',()=>{
   const job=jobs[Math.floor(i/4)];
   assert.equal((frame.match(/data-detail="workwear-(?:wood|stone|farm|build)"/g)||[]).length,1);
   assert.ok(frame.includes('data-detail="workwear-'+job+'"'));
+  assert.equal((frame.match(/data-detail="profession-hat-/g)||[]).length,1);
+  assert.ok(frame.includes('data-detail="profession-hat-'+job+'"'));
   assert.match(frame,new RegExp('Animated '+job+' pose '+(i%4)));
  });
 });
