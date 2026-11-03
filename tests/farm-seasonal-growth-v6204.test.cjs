@@ -53,7 +53,7 @@ test('inverno apresenta faixas de neve sem feixes de colheita',()=>{
 test('LOD: neve reduz detalhes no zoom distante e mantem custo limitado',()=>{
  const far=scene(),medium=scene(),near=scene();
  far.drawFarm(100,100,22,11,1,1000,26,1,1);
- medium.drawFarm(100,100,48,24,1,1000,26,1,1);
+ medium.drawFarm(100,100,36,18,1,1000,26,1,1);
  near.drawFarm(100,100,80,40,1,1000,26,1,1);
  assert.ok(!far.styles.includes('#dbe6dfad'));
  assert.ok(medium.styles.includes('#dbe6dfad'));
