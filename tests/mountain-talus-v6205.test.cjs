@@ -29,7 +29,7 @@ test('v6.205: sintaxe JavaScript e salvamentos anteriores preservados',()=>{
 });
 test('LOD limita o numero de leques rochosos e custo no Safari',()=>{
  const far=scene(40),medium=scene(62),near=scene(80),close=scene(100);
- assert.deepEqual([far.count,medium.count,near.count,close.count],[0,3,5,7]);
+ assert.deepEqual([far.count,medium.count,near.count,close.count],[0,1,2,3]);
  assert.equal(far.calls.length,0);
  assert.ok(medium.calls.length<near.calls.length&&near.calls.length<close.calls.length);
  assert.ok(close.calls.length<300,'limite de operacoes por terreno');
