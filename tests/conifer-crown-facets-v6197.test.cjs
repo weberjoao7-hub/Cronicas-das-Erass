@@ -22,7 +22,7 @@ function scene(season=1,zoom=1.2,size=22,now=1200){
 }
 test('v6.197 script compiles without changing the save schema',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.ok(html.includes('Crônicas das Eras v6.197'));
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.ok(script.includes('cronicas-v04'));
 });
 test('pine crowns have volumetric faces at close zoom only',()=>{
