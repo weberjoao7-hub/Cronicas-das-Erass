@@ -8227,6 +8227,70 @@ function drawGroundLightPool(px,py,ww,hh,kind='fire',era=0,season=0,rain=0,now=D
  }
  ctx.restore();return 1;
 }
+// v6.202: janelas iluminadas e reflexos isometricos das residencias.
+// Apenas visual: sem novas entidades, colisoes ou mudancas no save cronicas-v04.
+// LOD, horario e variacao deterministica limitam o custo no Safari iPhone.
+function residenceNightLightLevel(phase,seed=0){
+ if(!Number.isFinite(phase)||!Number.isFinite(seed)||Math.abs(Math.trunc(seed))%13===0)return 0;
+ const light=lightLevels(phase);
+ return Math.max(0,Math.min(1,light.night+light.dusk*.27));
+}
+function drawResidenceGroundLight(px,py,ww,hh,era=0,season=0,rain=0,now=Date.now(),seed=1,phase=(dayClock%120)/120){
+ if(![px,py,ww,hh,era,season,rain,now,seed,phase].every(Number.isFinite)||ww<46||hh<=0)return 0;
+ const intensity=residenceNightLightLevel(phase,seed);
+ if(intensity<.12)return 0;
+ const cool=era>=7,glow=cool?'#9eddf0':'#fbc27a';
+ const flicker=cool?1:.94+.06*Math.sin(now*.008+seed*.37);
+ const x=px+ww*.24,y=py+hh*.145;
+ ctx.save();ctx.fillStyle=glow;
+ for(let i=0;i<3;i++){
+  const size=1-i*.26;
+  ctx.globalAlpha=intensity*flicker*(.065+i*.036);
+  ctx.beginPath();ctx.ellipse(x,y,ww*.30*size,hh*.18*size,-.12,0,Math.PI*2);ctx.fill();
+ }
+ if(ww>=66&&season===3){
+  ctx.globalAlpha=intensity*.28;ctx.strokeStyle=cool?'#e4f8ff':'#fff0cc';
+  ctx.lineWidth=Math.max(.7,ww*.010);ctx.beginPath();
+  ctx.ellipse(x+ww*.08,y+hh*.055,ww*.12,hh*.035,-.12,0,Math.PI);ctx.stroke();
+ }else if(ww>=66&&rain>.35){
+  ctx.globalAlpha=intensity*Math.min(1,rain)*.24;ctx.strokeStyle=glow;
+  ctx.lineWidth=Math.max(.7,ww*.009);ctx.beginPath();
+  ctx.moveTo(x-ww*.11,y+hh*.075);ctx.lineTo(x+ww*.12,y+hh*.055);ctx.stroke();
+ }
+ ctx.restore();return 1;
+}
+function drawResidenceLitWindows(px,py,ww,hh,era=0,seed=1,now=Date.now(),phase=(dayClock%120)/120){
+ if(![px,py,ww,hh,era,seed,now,phase].every(Number.isFinite)||ww<34||hh<=0)return 0;
+ const intensity=residenceNightLightLevel(phase,seed);
+ if(intensity<.12)return 0;
+ // Quadrilateros internos acompanham as esquadrias das fachadas existentes.
+ const windows=era<2?
+  [[[.122,-.47],[.205,-.53],[.205,-.64],[.122,-.58]]]:
+  [[[-.218,-.496],[-.117,-.413],[-.117,-.632],[-.218,-.715]],
+   [[.143,-.44],[.227,-.51],[.227,-.75],[.143,-.68]]];
+ const cool=era>=7,lit=cool?'#b9edff':'#ffd58c';
+ const edge=cool?'#7bc5dc':'#e6aa5b';
+ const flicker=cool?1:.95+.05*Math.sin(now*.009+seed*.41);
+ let count=0;ctx.save();ctx.lineJoin='round';
+ for(let i=0;i<windows.length;i++){
+  if(i===0&&era>=2&&Math.abs(Math.trunc(seed))%11===0)continue;
+  const corners=windows[i],p=(a)=>[px+a[0]*ww,py+a[1]*hh];
+  ctx.globalAlpha=intensity*flicker*.83;
+  ctx.fillStyle=lit;ctx.beginPath();ctx.moveTo(...p(corners[0]));
+  for(let j=1;j<corners.length;j++)ctx.lineTo(...p(corners[j]));
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle=edge;ctx.lineWidth=Math.max(.65,ww*.012);ctx.stroke();
+  if(ww>=55){
+   const mid=(a,b)=>[(a[0]+b[0])*.5,(a[1]+b[1])*.5];
+   ctx.globalAlpha=intensity*.78;ctx.strokeStyle=cool?'#5e8794':'#91663e';
+   ctx.lineWidth=Math.max(.7,ww*.010);ctx.beginPath();
+   ctx.moveTo(...p(mid(corners[0],corners[1])));
+   ctx.lineTo(...p(mid(corners[3],corners[2])));ctx.stroke();
+  }
+  count++;
+ }
+ ctx.restore();return count;
+}
 function drawRoadLantern(px,py,ww,hh,x,y,era=game.era,now=Date.now()){
  if(era<4||ww<35)return;
  const stage=Math.min(7,Math.max(4,era|0)),lx=px+ww*.22,ly=py+hh*.11;
@@ -10846,6 +10910,7 @@ if(structureActors){
 }
 if(obj&&!obj.buildLeft&&(obj.t==='Aldeia'||obj.t==='Quartel')&&typeof drawGroundLightPool==='function')
  drawGroundLightPool(px,py,ww,hh,'fire',game.era,forestSeason(),rainLevel,frameTime);
+if(obj&&!obj.buildLeft&&obj.t==='Cabana')drawResidenceGroundLight(px,py,ww,hh,game.era,forestSeason(),rainLevel,frameTime,x*97+y*13);
 if(obj&&!obj.buildLeft&&obj.t==='Cabana')drawResidenceYard(px,py,ww,hh,game.era,x*97+y*13);
  if(obj&&!obj.buildLeft)drawBuildingFoundation(px,py,ww,hh,obj.t,game.era,forestSeason(),rainLevel,x*97+y*13);
  if(obj&&!obj.buildLeft)drawBuildingApproach(px,py,ww,hh,x,y,obj.t,game.era,forestSeason(),rainLevel,roadTiles,settlementPaths);
@@ -10863,6 +10928,7 @@ else if(obj){
  else if(obj.t==='Aldeia'){drawVillageSquare(px,py,ww,hh,x,y);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'back');drawVillageLife(px,py,ww,hh,game.era,frameTime,'back',forestSeason(),visibleFog[y*W+x]);drawTownHall(px,py,ww,hh,false);drawTownHallEraDetails(px,py,ww,hh,game.era,frameTime);drawVillagePalisade(px,py,ww,hh,game.era,forestSeason(),frameTime,'front',game.units.some(u=>u.hp>0&&Array.isArray(u.path)&&u.path.length&&Math.hypot(u.x-(x+.85),u.y-(y+.85))<1.35));drawVillageStockpiles(px,py,ww,hh,game.era,game,forestSeason(),visibleFog[y*W+x]);drawVillageLife(px,py,ww,hh,game.era,frameTime,'front',forestSeason(),visibleFog[y*W+x]);if(ww>25)smoke(px-ww*.19,py-hh*.55,ww*.25,Date.now())}
  else if(obj.t==='Cabana')drawEraResidence(px,py,ww,hh,obj.level||1,x*97+y*13,game.era);
  else house(px,py,ww*.7,obj.t);
+  if(obj.t==='Cabana')drawResidenceLitWindows(px,py,ww,hh,game.era,x*97+y*13,frameTime);
   if(obj.t==='Quartel')drawBarracksForge(px,py,ww,hh,game.era,frameTime,forestSeason());
  if(obj.t==='Torre')drawWatchtowerSentry(px,py,ww,hh,game.era,frameTime,forestSeason(),x,y);
  if(obj.t==='Torre')drawWatchtowerParapetForeground(px,py,ww,hh,game.era);
