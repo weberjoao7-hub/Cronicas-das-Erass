@@ -82,6 +82,38 @@ const W=160,H=160,S=34;const M=document.getElementById("minimap"),mc=M.getContex
 let dpr=1,w=0,h=0,scale=1,cx=80,cy=80,selected=null,dirty=true,dragged=false;
 // Resolução Retina completa por padrão; reduzida apenas quando o Canvas permanece caro.
 let renderResolutionScale=1;
+// v6.195: a direção visual acompanha a última passada, inclusive após parar.
+// WeakMap guarda somente o instante da virada; não altera o formato do save.
+const unitTurnStamp=new WeakMap();
+function facingFromTravel(current,dx,dy){
+ const face=current===-1?-1:1;
+ if(!Number.isFinite(dx)||!Number.isFinite(dy))return face;
+ const length=Math.hypot(dx,dy);
+ if(length<.000001)return face;
+ const projected=dx-dy;
+ // Evita oscilar quando a marcha é quase vertical na projeção isométrica.
+ if(Math.abs(projected)<length*.12)return face;
+ return projected<0?-1:1;
+}
+function updateUnitFacing(u,dx,dy,now){
+ if(!u||typeof u!=='object')return 1;
+ const previous=u.face===-1?-1:1;
+ const next=facingFromTravel(previous,dx,dy);
+ if(next!==previous&&Number.isFinite(u.face))
+  unitTurnStamp.set(u,Number.isFinite(now)?now:Date.now());
+ u.face=next;
+ return next;
+}
+function atlasTurnMotion(u,now,mounted=false){
+ if(!u||!Number.isFinite(now))return null;
+ const started=unitTurnStamp.get(u);
+ if(!Number.isFinite(started))return null;
+ const age=now-started;
+ if(age<0||age>=230)return null;
+ const pulse=Math.sin(Math.PI*age/230);
+ return {lean:(u.face===-1?1:-1)*(mounted?.065:.095)*pulse,
+  stretch:1-(mounted?.025:.035)*pulse,age};
+}
 const eras=['Primordial','Tribal','Antiga','Clássica','Medieval','Renascença','Industrial','Contemporânea'];
 const rnd=(x,y,z=0)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
 const noise=(x,y,f)=>{let xx=x/f,yy=y/f,a=Math.floor(xx),b=Math.floor(yy),u=xx-a,v=yy-b;u=u*u*(3-2*u);v=v*v*(3-2*v);let l=(p,q)=>rnd(p,q);return (l(a,b)*(1-u)+l(a+1,b)*u)*(1-v)+(l(a,b+1)*(1-u)+l(a+1,b+1)*u)*v};
@@ -7365,38 +7397,6 @@ function atlasStrideMotion(u,moving,mounted=false){
  return {lean:Math.sin(phase)*(mounted?.020:.042),
   stretch:1+Math.cos(phase*2)*(mounted?.012:.021)};
 }
-// v6.195: a direção visual acompanha a última passada, inclusive após parar.
-// WeakMap guarda somente o instante da virada; não altera o formato do save.
-const unitTurnStamp=new WeakMap();
-function facingFromTravel(current,dx,dy){
- const face=current===-1?-1:1;
- if(!Number.isFinite(dx)||!Number.isFinite(dy))return face;
- const length=Math.hypot(dx,dy);
- if(length<.000001)return face;
- const projected=dx-dy;
- // Evita oscilar quando a marcha é quase vertical na projeção isométrica.
- if(Math.abs(projected)<length*.12)return face;
- return projected<0?-1:1;
-}
-function updateUnitFacing(u,dx,dy,now){
- if(!u||typeof u!=='object')return 1;
- const previous=u.face===-1?-1:1;
- const next=facingFromTravel(previous,dx,dy);
- if(next!==previous&&Number.isFinite(u.face))
-  unitTurnStamp.set(u,Number.isFinite(now)?now:Date.now());
- u.face=next;
- return next;
-}
-function atlasTurnMotion(u,now,mounted=false){
- if(!u||!Number.isFinite(now))return null;
- const started=unitTurnStamp.get(u);
- if(!Number.isFinite(started))return null;
- const age=now-started;
- if(age<0||age>=230)return null;
- const pulse=Math.sin(Math.PI*age/230);
- return {lean:(u.face===-1?1:-1)*(mounted?.065:.095)*pulse,
-  stretch:1-(mounted?.025:.035)*pulse,age};
-}
 const paintedCavalry=typeof Image==='function'?new Image():{complete:false,naturalWidth:0};
 if(typeof Image==='function')paintedCavalry.src='assets/cronicas_cavalaria_atlas.svg';
 // v6.144: impacto inclina o tronco sem trocar o atlas nem deslocar os pés.
@@ -7439,7 +7439,7 @@ function drawPaintedCavalry(u,px,py,z){
  const eraBand=Math.min(3,Math.max(0,Math.floor(game.era/2)));
  const w=44*z,h=44*z;
  ctx.save();ctx.translate(px,py);ctx.scale(direction,1);
- const turn=atlasTurnMotion(u,now,true);
+ const turn=typeof atlasTurnMotion==='function'?atlasTurnMotion(u,now,true):null;
  if(turn)ctx.transform(1,0,turn.lean,turn.stretch,0,0);
  const gait=typeof atlasStrideMotion==='function'?atlasStrideMotion(u,moving,true):null;
  if(gait)ctx.transform(1,0,gait.lean,gait.stretch,0,0);
@@ -7585,7 +7585,7 @@ function drawPaintedVillager(u,px,py,z,job,moving,now){
  const dir=target?((target.x-u.x)-(target.y-u.y)>=0?1:-1):(u.face===-1?-1:1);
  const w=24*z,h=w*104/56;
  ctx.save();ctx.translate(px,py);ctx.scale(dir,1);
- const turn=atlasTurnMotion(u,Date.now());
+ const turn=typeof atlasTurnMotion==='function'?atlasTurnMotion(u,Date.now()):null;
  if(turn)ctx.transform(1,0,turn.lean,turn.stretch,0,0);
  const gait=typeof atlasStrideMotion==='function'?atlasStrideMotion(u,moving,false):null;
  if(gait)ctx.transform(1,0,gait.lean,gait.stretch,0,0);
@@ -7600,7 +7600,7 @@ function drawPaintedWorkerAction(u,px,py,z,job,moving,now){
  const dir=u.face===-1?-1:1,w=24*z,h=w*104/56;
  drawWorkerTaskProps(px,py,z,job,now);
  ctx.save();ctx.translate(px,py);ctx.scale(dir,1);
- const turn=atlasTurnMotion(u,Date.now());
+ const turn=typeof atlasTurnMotion==='function'?atlasTurnMotion(u,Date.now()):null;
  if(turn)ctx.transform(1,0,turn.lean,turn.stretch,0,0);
  ctx.drawImage(paintedWorkerActions,frame*56,0,56,104,-w*.5,-h*.89,w,h);
  ctx.restore();return true;
@@ -7642,7 +7642,7 @@ function drawVillagerAtlas(u,px,py,z,job,moving,now){
  const w=26*z,h=w*64/48;
  drawWorkerTaskProps(px,py,z,job,now);
  ctx.save();ctx.translate(px,py);ctx.scale(dir,1);
- const turn=atlasTurnMotion(u,Date.now());
+ const turn=typeof atlasTurnMotion==='function'?atlasTurnMotion(u,Date.now()):null;
  if(turn)ctx.transform(1,0,turn.lean,turn.stretch,0,0);
  const gait=typeof atlasStrideMotion==='function'?atlasStrideMotion(u,moving,false):null;
  if(gait)ctx.transform(1,0,gait.lean,gait.stretch,0,0);
@@ -7664,7 +7664,7 @@ function drawPaintedTroop(u,px,py,z,archer,moving,striking,now,direction,enemy=f
    ctx.strokeStyle='#d85a50';ctx.lineWidth=Math.max(1.1,z*1.25);
    ctx.beginPath();ctx.ellipse(0,z*.6,w*.50,h*.095,0,0,Math.PI*2);ctx.stroke();
   }
-  const turn=atlasTurnMotion(u,Date.now());
+  const turn=typeof atlasTurnMotion==='function'?atlasTurnMotion(u,Date.now()):null;
   if(turn)ctx.transform(1,0,turn.lean,turn.stretch,0,0);
   const gait=typeof atlasStrideMotion==='function'?atlasStrideMotion(u,moving,false):null;
   if(gait)ctx.transform(1,0,gait.lean,gait.stretch,0,0);

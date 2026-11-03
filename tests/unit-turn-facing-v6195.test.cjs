@@ -7,7 +7,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'main script');
 const start=script.indexOf('// v6.195: a direção visual');
-const end=script.indexOf('const paintedCavalry=',start);
+const end=script.indexOf('const eras=',start);
 assert.ok(start>=0&&end>start,'facing and turn helpers');
 const source=script.slice(start,end);
 const {facingFromTravel,updateUnitFacing,atlasTurnMotion,unitTurnStamp}=
@@ -64,6 +64,6 @@ test('unchanged facing does not retrigger a pivot every frame',()=>{
 test('friendly and hostile movement both record the final facing',()=>{
  assert.match(script,/updateUnitFacing\(guard,dx,dy\);guard\.x=nx/);
  assert.match(script,/updateUnitFacing\(u,dx,dy\);u\.x\+=dx\/len\*step/);
- assert.ok((script.match(/const turn=atlasTurnMotion\(/g)||[]).length>=5);
- assert.match(script,/const turn=atlasTurnMotion\(u,now,true\)/);
+ assert.ok((script.match(/const turn=typeof atlasTurnMotion==='function'\?/g)||[]).length>=5);
+ assert.match(script,/atlasTurnMotion\(u,now,true\):null/);
 });
