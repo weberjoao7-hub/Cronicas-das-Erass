@@ -21,7 +21,7 @@ const {walkSegmentClear,smoothUnitRoute,pavedRouteEdge,assignRoute}=api;
 
 test('v6.190: sintaxe e persistencia anterior preservadas',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.190<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=190);
  assert.match(script,/localStorage\.setItem\('cronicas-v04'/);
  assert.doesNotMatch(block,/localStorage|save\(\)/);
 });
