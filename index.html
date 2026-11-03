@@ -9520,7 +9520,7 @@ function drawTowerShots(){
   const shot=towerShots[i],age=(now-shot.start)/480;
   if(age>=1){towerShots.splice(i,1);continue}
   if(shot.kind==='cannon'&&age>=2/3&&!shot.scorchRecorded){
-   shot.scorchRecorded=true;recordCannonScorch(shot.ex,shot.ey,now);
+   shot.scorchRecorded=true;if(typeof recordCannonScorch==='function')recordCannonScorch(shot.ex,shot.ey,now);
   }
   if(!visibleAt(shot.ex,shot.ey))continue;
   const [sx,sy]=point(shot.sx,shot.sy,shot.kind==='archer'?TH*.55:shot.kind==='cannon'?TH*.75:TH*1.6);
