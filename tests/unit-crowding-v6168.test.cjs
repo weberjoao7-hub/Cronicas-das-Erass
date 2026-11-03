@@ -26,13 +26,13 @@ test('stationary overlapping troops receive distinct ground-anchored screen posi
  assert.deepEqual(units,original,'world coordinates and paths are untouched');
  assert.deepEqual(anchors,units.map(u=>visualUnitScreenPoint(u,units,1)),'render is deterministic');
 });
-test('zoomed-out, moving, dead and isolated troops are never displaced',()=>{
+test('zoomed-out, isolated and dead troops stay put; marching crowds spread',()=>{
  const units=squad(2);
  assert.deepEqual(unitCrowdOffset(units[0],units,.6),[0,0]);
  assert.deepEqual(unitCrowdOffset(units[0],[units[0]],1),[0,0]);
- units[0].path=[{x:11,y:12}];
- assert.deepEqual(unitCrowdOffset(units[0],units,1),[0,0]);
- units[0].path=[];units[1].hp=0;
+ units[0].path=[{x:11,y:12}];units[1].path=[{x:11,y:12}];
+ assert.ok(Math.hypot(...unitCrowdOffset(units[0],units,1))>1);
+ units[0].path=[];units[1].path=[];units[1].hp=0;
  assert.deepEqual(unitCrowdOffset(units[0],units,1),[0,0]);
 });
 test('only nearby stationary units in the same tile can form a cluster',()=>{
