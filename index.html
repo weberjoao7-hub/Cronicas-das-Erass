@@ -11120,6 +11120,14 @@ function drawMeadowGrassTufts(px,py,ww,hh,x,y,b,season){
   if(Math.abs(ox)/(ww*.5)+Math.abs(oy)/(hh*.5)>.72)continue;
   const gx=px+ox,gy=py+oy;
   const size=Math.max(2.4,Math.min(5.2,ww*.042));
+  // v6.211: anchored contact shadow and small leaf blades ground each tuft in the tile.
+  // Keep the shadow below the stalks, with no extra detail at distant zoom.
+  if(ww>=92){
+   ctx.fillStyle=season===2?'#3b38251f':'#17331b29';
+   ctx.beginPath();
+   ctx.ellipse(gx+size*.12,gy+size*.11,size*1.12,size*.24,-.12,0,Math.PI*2);
+   ctx.fill();
+  }
   ctx.strokeStyle=season===2?'#8d8754':i%2?'#4b743a':'#719451';
   ctx.beginPath();
   ctx.moveTo(gx,gy);
