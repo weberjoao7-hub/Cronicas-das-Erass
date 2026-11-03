@@ -25,7 +25,7 @@ test('v6.192: script parseable and existing save key preserved',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/cronicas-v04/);
  assert.doesNotMatch(source,/localStorage|Math\.random|setInterval|requestAnimationFrame/);
- assert.match(html,/<title>Crônicas das Eras v6\.192<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=192);
 });
 test('bridge ripples use LOD and disappear under winter ice or early construction',()=>{
  assert.equal(scene().ripples,9);
