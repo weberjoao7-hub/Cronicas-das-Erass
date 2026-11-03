@@ -10,7 +10,7 @@ assert.ok(start>0&&end>start,'renderizador da cordilheira presente');
 const source=html.slice(start,end);
 const rnd=(x,y,z=0)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)};
 function render(x,y,ww,hh,biome=(x,y)=>((x+y)%5===0?4:5)){
- const calls=[],methods=new Set(['save','restore','beginPath','ellipse','fill','stroke','moveTo','lineTo','closePath']);
+ const calls=[],methods=new Set(['save','restore','beginPath','ellipse','fill','stroke','moveTo','lineTo','closePath','clip']);
  const ctx=new Proxy({},{get:(o,k)=>methods.has(k)?(...args)=>calls.push([k,...args]):o[k],set:(o,k,v)=>(o[k]=v,true)});
  const draw=new Function('ctx','biome','rnd',source+'return drawMountain')(ctx,biome,rnd);
  draw(200,180,ww,hh,x,y);
