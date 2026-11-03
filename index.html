@@ -11117,8 +11117,21 @@ function drawMeadowFlowers(px,py,ww,hh,x,y,b,season){
   const r=Math.max(.65,Math.min(2.1,ww*.019));
   ctx.fillStyle=season===2?'#b9a476':i%3===0?'#e5d7a2':i%3===1?'#d8b3a1':'#c8d9b4';
   ctx.globalAlpha=winterFade*(.62+.25*a);
-  ctx.beginPath();ctx.arc(px+ox,py+oy,r,0,Math.PI*2);ctx.fill();
-  if(ww>=70){ctx.strokeStyle='#547b42';ctx.lineWidth=Math.max(.65,r*.55);ctx.beginPath();ctx.moveTo(px+ox,py+oy+r);ctx.lineTo(px+ox-r*.3,py+oy+r*2.3);ctx.stroke()}
+  const fx=px+ox,fy=py+oy;
+  if(ww>=92&&season!==2){
+   // Four petals and a contrasting centre are only drawn at close zoom.
+   const petal=r*.82;
+   for(let p=0;p<4;p++){
+    const angle=p*Math.PI/2;
+    ctx.beginPath();ctx.arc(fx+Math.cos(angle)*petal,fy+Math.sin(angle)*petal,petal*.73,0,Math.PI*2);ctx.fill();
+   }
+   ctx.fillStyle='#e8b85d';ctx.beginPath();ctx.arc(fx,fy,r*.46,0,Math.PI*2);ctx.fill();
+  }else{ctx.beginPath();ctx.arc(fx,fy,r,0,Math.PI*2);ctx.fill();}
+  if(ww>=70){
+   ctx.strokeStyle='#547b42';ctx.lineWidth=Math.max(.65,r*.55);
+   ctx.beginPath();ctx.moveTo(fx,fy+r);ctx.lineTo(fx-r*.3,fy+r*2.3);ctx.stroke();
+   if(ww>=92){ctx.fillStyle='#63874a';ctx.beginPath();ctx.ellipse(fx-r*.55,fy+r*1.65,r*.65,r*.26,-.35,0,Math.PI*2);ctx.fill();}
+  }
  }
  ctx.restore();
 }
