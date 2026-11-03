@@ -44,9 +44,9 @@ test('luz e samambaias possuem LOD limitado',()=>{
 });
 test('outono e inverno mudam materiais sem folhas verdes na neve',()=>{
  const summer=scene(),autumn=scene(),winter=scene();
- summer.draw(100,100,80,40,15,20,1000,1,0);
- autumn.draw(100,100,80,40,15,20,1000,2,0);
- winter.draw(100,100,80,40,15,20,1000,3,0);
+ summer.draw(100,100,110,55,15,20,1000,1,0);
+ autumn.draw(100,100,110,55,15,20,1000,2,0);
+ winter.draw(100,100,110,55,15,20,1000,3,0);
  assert.ok(summer.styles.includes('#f5df9f')&&summer.styles.includes('#397349'));
  assert.ok(autumn.styles.includes('#e8bd79')&&autumn.styles.includes('#8a7943'));
  assert.ok(winter.styles.includes('#f0ecdc')&&!winter.styles.includes('#397349'));
