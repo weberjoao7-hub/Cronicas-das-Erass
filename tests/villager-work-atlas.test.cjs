@@ -34,7 +34,10 @@ test('script compila, atlas de tarefas é carregado e save legado permanece',()=
 test('atlas transparente contém 16 poses, 4 por tarefa',()=>{
  assert.match(svg,/<svg[^>]*width="896"[^>]*height="104"/);
  assert.ok(!/<(?:image|foreignObject|script)\b/i.test(svg),'sem recursos remotos ou scripts');
- const frames=[...svg.matchAll(/<g transform="translate\((\d+) 0\)">([\s\S]*?)<\/g>/g)];
+ // A frame may contain nested SVG groups (workwear, hats); do not stop at the first </g>.
+ const starts=[...svg.matchAll(/<g transform="translate\((\d+) 0\)">/g)];
+ const frames=starts.map((m,i)=>[m[0],m[1],svg.slice(m.index+m[0].length,
+  i+1<starts.length?starts[i+1].index:svg.lastIndexOf('</svg>'))]);
  assert.equal(frames.length,16);
  frames.forEach((frame,i)=>{
   assert.equal(Number(frame[1]),i*56);
