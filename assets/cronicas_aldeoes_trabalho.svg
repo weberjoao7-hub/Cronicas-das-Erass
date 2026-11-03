@@ -58,6 +58,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-wood"><path d="M17 26 Q29 23 41 26" stroke="#b77d46" stroke-width="3.2" fill="none"/><path d="M29 25 L32 22 L34 25" fill="#d3b06c" stroke="#60472a" stroke-width=".65"/></g>
  </g>
 <g transform="translate(56 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -111,6 +112,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-wood"><path d="M17 26 Q29 23 41 26" stroke="#b77d46" stroke-width="3.2" fill="none"/><path d="M29 25 L32 22 L34 25" fill="#d3b06c" stroke="#60472a" stroke-width=".65"/></g>
  </g>
 <g transform="translate(112 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -164,6 +166,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-wood"><path d="M17 26 Q29 23 41 26" stroke="#b77d46" stroke-width="3.2" fill="none"/><path d="M29 25 L32 22 L34 25" fill="#d3b06c" stroke="#60472a" stroke-width=".65"/></g>
  </g>
 <g transform="translate(168 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -217,6 +220,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-wood"><path d="M17 26 Q29 23 41 26" stroke="#b77d46" stroke-width="3.2" fill="none"/><path d="M29 25 L32 22 L34 25" fill="#d3b06c" stroke="#60472a" stroke-width=".65"/></g>
  </g>
 <g transform="translate(224 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -271,6 +275,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-stone"><path d="M17 26 Q29 23 41 26" stroke="#748a8d" stroke-width="3.2" fill="none"/><path d="M27 24 L33 24 L33 27 L27 27Z" fill="#d0d0c0" stroke="#485451" stroke-width=".7"/></g>
  </g>
 <g transform="translate(280 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -325,6 +330,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-stone"><path d="M17 26 Q29 23 41 26" stroke="#748a8d" stroke-width="3.2" fill="none"/><path d="M27 24 L33 24 L33 27 L27 27Z" fill="#d0d0c0" stroke="#485451" stroke-width=".7"/></g>
  </g>
 <g transform="translate(336 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -379,6 +385,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-stone"><path d="M17 26 Q29 23 41 26" stroke="#748a8d" stroke-width="3.2" fill="none"/><path d="M27 24 L33 24 L33 27 L27 27Z" fill="#d0d0c0" stroke="#485451" stroke-width=".7"/></g>
  </g>
 <g transform="translate(392 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -433,6 +440,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-stone"><path d="M17 26 Q29 23 41 26" stroke="#748a8d" stroke-width="3.2" fill="none"/><path d="M27 24 L33 24 L33 27 L27 27Z" fill="#d0d0c0" stroke="#485451" stroke-width=".7"/></g>
  </g>
 <g transform="translate(448 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -486,6 +494,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-farm"><path d="M17 26 Q29 23 41 26" stroke="#829e58" stroke-width="3.2" fill="none"/><path d="M32 25 L35 21 M32 25 L30 22" stroke="#ebc976" stroke-width="1.6" fill="none"/></g>
  </g>
 <g transform="translate(504 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -539,6 +548,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-farm"><path d="M17 26 Q29 23 41 26" stroke="#829e58" stroke-width="3.2" fill="none"/><path d="M32 25 L35 21 M32 25 L30 22" stroke="#ebc976" stroke-width="1.6" fill="none"/></g>
  </g>
 <g transform="translate(560 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -592,6 +602,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-farm"><path d="M17 26 Q29 23 41 26" stroke="#829e58" stroke-width="3.2" fill="none"/><path d="M32 25 L35 21 M32 25 L30 22" stroke="#ebc976" stroke-width="1.6" fill="none"/></g>
  </g>
 <g transform="translate(616 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -645,6 +656,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-farm"><path d="M17 26 Q29 23 41 26" stroke="#829e58" stroke-width="3.2" fill="none"/><path d="M32 25 L35 21 M32 25 L30 22" stroke="#ebc976" stroke-width="1.6" fill="none"/></g>
  </g>
 <g transform="translate(672 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -699,6 +711,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-build"><path d="M17 26 Q29 23 41 26" stroke="#c69652" stroke-width="3.2" fill="none"/><path d="M27 24 L34 24" stroke="#4d3527" stroke-width="1.5"/></g>
  </g>
 <g transform="translate(728 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -753,6 +766,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-build"><path d="M17 26 Q29 23 41 26" stroke="#c69652" stroke-width="3.2" fill="none"/><path d="M27 24 L34 24" stroke="#4d3527" stroke-width="1.5"/></g>
  </g>
 <g transform="translate(784 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -807,6 +821,7 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-build"><path d="M17 26 Q29 23 41 26" stroke="#c69652" stroke-width="3.2" fill="none"/><path d="M27 24 L34 24" stroke="#4d3527" stroke-width="1.5"/></g>
  </g>
 <g transform="translate(840 0)">
  <!-- Contact shadow is grounded at the character's feet, never a rectangular card. -->
@@ -861,5 +876,6 @@
  <path d="M22 23 L23 14 Q29 10 36 15 L39 24Z" fill="#765236" stroke="#3e2d21" stroke-width="1.2"/>
  <path d="M24 17 Q30 14 35 18" stroke="#bb8b55" stroke-width="1.2" opacity=".8" fill="none"/>
  <path d="M22 23 L38 24" stroke="#3f2c21" stroke-width="2"/>
+ <g data-detail="profession-hat-build"><path d="M17 26 Q29 23 41 26" stroke="#c69652" stroke-width="3.2" fill="none"/><path d="M27 24 L34 24" stroke="#4d3527" stroke-width="1.5"/></g>
  </g>
 </svg>
