@@ -12021,9 +12021,20 @@ function adjustRenderCadence(drawMs){
  adjustCanvasResolution(average,performance.now());
  return frameInterval;
 }
+// Safari pode restaurar a pagina pelo back-forward cache sem executar o bootstrap.
+// Recalcula o backing store Retina e o minimapa apos restauracao ou rotacao.
+function restoreViewportAfterResume(){
+ lastFrame=0;renderTick=0;minimapTick=0;dirty=true;
+ resize();redrawMinimap();
+}
 addEventListener('pagehide',save);
+addEventListener('pageshow',event=>{
+ if(event.persisted)restoreViewportAfterResume();
+});
+addEventListener('orientationchange',restoreViewportAfterResume);
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden)save();
+ else restoreViewportAfterResume();
  lastFrame=0;dirty=true;
 });
 // Bônus de deslocamento apenas nas arestas reais da rede viária.
