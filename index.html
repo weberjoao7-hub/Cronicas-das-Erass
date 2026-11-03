@@ -4326,6 +4326,64 @@ function drawBarracksForge(px,py,ww,hh,era=game.era,now=Date.now(),season=forest
 }
 
 
+// v6.207: portao de quartel com relevo, arco de pedra e ferragens por era.
+// Apenas geometria Canvas, sem novas entidades nem campos persistidos.
+function drawBarracksGateRelief(px,py,ww,hh,era=2){
+ if(![px,py,ww,hh,era].every(Number.isFinite)||ww<42||hh<13||era<2)return 0;
+ const industrial=era>=6,medieval=era>=4;
+ const left=px-ww*.094,right=px+ww*.094,base=py-hh*.025;
+ const spring=py-hh*.27,crown=py-hh*.49;
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+ // Folhas recortadas ao vao arqueado: nada invade a fachada.
+ ctx.beginPath();ctx.moveTo(left,base);ctx.lineTo(left,spring);
+ ctx.quadraticCurveTo(px,crown,right,spring);ctx.lineTo(right,base);
+ ctx.closePath();ctx.clip();
+ ctx.fillStyle='#182724';ctx.fillRect(left,py-hh*.55,right-left,hh*.56);
+ for(const side of [-1,1]){
+  const a=side<0?left:px,b=side<0?px:right;
+  ctx.fillStyle=side<0?(industrial?'#526a6b':medieval?'#76533e':'#946a42'):
+   (industrial?'#30484b':medieval?'#4c3329':'#60452f');
+  ctx.fillRect(a+ww*.003,py-hh*.51,b-a-ww*.006,hh*.49);
+  ctx.strokeStyle=industrial?'#93aeb0':'#bc9164';ctx.lineWidth=Math.max(.6,ww*.007);
+  if(ww>=58)for(let i=1;i<=2;i++){
+   const x=a+(b-a)*i/3;ctx.beginPath();
+   ctx.moveTo(x,py-hh*.49);ctx.lineTo(x,base);ctx.stroke();
+  }
+  ctx.strokeStyle=industrial?'#b7c9c9':'#41433b';ctx.lineWidth=Math.max(1,ww*.017);
+  for(const y of [py-hh*.18,py-hh*.065]){
+   ctx.beginPath();ctx.moveTo(a+ww*.008,y);ctx.lineTo(b-ww*.008,y);ctx.stroke();
+  }
+  if(ww>=72){
+   ctx.fillStyle=industrial?'#dce6df':'#d8c7a0';
+   for(const y of [py-hh*.18,py-hh*.065])
+    for(const x of [a+ww*.017,b-ww*.017]){
+     ctx.beginPath();ctx.arc(x,y,Math.max(.65,ww*.006),0,Math.PI*2);ctx.fill();
+    }
+  }
+ }
+ ctx.restore();
+ // Aro com borda sombreada e ressalto iluminado; pedra-chave no zoom proximo.
+ ctx.save();ctx.lineJoin='round';
+ ctx.strokeStyle=industrial?'#354e54':medieval?'#63584c':'#654b33';
+ ctx.lineWidth=Math.max(2,ww*.035);ctx.beginPath();
+ ctx.moveTo(left,base);ctx.lineTo(left,spring);
+ ctx.quadraticCurveTo(px,crown,right,spring);ctx.lineTo(right,base);ctx.stroke();
+ ctx.strokeStyle=industrial?'#b9cac5':medieval?'#d2c1a0':'#c9a777';
+ ctx.lineWidth=Math.max(1,ww*.013);ctx.beginPath();
+ ctx.moveTo(left-ww*.009,base);ctx.lineTo(left-ww*.009,spring);
+ ctx.quadraticCurveTo(px,crown-hh*.022,right+ww*.009,spring);
+ ctx.lineTo(right+ww*.009,base);ctx.stroke();
+ if(ww>=64){
+  ctx.fillStyle=industrial?'#a7bbbc':medieval?'#e2d1af':'#c9a77b';
+  ctx.beginPath();ctx.moveTo(px-ww*.025,crown+hh*.028);
+  ctx.lineTo(px,crown-hh*.07);ctx.lineTo(px+ww*.025,crown+hh*.028);
+  ctx.lineTo(px,crown+hh*.095);ctx.closePath();ctx.fill();
+  ctx.fillStyle=industrial?'#4e6466':'#665341';
+  ctx.fillRect(left-ww*.018,base,right-left+ww*.036,Math.max(1,hh*.045));
+ }
+ ctx.restore();return 1;
+}
+
 function drawBarracks(px,py,ww,hh,era=2,now=Date.now()){
  if(era<2)return drawTribalBarracks(px,py,ww,hh,era,now);
  const t=now*.002,poly=(pts,color,stroke)=>{
@@ -4354,6 +4412,7 @@ function drawBarracks(px,py,ww,hh,era=2,now=Date.now()){
  ctx.fillStyle='#2b2e2b';ctx.beginPath();ctx.moveTo(px-ww*.095,py-hh*.03);ctx.lineTo(px-ww*.095,py-hh*.27);ctx.quadraticCurveTo(px,py-hh*.52,px+ww*.095,py-hh*.27);ctx.lineTo(px+ww*.095,py-hh*.03);ctx.closePath();ctx.fill();
  ctx.fillStyle='#72583b';ctx.fillRect(px-ww*.064,py-hh*.25,ww*.128,hh*.24);
  ctx.strokeStyle='#d6b077';ctx.lineWidth=Math.max(.7,scale);ctx.beginPath();ctx.moveTo(px,py-hh*.24);ctx.lineTo(px,py-hh*.02);ctx.stroke();
+ drawBarracksGateRelief(px,py,ww,hh,era);
  // Torreoes nas duas extremidades, com merloes de pedra.
  for(const [x,y,shade] of [[-.34,-.43,'#aeb5a6'],[.32,-.43,'#899993']]){
   ctx.fillStyle='#233b38';ctx.beginPath();ctx.ellipse(px+x*ww,py+(y+.34)*hh,ww*.105,hh*.055,0,0,7);ctx.fill();
