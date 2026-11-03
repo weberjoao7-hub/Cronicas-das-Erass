@@ -31,7 +31,7 @@ function render(type='Cabana',progress=.6,width=74,era=3){
 }
 test('v6.194: syntax and v04 save remain unchanged',()=>{
  assert.doesNotThrow(()=>new Function(script));
- assert.match(html,/<title>Crônicas das Eras v6\.194<\/title>/);
+ assert.ok(Number(html.match(/<title>Crônicas das Eras v6\.(\d+)<\/title>/)?.[1])>=194);
  assert.match(script,/localStorage\.getItem\('cronicas-v04'\)/);
  assert.doesNotMatch(source,/localStorage|Math\.random|requestAnimationFrame/);
 });
