@@ -82,7 +82,7 @@ const W=160,H=160,S=34;const M=document.getElementById("minimap"),mc=M.getContex
 let dpr=1,w=0,h=0,scale=1,cx=80,cy=80,selected=null,dirty=true,dragged=false;
 // Resolução Retina completa por padrão; reduzida apenas quando o Canvas permanece caro.
 let renderResolutionScale=1;
-// v6.196: a direção visual acompanha a última passada, inclusive após parar.
+// v6.195: a direção visual acompanha a última passada, inclusive após parar.
 // WeakMap guarda somente o instante da virada; não altera o formato do save.
 const unitTurnStamp=new WeakMap();
 function facingFromTravel(current,dx,dy){
