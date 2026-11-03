@@ -9508,6 +9508,9 @@ function drawTowerShots(){
  for(let i=towerShots.length-1;i>=0;i--){
   const shot=towerShots[i],age=(now-shot.start)/480;
   if(age>=1){towerShots.splice(i,1);continue}
+  if(shot.kind==='cannon'&&age>=2/3&&!shot.scorchRecorded){
+   shot.scorchRecorded=true;recordCannonScorch(shot.ex,shot.ey,now);
+  }
   if(!visibleAt(shot.ex,shot.ey))continue;
   const [sx,sy]=point(shot.sx,shot.sy,shot.kind==='archer'?TH*.55:shot.kind==='cannon'?TH*.75:TH*1.6);
   const [ex,ey]=point(shot.ex,shot.ey,TH*.38);
@@ -9806,6 +9809,75 @@ function drawFormationStandard(px,py,z,era,now=Date.now()){
   }
  }
  ctx.restore();return 1;
+}
+// v6.193: marcas de artilharia integradas ao solo, limitadas e fora do save.
+const cannonScorches=[];
+const CANNON_SCORCH_LIFE=24000;
+function cannonScorchEligible(x,y,terrain,occupied=false){
+ return Number.isFinite(x)&&Number.isFinite(y)&&terrain!==0&&terrain!==5&&!occupied;
+}
+function recordCannonScorch(x,y,now=Date.now()){
+ if(!Number.isFinite(now))return false;
+ const tx=Math.floor(x),ty=Math.floor(y);
+ if(tx<0||ty<0||tx>=W||ty>=H||
+    !cannonScorchEligible(x,y,biome(tx,ty),
+     game.buildings.some(b=>b.x===tx&&b.y===ty)||
+     !!(game.enemy&&game.enemy.hp>0&&game.enemy.x===tx&&game.enemy.y===ty)))return false;
+ cannonScorches.push({x,y,at:now,seed:rnd(tx,ty,1607)});
+ if(cannonScorches.length>24)cannonScorches.shift();
+ return true;
+}
+function collectCannonScorches(bounds,now=Date.now()){
+ const tiles=new Map();
+ for(let i=cannonScorches.length-1;i>=0;i--){
+  const m=cannonScorches[i],age=now-m.at;
+  if(age<0||age>=CANNON_SCORCH_LIFE){cannonScorches.splice(i,1);continue}
+  const x=Math.floor(m.x),y=Math.floor(m.y);
+  if(x<bounds.minX||x>bounds.maxX||y<bounds.minY||y>bounds.maxY||
+     !visibleFog[y*W+x])continue;
+  const id=key(x,y);
+  if(!tiles.has(id))tiles.set(id,[]);
+  if(tiles.get(id).length<3)tiles.get(id).push(m);
+ }
+ return tiles;
+}
+function drawCannonScorchesTile(items,z,now=Date.now(),season=forestSeason()){
+ if(!items||z<.72||!Number.isFinite(z))return 0;
+ let drawn=0;
+ for(const m of items){
+  const age=now-m.at;
+  if(age<0||age>=CANNON_SCORCH_LIFE)continue;
+  const fade=Math.min(1,(CANNON_SCORCH_LIFE-age)/8000);
+  const [px,py]=point(m.x,m.y),r=z*(9+m.seed*3);
+  ctx.save();ctx.translate(px,py+z*2.2);ctx.rotate((m.seed-.5)*.30);
+  ctx.globalAlpha=fade*(season===3?.54:.83);
+  ctx.fillStyle=season===3?'#738086':'#342b24';
+  ctx.beginPath();ctx.ellipse(0,0,r*1.14,r*.42,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=season===3?'#48545a':'#211e1a';
+  ctx.beginPath();ctx.ellipse(0,-r*.015,r*.82,r*.28,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=season===3?'#d1d9d7':'#8e7759';
+  ctx.lineWidth=Math.max(.7,z*.8);ctx.beginPath();
+  ctx.ellipse(0,-r*.045,r*1.02,r*.36,0,Math.PI*.16,Math.PI*1.32);ctx.stroke();
+  if(z>=.9){
+   ctx.strokeStyle=season===3?'#6e7d83':'#4d3b2e';ctx.lineWidth=Math.max(.7,z*.65);
+   for(let i=0;i<5;i++){
+    const a=i*Math.PI*2/5+m.seed*2.1;
+    ctx.beginPath();ctx.moveTo(Math.cos(a)*r*.75,Math.sin(a)*r*.27);
+    ctx.lineTo(Math.cos(a)*r*(1.17+(i%2)*.14),
+      Math.sin(a)*r*(.43+(i%2)*.06));ctx.stroke();
+   }
+  }
+  if(age<2800&&season!==3&&z>=.95){
+   ctx.globalAlpha=fade*(1-age/2800)*.55;ctx.fillStyle='#d88b4c';
+   for(let i=0;i<3;i++){
+    const a=m.seed*8+i*2.399;
+    ctx.beginPath();ctx.arc(Math.cos(a)*r*.43,Math.sin(a)*r*.15,
+      Math.max(.7,z*.8),0,Math.PI*2);ctx.fill();
+   }
+  }
+  ctx.restore();drawn++;
+ }
+ return drawn;
 }
 // v6.132: rastros de passos em neve e lama; efeitos efemeros fora do save.
 const groundTrackHistory=new WeakMap();
@@ -10570,6 +10642,7 @@ function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const ra
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 const groundTrackTiles=collectGroundTrackTiles(bounds,frameTime);
 const remnantTiles=collectBattlefieldRemnants(bounds,frameTime,z);
+const scorchTiles=collectCannonScorches(bounds,frameTime);
  const settlementPaths=ww>=38?collectSettlementPaths(structures,roadTiles,biome):new Map();
 for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=Math.max(bounds.minX,sum-bounds.maxY),hi=Math.min(bounds.maxX,sum-bounds.minY);for(let x=lo;x<=hi;x++){let y=sum-x;let [px,py]=point(x+.5,y+.5);if(px< -ww||px>w+ww||py< -hh*4||py>h+hh*4)continue;
 // Nevoa nao explorada: sem atlas, ruinas ou efeitos sob a cobertura opaca.
@@ -10583,6 +10656,7 @@ if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y))){
  if(pathLinks.length>=3&&(pathLinks.length===4||rnd(x,y,423)>.55))
   drawSettlementLandmark(px,py,ww,hh,x,y,pathLinks,game.era,forestSeason(),frameTime);
 }
+if(visibleFog[y*W+x])drawCannonScorchesTile(scorchTiles.get(key(x,y)),z,frameTime,forestSeason());
 if(visibleFog[y*W+x])drawGroundTracksTile(groundTrackTiles.get(key(x,y)),z,frameTime);
 if(visibleFog[y*W+x]&&remnantTiles.has(key(x,y)))drawBattlefieldRemnantsTile(remnantTiles.get(key(x,y)),z,frameTime,forestSeason());
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
