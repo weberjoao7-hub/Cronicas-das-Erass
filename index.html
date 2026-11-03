@@ -11102,6 +11102,26 @@ function drawFogFrontier(px,py,ww,hh,x,y,visible,explored){
  }
  ctx.restore();return edges.length;
 }
+// v6.210 — deterministic meadow flower clusters, painted beneath buildings and units.
+// No persistent state or per-frame allocations: low-detail mobile zoom skips the effect.
+function drawMeadowFlowers(px,py,ww,hh,x,y,b,season){
+ if((b!==1&&b!==2)||ww<46||season===3||rnd(x,y,781)<.73)return;
+ const amount=ww>=85?5:ww>=62?3:2;
+ const winterFade=season===2?.52:1;
+ ctx.save();
+ for(let i=0;i<amount;i++){
+  const a=rnd(x*17+i*31,y*13+i*7,782),v=rnd(x*23+i*19,y*29+i*11,783);
+  const ox=(a-.5)*ww*.57,oy=(v-.5)*hh*.48;
+  // Diamond-shaped tile footprint keeps flowers away from neighbouring tiles.
+  if(Math.abs(ox)/(ww*.5)+Math.abs(oy)/(hh*.5)>.78)continue;
+  const r=Math.max(.65,Math.min(2.1,ww*.019));
+  ctx.fillStyle=season===2?'#b9a476':i%3===0?'#e5d7a2':i%3===1?'#d8b3a1':'#c8d9b4';
+  ctx.globalAlpha=winterFade*(.62+.25*a);
+  ctx.beginPath();ctx.arc(px+ox,py+oy,r,0,Math.PI*2);ctx.fill();
+  if(ww>=70){ctx.strokeStyle='#547b42';ctx.lineWidth=Math.max(.65,r*.55);ctx.beginPath();ctx.moveTo(px+ox,py+oy+r);ctx.lineTo(px+ox-r*.3,py+oy+r*2.3);ctx.stroke()}
+ }
+ ctx.restore();
+}
 function draw(){if(!dirty)return;dirty=false;const frameTime=Date.now();const rainLevel=forestSeason()===3?0:(weatherPreview ? .82 : weatherForDay(game.day,(dayClock%120)/120));renderRainLevel=rainLevel;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#19362d';ctx.fillRect(0,0,w,h);updateRoads();let z=scale,ww=TW*z,hh=TH*z,bounds=visibleTileBounds();let own=claimed();const structures=new Map(game.buildings.map(b=>[key(b.x,b.y),b]));const roadConvoyTiles=new Map();if(ww>=37){for(const cart of roadConvoyPositions(frameTime,roadCartRoutes,ww>=54?3:1)){const id=key(Math.floor(cart.x),Math.floor(cart.y));if(!roadConvoyTiles.has(id))roadConvoyTiles.set(id,cart)}}const unitTiles=new Map(),enemyTiles=new Map(),boatTiles=new Map(),activeHunts=new Set();for(const dock of game.buildings){if(dock.t!=='Pesqueiro'||dock.buildLeft||!dock.boat)continue;const boat=dock.boat,x=Math.floor(boat.x),y=Math.floor(boat.y);if(x<0||y<0||x>=W||y>=H)continue;const k=key(x,y);if(!boatTiles.has(k))boatTiles.set(k,[]);boatTiles.get(k).push(boat)}for(const u of game.units){const k=key(Math.floor(u.x),Math.floor(u.y));if(!unitTiles.has(k))unitTiles.set(k,[]);unitTiles.get(k).push(u);if(u.huntTarget)activeHunts.add(u.huntTarget)}for(const e of game.enemyUnits||[]){const k=key(Math.floor(e.x),Math.floor(e.y));if(!enemyTiles.has(k))enemyTiles.set(k,[]);enemyTiles.get(k).push(e)}
 formationStandardLeader=selectFormationStandardLeader(game.units,selectedGroup,visibleAt);
 const groundTrackTiles=collectGroundTrackTiles(bounds,frameTime);
@@ -11112,7 +11132,7 @@ for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=M
 // Nevoa nao explorada: sem atlas, ruinas ou efeitos sob a cobertura opaca.
 if(!exploredFog[y*W+x])continue;
 let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
-ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
+ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b);if(visibleFog[y*W+x]&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))drawMeadowFlowers(px,py,ww,hh,x,y,b,forestSeason()); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(tributaryMask[y*W+x]&&b!==0)drawTributary(px,py,ww,hh,x,y,tributaryMask[y*W+x],forestSeason(),frameTime);if(tributaryMask[y*W+x]&&b!==0&&!roadTiles.has(key(x,y)))drawTributaryBanks(px,py,ww,hh,x,y,tributaryMask[y*W+x],forestSeason());if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);if(tributaryMask[y*W+x]&&b!==0&&roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTributaryCrossing(px,py,ww,hh,x,y,tributaryMask[y*W+x],roadLinks.get(key(x,y))||[],game.era,forestSeason());
  if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y)))drawSettlementFootpath(px,py,ww,hh,x,y,settlementPaths.get(key(x,y)),game.era,forestSeason(),rainLevel);
 if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y))){
