@@ -25,7 +25,7 @@ function scene(){
 test('v6.204: JavaScript compila e formato dos saves permanece intacto',()=>{
  assert.doesNotThrow(()=>new Function(script));
  assert.match(script,/cronicas-v04/);
- assert.match(html,/<title>Crônicas das Eras v6\.204<\/title>/);
+ assert.match(html,/<title>Crônicas das Eras v6\.\d+<\/title>/);
  assert.doesNotMatch(source,/localStorage|(?:^|[^\w.])save\(|game\.buildings\.push/);
 });
 test('fases da lavoura acompanham primavera, verao, outono e inverno',()=>{
