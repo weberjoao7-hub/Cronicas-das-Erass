@@ -2546,7 +2546,7 @@ function drawMountain(px,py,ww,hh,x,y){
 // Apenas renderizacao; nao altera recursos, navegacao ou formato de salvamento.
 function drawMountainTalus(px,py,ww,hh,x,y,peakX,peakY,left,right,base,season=0){
  if(ww<50||hh<12||![px,py,ww,hh,x,y,peakX,peakY,left,right,base,season].every(Number.isFinite))return 0;
- const winter=season===3,autumn=season===2,patches=ww>=90?7:ww>=72?5:3;
+ const winter=season===3,autumn=season===2,patches=ww>=90?3:ww>=72?2:1;
  ctx.save();
  // Recorte ao pe do macico: as faces nao flutuam fora do losango.
  ctx.beginPath();ctx.moveTo(left,base);ctx.lineTo(px-ww*.34,base-hh*.24);
