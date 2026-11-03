@@ -7,7 +7,7 @@ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script,'main script');
 const start=script.indexOf('function drawBridgeWaterContact(');
-const end=script.indexOf(" function drawBridge(",start);
+const end=script.indexOf("function drawConstructionSite(",start);
 assert.ok(start>=0&&end>start,'bridge contact helper');
 const source=script.slice(start,end);
 function scene({ww=74,hh=34,axis='x',era=3,progress=1,now=1000,season=1}={}){
@@ -52,8 +52,9 @@ test('deterministic animation and finite coordinates with balanced Canvas',()=>{
  assert.notDeepEqual(a.calls,scene({now:5000}).calls);
 });
 test('bridge contact is drawn before bridge deck and Safari has viewport fallbacks',()=>{
- const bridge=script.slice(end,script.indexOf('function drawBridgeEngineering(',end));
- assert.ok(bridge.includes('drawBridgeWaterContact(px,py,ww,hh,axis,stage,complete,Date.now(),forestSeason());'));
+ const bridgeStart=script.indexOf('function drawBridge(');
+ const bridge=script.slice(bridgeStart,script.indexOf('function drawBridgeEngineering(',bridgeStart));
+ assert.ok(bridge.includes("drawBridgeWaterContact(px,py,ww,hh,axis,stage,complete,Date.now(),typeof forestSeason==='function'?forestSeason():0);"));
  assert.ok(bridge.indexOf('drawBridgeWaterContact(')<bridge.indexOf('const count=9,laid='));
  assert.match(html,/height:100vh;height:100dvh/);
  assert.match(html,/max-height:55vh;max-height:55dvh/);
