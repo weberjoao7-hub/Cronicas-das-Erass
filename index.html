@@ -11104,6 +11104,34 @@ function drawFogFrontier(px,py,ww,hh,x,y,visible,explored){
 }
 // v6.210 — deterministic meadow flower clusters, painted beneath buildings and units.
 // No persistent state or per-frame allocations: low-detail mobile zoom skips the effect.
+function drawMeadowGrassTufts(px,py,ww,hh,x,y,b,season){
+ // Sparse deterministic grass silhouettes add ground depth without sprite assets.
+ // The detail is deliberately omitted at strategic zoom and during winter.
+ if((b!==1&&b!==2)||season===3||ww<74||rnd(x,y,790)<.42)return;
+ const count=ww>=110?4:2;
+ ctx.save();
+ ctx.lineCap='round';
+ ctx.lineWidth=Math.max(.65,Math.min(1.35,ww*.012));
+ ctx.globalAlpha=season===2?.48:.68;
+ for(let i=0;i<count;i++){
+  const a=rnd(x*13+i*17,y*19+i*23,791);
+  const v=rnd(x*29+i*11,y*7+i*31,792);
+  const ox=(a-.5)*ww*.58,oy=(v-.5)*hh*.48;
+  if(Math.abs(ox)/(ww*.5)+Math.abs(oy)/(hh*.5)>.72)continue;
+  const gx=px+ox,gy=py+oy;
+  const size=Math.max(2.4,Math.min(5.2,ww*.042));
+  ctx.strokeStyle=season===2?'#8d8754':i%2?'#4b743a':'#719451';
+  ctx.beginPath();
+  ctx.moveTo(gx,gy);
+  ctx.quadraticCurveTo(gx-size*.62,gy-size*.7,gx-size*.9,gy-size*.9);
+  ctx.moveTo(gx,gy);
+  ctx.quadraticCurveTo(gx+size*.12,gy-size*.8,gx+size*.2,gy-size*1.25);
+  ctx.moveTo(gx,gy);
+  ctx.quadraticCurveTo(gx+size*.55,gy-size*.55,gx+size,gy-size*.65);
+  ctx.stroke();
+ }
+ ctx.restore();
+}
 function drawMeadowFlowers(px,py,ww,hh,x,y,b,season){
  if((b!==1&&b!==2)||ww<46||season===3||rnd(x,y,781)<.73)return;
  const amount=ww>=85?5:ww>=62?3:2;
@@ -11145,7 +11173,7 @@ for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=M
 // Nevoa nao explorada: sem atlas, ruinas ou efeitos sob a cobertura opaca.
 if(!exploredFog[y*W+x])continue;
 let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
-ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b);if(visibleFog[y*W+x]&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y)))drawMeadowFlowers(px,py,ww,hh,x,y,b,forestSeason()); // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
+ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b);if(visibleFog[y*W+x]&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){drawMeadowGrassTufts(px,py,ww,hh,x,y,b,forestSeason());drawMeadowFlowers(px,py,ww,hh,x,y,b,forestSeason());} // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(tributaryMask[y*W+x]&&b!==0)drawTributary(px,py,ww,hh,x,y,tributaryMask[y*W+x],forestSeason(),frameTime);if(tributaryMask[y*W+x]&&b!==0&&!roadTiles.has(key(x,y)))drawTributaryBanks(px,py,ww,hh,x,y,tributaryMask[y*W+x],forestSeason());if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);if(tributaryMask[y*W+x]&&b!==0&&roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTributaryCrossing(px,py,ww,hh,x,y,tributaryMask[y*W+x],roadLinks.get(key(x,y))||[],game.era,forestSeason());
  if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y)))drawSettlementFootpath(px,py,ww,hh,x,y,settlementPaths.get(key(x,y)),game.era,forestSeason(),rainLevel);
 if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y))){
