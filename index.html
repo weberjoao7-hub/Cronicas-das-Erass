@@ -1552,6 +1552,63 @@ function drawShoreFoam(px,py,ww,hh,x,y,mask,now){
  ctx.restore();
 }
 
+// v6.206: arrebentacao e blocos minerais nas margens rochosas dos lagos.
+// Rochas estaveis em coordenadas do mundo; apenas a espuma acompanha o tempo.
+// LOD e recorte isometrico limitam o custo em Safari sem alterar navegacao.
+function drawRockyShoreBreakers(px,py,ww,hh,x,y,mask,season=forestSeason(),now=Date.now()){
+ if(!mask||ww<46||hh<14||![px,py,ww,hh,x,y,now].every(Number.isFinite))return 0;
+ const edges=[[3,0,1,-1,0],[0,1,2,0,-1],[1,2,4,1,0],[2,3,8,0,1]];
+ const rocky=edges.filter(e=>(mask&e[2])&&biome(x+e[3],y+e[4])>=4);
+ if(!rocky.length)return 0;
+ const corners=[[px,py-hh*.5],[px+ww*.5,py],[px,py+hh*.5],[px-ww*.5,py]];
+ const winter=season===3,autumn=season===2,perEdge=ww>=96?3:ww>=68?2:1;
+ let painted=0;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.beginPath();ctx.moveTo(...corners[0]);
+ for(let i=1;i<4;i++)ctx.lineTo(...corners[i]);
+ ctx.closePath();ctx.clip();
+ for(const [a,b,flag] of rocky){
+  const p=corners[a],q=corners[b];
+  for(let i=0;i<perEdge;i++){
+   const seed=rnd(x+flag*13+i*7,y-flag*3-i*11,972);
+   const t=(i+.55+seed*.33)/(perEdge+.20);
+   const ex=p[0]*(1-t)+q[0]*t,ey=p[1]*(1-t)+q[1]*t;
+   const inset=.12+seed*.12,sx=ex+(px-ex)*inset,sy=ey+(py-ey)*inset;
+   const r=ww*(.027+seed*.014),height=hh*(.026+seed*.013);
+   // O bloco emerge da agua com face iluminada, lateral escura e sombra submersa.
+   ctx.fillStyle='#0c34445c';ctx.beginPath();
+   ctx.ellipse(sx+r*.26,sy+height*.9,r*1.25,height*.86,-.18,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=winter?'#82969a':autumn?'#9a8c78':'#798a8c';
+   ctx.beginPath();ctx.moveTo(sx-r,sy+height*.10);
+   ctx.lineTo(sx-r*.34,sy-height*.85);ctx.lineTo(sx+r*.65,sy-height*.62);
+   ctx.lineTo(sx+r,sy+height*.08);ctx.closePath();ctx.fill();
+   ctx.fillStyle=winter?'#536d77':autumn?'#615f57':'#465e65';
+   ctx.beginPath();ctx.moveTo(sx+r,sy+height*.08);
+   ctx.lineTo(sx+r*.56,sy+height*.92);ctx.lineTo(sx-r*.62,sy+height*.68);
+   ctx.lineTo(sx-r,sy+height*.10);ctx.closePath();ctx.fill();
+   ctx.strokeStyle=winter?'#d7e8e6':autumn?'#d0c3a7':'#bac9c5';
+   ctx.lineWidth=Math.max(.6,ww*.008);ctx.beginPath();
+   ctx.moveTo(sx-r*.78,sy-height*.02);
+   ctx.lineTo(sx-r*.32,sy-height*.73);ctx.lineTo(sx+r*.50,sy-height*.53);ctx.stroke();
+   if(winter){
+    ctx.fillStyle='#e7f2ebc9';ctx.beginPath();
+    ctx.moveTo(sx-r*.56,sy-height*.32);ctx.lineTo(sx-r*.32,sy-height*.81);
+    ctx.lineTo(sx+r*.40,sy-height*.56);ctx.lineTo(sx+r*.12,sy-height*.23);
+    ctx.closePath();ctx.fill();
+   }else{
+    const wave=Math.sin(now*.0016+x*.37+y*.29+flag+i*1.9);
+    ctx.globalAlpha=.27+.20*(wave+1)*.5;
+    ctx.strokeStyle='#d8f1e9';ctx.lineWidth=Math.max(.75,ww*.012);
+    ctx.beginPath();ctx.ellipse(sx+r*.15,sy+height*.73,
+     r*(1.22+wave*.12),height*(.69+wave*.09),-.15,.05,Math.PI*1.89);ctx.stroke();
+    ctx.globalAlpha=1;
+   }
+   painted++;
+  }
+ }
+ ctx.restore();return painted;
+}
+
 // v6.87: placas finas de gelo nas margens dos lagos durante o inverno.
 // Recortadas no losango isométrico; não alteram navegação, pesca ou salvamento.
 function drawWinterLakeIce(px,py,ww,hh,x,y,mask,depth,season=forestSeason(),occupied=false,now=Date.now()){
@@ -10976,7 +11033,7 @@ if(visibleFog[y*W+x]&&remnantTiles.has(key(x,y)))drawBattlefieldRemnantsTile(rem
  if(game.era>=4&&roadLanternSet.has(key(x,y))&&!structures.has(key(x,y)))drawRoadLantern(px,py,ww,hh,x,y,game.era,frameTime);
 if(b===0)drawLakeDepth(px,py,ww,hh,waterDepth[y*W+x],q,frameTime);
  if(b===0&&visibleFog[y*W+x]&&shoreMask[y*W+x])drawShallowWaterCaustics(px,py,ww,hh,x,y,shoreMask[y*W+x],waterDepth[y*W+x],forestSeason(),(dayClock%120)/120,rainLevel,structures.has(key(x,y))||boatTiles.has(key(x,y)),frameTime);
- if(b===0&&shoreMask[y*W+x]&&ww>20){drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);drawForestWaterReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);drawWaterfrontReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],structures,visibleFog,forestSeason(),frameTime,game.era);drawShoreUnitReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],unitTiles,enemyTiles,visibleFog,z,forestSeason(),frameTime);drawShoreFoam(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime)}
+ if(b===0&&shoreMask[y*W+x]&&ww>20){drawCoast(px,py,ww,hh,x,y,shoreMask[y*W+x]);drawForestWaterReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);drawWaterfrontReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],structures,visibleFog,forestSeason(),frameTime,game.era);drawShoreUnitReflections(px,py,ww,hh,x,y,shoreMask[y*W+x],unitTiles,enemyTiles,visibleFog,z,forestSeason(),frameTime);drawShoreFoam(px,py,ww,hh,x,y,shoreMask[y*W+x],frameTime);if(visibleFog[y*W+x]&&!structures.has(key(x,y))&&!boatTiles.has(key(x,y)))drawRockyShoreBreakers(px,py,ww,hh,x,y,shoreMask[y*W+x],forestSeason(),frameTime)}
 
 if(b===0&&tributaryMouthMask[y*W+x]&&visibleFog[y*W+x])drawTributaryEstuary(px,py,ww,hh,x,y,tributaryMouthMask[y*W+x],forestSeason(),frameTime);
 if(b===0)drawLakeDetails(px,py,ww,hh,x,y,q,shoreMask[y*W+x],structures.has(key(x,y)),frameTime);
