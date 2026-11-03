@@ -86,6 +86,26 @@ nav button{min-width:0;max-width:none;min-height:46px;padding:8px 6px;
  #cancelPlacement{left:calc(env(safe-area-inset-left) + 8px);transform:none;bottom:calc(env(safe-area-inset-bottom) + 60px)}
  #perfHud{top:calc(env(safe-area-inset-top) + 57px);left:calc(env(safe-area-inset-left) + 8px)}
 }
+/* v6.209: portrait phones keep resource HUD and navigation within safe-area bounds. */
+@media (orientation:portrait) and (max-width:430px){
+ header{left:0;right:0;max-width:100vw;padding-left:calc(env(safe-area-inset-left) + 8px);padding-right:calc(env(safe-area-inset-right) + 8px);gap:6px}
+ header>div:first-child{min-width:0;flex:1 1 auto}
+ header strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ header .resources{min-width:0;max-width:52vw;flex:0 1 auto;overflow-wrap:anywhere}
+ nav{left:calc(env(safe-area-inset-left) + 5px);right:calc(env(safe-area-inset-right) + 5px);width:auto}
+ nav button{flex:1 1 0;min-width:0;overflow-wrap:anywhere;line-height:1.1}
+ #minimap{right:calc(env(safe-area-inset-right) + 8px)}
+ #mapLabel{right:calc(env(safe-area-inset-right) + 8px)}
+ #panel{left:calc(env(safe-area-inset-left) + 7px);right:calc(env(safe-area-inset-right) + 7px)}
+}
+@media (orientation:portrait) and (max-width:350px){
+ header strong{font-size:11px}
+ header small{font-size:9px}
+ header .resources{font-size:10px;max-width:48vw}
+ nav button{font-size:10px;padding:6px 1px}
+ #minimap{width:82px;height:82px}
+ #mapLabel{top:calc(178px + env(safe-area-inset-top));font-size:9px}
+}
 @media(prefers-reduced-motion:reduce){button{transition:none}}
 </style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" aria-label="Minimapa interativo"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · segure e arraste para selecionar tropas · pinça para zoom</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
 <script>
