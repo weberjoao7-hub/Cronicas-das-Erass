@@ -6215,32 +6215,6 @@ function drawWatchtower(px,py,ww,hh,level=1){
 }
 
  // Ponte isométrica: direção salva na construção, tábuas progressivas e pilares.
-// v6.192: reflexos rasos e ondas nas bases das pontes, abaixo do tabuleiro.
-// O desenho usa a mesma projecao isometrica e nao cria estado persistente.
-function drawBridgeWaterContact(px,py,ww,hh,axis='x',era=0,progress=1,now=Date.now(),season=forestSeason()){
- if(![px,py,ww,hh,era,progress,now,season].every(Number.isFinite)||
-    ww<30||hh<=0||progress<.4||season===3)return 0;
- const metal=era>=5,stone=era>=3;
- const a=axis==='y'?[-ww*.30,hh*.30]:[ww*.30,hh*.30];
- const s=axis==='y'?[ww*.17,hh*.17]:[ww*.17,-hh*.17];
- const piers=ww>=58?[-.72,0,.72]:[-.68,.68],rings=ww>=52?3:2;
- ctx.save();ctx.lineCap='round';
- for(const t of piers){
-  const x=px+a[0]*t+s[0]*.5,y=py+a[1]*t+s[1]*.5+hh*.22;
-  ctx.globalAlpha=.16*progress;
-  ctx.strokeStyle=metal?'#526e73':stone?'#717c76':'#866b4e';
-  ctx.lineWidth=Math.max(.7,ww*.014);
-  ctx.beginPath();ctx.moveTo(x,y-hh*.08);ctx.lineTo(x+ww*.024,y+hh*.20);ctx.stroke();
-  for(let i=0;i<rings;i++){
-   const phase=((now*.00032+t*.31+i/rings)%1+1)%1;
-   ctx.globalAlpha=(1-phase)*(.19+.07*progress);
-   ctx.strokeStyle=metal?'#c6e1de':stone?'#d4d5c3':'#f0d5a3';
-   ctx.lineWidth=Math.max(.65,ww*.011);
-   ctx.beginPath();ctx.ellipse(x,y+hh*.05,ww*(.06+phase*.095),hh*(.025+phase*.045),0,0,Math.PI*2);ctx.stroke();
-  }
- }
- ctx.restore();return piers.length*rings;
-}
  function drawBridge(px,py,ww,hh,axis='x',progress=1,era=0){
  const stage=Math.max(0,Math.min(7,era|0)),stone=stage>=3,iron=stage>=5,asphalt=stage>=7;
  const complete=Math.max(0,Math.min(1,progress));
@@ -6250,7 +6224,7 @@ function drawBridgeWaterContact(px,py,ww,hh,axis='x',era=0,progress=1,now=Date.n
  ctx.save();
  // Sombras e apoios ficam abaixo do tabuleiro; a ponte permanece ancorada à água.
  ctx.fillStyle='#102b3870';ctx.beginPath();ctx.ellipse(px+ww*.07,py+hh*.18,ww*.34,hh*.20,-.12,0,Math.PI*2);ctx.fill();
- drawBridgeWaterContact(px,py,ww,hh,axis,stage,complete,Date.now(),forestSeason());
+ drawBridgeWaterContact(px,py,ww,hh,axis,stage,complete,Date.now(),typeof forestSeason==='function'?forestSeason():0);
  for(const q of [-.79,.79]){
   ctx.strokeStyle=stone?'#505b58':'#4c3222';ctx.lineWidth=Math.max(2,ww*.085);
   ctx.beginPath();ctx.moveTo(...v(-1,q));ctx.lineTo(...v(1,q));ctx.stroke();
@@ -6405,6 +6379,32 @@ function drawBridgeEngineering(px,py,ww,hh,axis,era,progress){
   }
  }
  ctx.restore();return 1;
+}
+// v6.192: reflexos rasos e ondas nas bases das pontes, abaixo do tabuleiro.
+// O desenho usa a mesma projecao isometrica e nao cria estado persistente.
+function drawBridgeWaterContact(px,py,ww,hh,axis='x',era=0,progress=1,now=Date.now(),season=0){
+ if(![px,py,ww,hh,era,progress,now,season].every(Number.isFinite)||
+    ww<30||hh<=0||progress<.4||season===3)return 0;
+ const metal=era>=5,stone=era>=3;
+ const a=axis==='y'?[-ww*.30,hh*.30]:[ww*.30,hh*.30];
+ const s=axis==='y'?[ww*.17,hh*.17]:[ww*.17,-hh*.17];
+ const piers=ww>=58?[-.72,0,.72]:[-.68,.68],rings=ww>=52?3:2;
+ ctx.save();ctx.lineCap='round';
+ for(const t of piers){
+  const x=px+a[0]*t+s[0]*.5,y=py+a[1]*t+s[1]*.5+hh*.22;
+  ctx.globalAlpha=.16*progress;
+  ctx.strokeStyle=metal?'#526e73':stone?'#717c76':'#866b4e';
+  ctx.lineWidth=Math.max(.7,ww*.014);
+  ctx.beginPath();ctx.moveTo(x,y-hh*.08);ctx.lineTo(x+ww*.024,y+hh*.20);ctx.stroke();
+  for(let i=0;i<rings;i++){
+   const phase=((now*.00032+t*.31+i/rings)%1+1)%1;
+   ctx.globalAlpha=(1-phase)*(.19+.07*progress);
+   ctx.strokeStyle=metal?'#c6e1de':stone?'#d4d5c3':'#f0d5a3';
+   ctx.lineWidth=Math.max(.65,ww*.011);
+   ctx.beginPath();ctx.ellipse(x,y+hh*.05,ww*(.06+phase*.095),hh*(.025+phase*.045),0,0,Math.PI*2);ctx.stroke();
+  }
+ }
+ ctx.restore();return piers.length*rings;
 }
 function drawConstructionSite(b,px,py,ww,hh){
  const total=Math.max(1,b.buildTotal||18);
