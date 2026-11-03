@@ -25,6 +25,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-wood" stroke-linejoin="round">
+ <!-- Woodcutter: diagonal leather harness, carved wedge, ochre hatband. -->
+ <path d="M22 43 Q29 49 36 60" stroke="#3d2b21" stroke-width="5.1" fill="none"/>
+ <path d="M22 43 Q29 49 36 60" stroke="#ba8653" stroke-width="2.6" fill="none"/>
+ <path d="M24 45 L26 48 M30 53 L32 56" stroke="#e4b980" stroke-width=".85"/>
+ <circle cx="23" cy="44" r="1.6" fill="#d4b06d" stroke="#614729" stroke-width=".55"/>
+ <path d="M20 61 L25 63 L24 70 L19 68Z" fill="#65452e" stroke="#342820" stroke-width=".9"/>
+ <path d="M21 63 L23 64 L22.5 68" stroke="#c69b60" stroke-width=".9" fill="none"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#b77d46" stroke-width="2" fill="none"/>
+ <path d="M29 25 L32 22 L34 25" fill="#b89a60" stroke="#5b3d25" stroke-width=".6"/>
+</g>
  <!-- Animated wood pose 0 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -67,6 +78,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-wood" stroke-linejoin="round">
+ <!-- Woodcutter: diagonal leather harness, carved wedge, ochre hatband. -->
+ <path d="M22 43 Q29 49 36 60" stroke="#3d2b21" stroke-width="5.1" fill="none"/>
+ <path d="M22 43 Q29 49 36 60" stroke="#ba8653" stroke-width="2.6" fill="none"/>
+ <path d="M24 45 L26 48 M30 53 L32 56" stroke="#e4b980" stroke-width=".85"/>
+ <circle cx="23" cy="44" r="1.6" fill="#d4b06d" stroke="#614729" stroke-width=".55"/>
+ <path d="M20 61 L25 63 L24 70 L19 68Z" fill="#65452e" stroke="#342820" stroke-width=".9"/>
+ <path d="M21 63 L23 64 L22.5 68" stroke="#c69b60" stroke-width=".9" fill="none"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#b77d46" stroke-width="2" fill="none"/>
+ <path d="M29 25 L32 22 L34 25" fill="#b89a60" stroke="#5b3d25" stroke-width=".6"/>
+</g>
  <!-- Animated wood pose 1 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -109,6 +131,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-wood" stroke-linejoin="round">
+ <!-- Woodcutter: diagonal leather harness, carved wedge, ochre hatband. -->
+ <path d="M22 43 Q29 49 36 60" stroke="#3d2b21" stroke-width="5.1" fill="none"/>
+ <path d="M22 43 Q29 49 36 60" stroke="#ba8653" stroke-width="2.6" fill="none"/>
+ <path d="M24 45 L26 48 M30 53 L32 56" stroke="#e4b980" stroke-width=".85"/>
+ <circle cx="23" cy="44" r="1.6" fill="#d4b06d" stroke="#614729" stroke-width=".55"/>
+ <path d="M20 61 L25 63 L24 70 L19 68Z" fill="#65452e" stroke="#342820" stroke-width=".9"/>
+ <path d="M21 63 L23 64 L22.5 68" stroke="#c69b60" stroke-width=".9" fill="none"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#b77d46" stroke-width="2" fill="none"/>
+ <path d="M29 25 L32 22 L34 25" fill="#b89a60" stroke="#5b3d25" stroke-width=".6"/>
+</g>
  <!-- Animated wood pose 2 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -151,6 +184,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-wood" stroke-linejoin="round">
+ <!-- Woodcutter: diagonal leather harness, carved wedge, ochre hatband. -->
+ <path d="M22 43 Q29 49 36 60" stroke="#3d2b21" stroke-width="5.1" fill="none"/>
+ <path d="M22 43 Q29 49 36 60" stroke="#ba8653" stroke-width="2.6" fill="none"/>
+ <path d="M24 45 L26 48 M30 53 L32 56" stroke="#e4b980" stroke-width=".85"/>
+ <circle cx="23" cy="44" r="1.6" fill="#d4b06d" stroke="#614729" stroke-width=".55"/>
+ <path d="M20 61 L25 63 L24 70 L19 68Z" fill="#65452e" stroke="#342820" stroke-width=".9"/>
+ <path d="M21 63 L23 64 L22.5 68" stroke="#c69b60" stroke-width=".9" fill="none"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#b77d46" stroke-width="2" fill="none"/>
+ <path d="M29 25 L32 22 L34 25" fill="#b89a60" stroke="#5b3d25" stroke-width=".6"/>
+</g>
  <!-- Animated wood pose 3 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -193,6 +237,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-stone" stroke-linejoin="round">
+ <!-- Mason: slate apron, reinforced shoulder, stone dust and steel badge. -->
+ <path d="M23 51 L37 51 L39 68 Q31 72 22 68Z" fill="#65706d" stroke="#35423e" stroke-width="1"/>
+ <path d="M23 51 L28 54 L27 67 L22 68Z" fill="#a4a9a0" opacity=".67"/>
+ <path d="M30 53 L37 52 L38 66 L33 67Z" fill="#465856" opacity=".73"/>
+ <path d="M23 45 L32 44 L37 49 L32 51 L24 49Z" fill="#6d7772" stroke="#3d4945" stroke-width=".8"/>
+ <path d="M24 46 L31 45 L34 47" stroke="#d2d2bc" stroke-width="1" fill="none"/>
+ <circle cx="26" cy="49" r="1.1" fill="#c3bd9b"/><circle cx="35" cy="65" r="1" fill="#c3bd9b"/>
+ <path d="M25 58 L28 57 M31 62 L34 61 M26 66 L28 65" stroke="#d7d7c7" stroke-width="1.2"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#7b8988" stroke-width="2.5" fill="none"/>
+ <path d="M27 25 L32 24 L33 27 L27 27Z" fill="#c7c7af" stroke="#485451" stroke-width=".6"/>
+</g>
  <!-- Animated stone pose 0 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -235,6 +291,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-stone" stroke-linejoin="round">
+ <!-- Mason: slate apron, reinforced shoulder, stone dust and steel badge. -->
+ <path d="M23 51 L37 51 L39 68 Q31 72 22 68Z" fill="#65706d" stroke="#35423e" stroke-width="1"/>
+ <path d="M23 51 L28 54 L27 67 L22 68Z" fill="#a4a9a0" opacity=".67"/>
+ <path d="M30 53 L37 52 L38 66 L33 67Z" fill="#465856" opacity=".73"/>
+ <path d="M23 45 L32 44 L37 49 L32 51 L24 49Z" fill="#6d7772" stroke="#3d4945" stroke-width=".8"/>
+ <path d="M24 46 L31 45 L34 47" stroke="#d2d2bc" stroke-width="1" fill="none"/>
+ <circle cx="26" cy="49" r="1.1" fill="#c3bd9b"/><circle cx="35" cy="65" r="1" fill="#c3bd9b"/>
+ <path d="M25 58 L28 57 M31 62 L34 61 M26 66 L28 65" stroke="#d7d7c7" stroke-width="1.2"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#7b8988" stroke-width="2.5" fill="none"/>
+ <path d="M27 25 L32 24 L33 27 L27 27Z" fill="#c7c7af" stroke="#485451" stroke-width=".6"/>
+</g>
  <!-- Animated stone pose 1 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -277,6 +345,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-stone" stroke-linejoin="round">
+ <!-- Mason: slate apron, reinforced shoulder, stone dust and steel badge. -->
+ <path d="M23 51 L37 51 L39 68 Q31 72 22 68Z" fill="#65706d" stroke="#35423e" stroke-width="1"/>
+ <path d="M23 51 L28 54 L27 67 L22 68Z" fill="#a4a9a0" opacity=".67"/>
+ <path d="M30 53 L37 52 L38 66 L33 67Z" fill="#465856" opacity=".73"/>
+ <path d="M23 45 L32 44 L37 49 L32 51 L24 49Z" fill="#6d7772" stroke="#3d4945" stroke-width=".8"/>
+ <path d="M24 46 L31 45 L34 47" stroke="#d2d2bc" stroke-width="1" fill="none"/>
+ <circle cx="26" cy="49" r="1.1" fill="#c3bd9b"/><circle cx="35" cy="65" r="1" fill="#c3bd9b"/>
+ <path d="M25 58 L28 57 M31 62 L34 61 M26 66 L28 65" stroke="#d7d7c7" stroke-width="1.2"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#7b8988" stroke-width="2.5" fill="none"/>
+ <path d="M27 25 L32 24 L33 27 L27 27Z" fill="#c7c7af" stroke="#485451" stroke-width=".6"/>
+</g>
  <!-- Animated stone pose 2 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -319,6 +399,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-stone" stroke-linejoin="round">
+ <!-- Mason: slate apron, reinforced shoulder, stone dust and steel badge. -->
+ <path d="M23 51 L37 51 L39 68 Q31 72 22 68Z" fill="#65706d" stroke="#35423e" stroke-width="1"/>
+ <path d="M23 51 L28 54 L27 67 L22 68Z" fill="#a4a9a0" opacity=".67"/>
+ <path d="M30 53 L37 52 L38 66 L33 67Z" fill="#465856" opacity=".73"/>
+ <path d="M23 45 L32 44 L37 49 L32 51 L24 49Z" fill="#6d7772" stroke="#3d4945" stroke-width=".8"/>
+ <path d="M24 46 L31 45 L34 47" stroke="#d2d2bc" stroke-width="1" fill="none"/>
+ <circle cx="26" cy="49" r="1.1" fill="#c3bd9b"/><circle cx="35" cy="65" r="1" fill="#c3bd9b"/>
+ <path d="M25 58 L28 57 M31 62 L34 61 M26 66 L28 65" stroke="#d7d7c7" stroke-width="1.2"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#7b8988" stroke-width="2.5" fill="none"/>
+ <path d="M27 25 L32 24 L33 27 L27 27Z" fill="#c7c7af" stroke="#485451" stroke-width=".6"/>
+</g>
  <!-- Animated stone pose 3 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -361,6 +453,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-farm" stroke-linejoin="round">
+ <!-- Farmer: green field shawl, seed satchel, embroidered ears of wheat. -->
+ <path d="M21 44 Q30 47 36 43 L38 49 Q30 54 22 49Z" fill="#58714a" stroke="#334b35" stroke-width="1"/>
+ <path d="M23 46 Q30 50 36 46" stroke="#9fb477" stroke-width="1.4" fill="none"/>
+ <path d="M22 56 Q31 59 38 55 L39 68 Q31 72 22 67Z" fill="#8a784f" stroke="#4c4632" stroke-width=".9"/>
+ <path d="M27 64 L28 55 M28 59 L25 57 M28 61 L31 58 M28 64 L25 61 M28 65 L31 62" stroke="#d6b96e" stroke-width="1.1" fill="none"/>
+ <path d="M18 60 Q22 58 26 62 L26 69 Q21 72 17 68Z" fill="#6b5436" stroke="#3c3124" stroke-width=".9"/>
+ <path d="M18 62 L25 63" stroke="#c8a46b" stroke-width="1.1"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#8ca360" stroke-width="2.2" fill="none"/>
+ <path d="M32 25 L35 21 M32 25 L30 22" stroke="#d9bb6d" stroke-width="1.4" fill="none"/>
+</g>
  <!-- Animated farm pose 0 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -403,6 +506,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-farm" stroke-linejoin="round">
+ <!-- Farmer: green field shawl, seed satchel, embroidered ears of wheat. -->
+ <path d="M21 44 Q30 47 36 43 L38 49 Q30 54 22 49Z" fill="#58714a" stroke="#334b35" stroke-width="1"/>
+ <path d="M23 46 Q30 50 36 46" stroke="#9fb477" stroke-width="1.4" fill="none"/>
+ <path d="M22 56 Q31 59 38 55 L39 68 Q31 72 22 67Z" fill="#8a784f" stroke="#4c4632" stroke-width=".9"/>
+ <path d="M27 64 L28 55 M28 59 L25 57 M28 61 L31 58 M28 64 L25 61 M28 65 L31 62" stroke="#d6b96e" stroke-width="1.1" fill="none"/>
+ <path d="M18 60 Q22 58 26 62 L26 69 Q21 72 17 68Z" fill="#6b5436" stroke="#3c3124" stroke-width=".9"/>
+ <path d="M18 62 L25 63" stroke="#c8a46b" stroke-width="1.1"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#8ca360" stroke-width="2.2" fill="none"/>
+ <path d="M32 25 L35 21 M32 25 L30 22" stroke="#d9bb6d" stroke-width="1.4" fill="none"/>
+</g>
  <!-- Animated farm pose 1 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -445,6 +559,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-farm" stroke-linejoin="round">
+ <!-- Farmer: green field shawl, seed satchel, embroidered ears of wheat. -->
+ <path d="M21 44 Q30 47 36 43 L38 49 Q30 54 22 49Z" fill="#58714a" stroke="#334b35" stroke-width="1"/>
+ <path d="M23 46 Q30 50 36 46" stroke="#9fb477" stroke-width="1.4" fill="none"/>
+ <path d="M22 56 Q31 59 38 55 L39 68 Q31 72 22 67Z" fill="#8a784f" stroke="#4c4632" stroke-width=".9"/>
+ <path d="M27 64 L28 55 M28 59 L25 57 M28 61 L31 58 M28 64 L25 61 M28 65 L31 62" stroke="#d6b96e" stroke-width="1.1" fill="none"/>
+ <path d="M18 60 Q22 58 26 62 L26 69 Q21 72 17 68Z" fill="#6b5436" stroke="#3c3124" stroke-width=".9"/>
+ <path d="M18 62 L25 63" stroke="#c8a46b" stroke-width="1.1"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#8ca360" stroke-width="2.2" fill="none"/>
+ <path d="M32 25 L35 21 M32 25 L30 22" stroke="#d9bb6d" stroke-width="1.4" fill="none"/>
+</g>
  <!-- Animated farm pose 2 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -487,6 +612,17 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-farm" stroke-linejoin="round">
+ <!-- Farmer: green field shawl, seed satchel, embroidered ears of wheat. -->
+ <path d="M21 44 Q30 47 36 43 L38 49 Q30 54 22 49Z" fill="#58714a" stroke="#334b35" stroke-width="1"/>
+ <path d="M23 46 Q30 50 36 46" stroke="#9fb477" stroke-width="1.4" fill="none"/>
+ <path d="M22 56 Q31 59 38 55 L39 68 Q31 72 22 67Z" fill="#8a784f" stroke="#4c4632" stroke-width=".9"/>
+ <path d="M27 64 L28 55 M28 59 L25 57 M28 61 L31 58 M28 64 L25 61 M28 65 L31 62" stroke="#d6b96e" stroke-width="1.1" fill="none"/>
+ <path d="M18 60 Q22 58 26 62 L26 69 Q21 72 17 68Z" fill="#6b5436" stroke="#3c3124" stroke-width=".9"/>
+ <path d="M18 62 L25 63" stroke="#c8a46b" stroke-width="1.1"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#8ca360" stroke-width="2.2" fill="none"/>
+ <path d="M32 25 L35 21 M32 25 L30 22" stroke="#d9bb6d" stroke-width="1.4" fill="none"/>
+</g>
  <!-- Animated farm pose 3 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -529,6 +665,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-build" stroke-linejoin="round">
+ <!-- Builder: carpenter's leather apron, square, nails and tool pockets. -->
+ <path d="M23 52 L37 52 L40 69 Q30 72 21 68Z" fill="#9a6c43" stroke="#503723" stroke-width="1.1"/>
+ <path d="M24 54 L30 54 L28 67 L22 66Z" fill="#c0925c" opacity=".75"/>
+ <path d="M31 55 L37 55 L38 65 L32 66Z" fill="#69472f"/>
+ <path d="M22 55 Q31 58 39 54" stroke="#4a3525" stroke-width="3" fill="none"/>
+ <rect x="30" y="55" width="4.2" height="3.6" rx=".5" fill="#d8bc7a" stroke="#60462c" stroke-width=".6"/>
+ <path d="M20 60 L20 68 L26 68 M20 63 L24 63" stroke="#d3c6a4" stroke-width="1.5" fill="none"/>
+ <path d="M35 60 L35 65 M37 59 L37 64" stroke="#c4c7bb" stroke-width="1.4"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#d1a260" stroke-width="2.3" fill="none"/>
+ <path d="M27 24 L34 24" stroke="#65432d" stroke-width="1.2"/>
+</g>
  <!-- Animated build pose 0 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -571,6 +719,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-build" stroke-linejoin="round">
+ <!-- Builder: carpenter's leather apron, square, nails and tool pockets. -->
+ <path d="M23 52 L37 52 L40 69 Q30 72 21 68Z" fill="#9a6c43" stroke="#503723" stroke-width="1.1"/>
+ <path d="M24 54 L30 54 L28 67 L22 66Z" fill="#c0925c" opacity=".75"/>
+ <path d="M31 55 L37 55 L38 65 L32 66Z" fill="#69472f"/>
+ <path d="M22 55 Q31 58 39 54" stroke="#4a3525" stroke-width="3" fill="none"/>
+ <rect x="30" y="55" width="4.2" height="3.6" rx=".5" fill="#d8bc7a" stroke="#60462c" stroke-width=".6"/>
+ <path d="M20 60 L20 68 L26 68 M20 63 L24 63" stroke="#d3c6a4" stroke-width="1.5" fill="none"/>
+ <path d="M35 60 L35 65 M37 59 L37 64" stroke="#c4c7bb" stroke-width="1.4"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#d1a260" stroke-width="2.3" fill="none"/>
+ <path d="M27 24 L34 24" stroke="#65432d" stroke-width="1.2"/>
+</g>
  <!-- Animated build pose 1 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -613,6 +773,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-build" stroke-linejoin="round">
+ <!-- Builder: carpenter's leather apron, square, nails and tool pockets. -->
+ <path d="M23 52 L37 52 L40 69 Q30 72 21 68Z" fill="#9a6c43" stroke="#503723" stroke-width="1.1"/>
+ <path d="M24 54 L30 54 L28 67 L22 66Z" fill="#c0925c" opacity=".75"/>
+ <path d="M31 55 L37 55 L38 65 L32 66Z" fill="#69472f"/>
+ <path d="M22 55 Q31 58 39 54" stroke="#4a3525" stroke-width="3" fill="none"/>
+ <rect x="30" y="55" width="4.2" height="3.6" rx=".5" fill="#d8bc7a" stroke="#60462c" stroke-width=".6"/>
+ <path d="M20 60 L20 68 L26 68 M20 63 L24 63" stroke="#d3c6a4" stroke-width="1.5" fill="none"/>
+ <path d="M35 60 L35 65 M37 59 L37 64" stroke="#c4c7bb" stroke-width="1.4"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#d1a260" stroke-width="2.3" fill="none"/>
+ <path d="M27 24 L34 24" stroke="#65432d" stroke-width="1.2"/>
+</g>
  <!-- Animated build pose 2 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 64" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="64" rx="3.2" ry="3.5" fill="url(#skin)"/>
@@ -655,6 +827,18 @@
  <path d="M20 61 Q28 64 38 60 L39 65 Q30 69 20 66Z" fill="#59412b" stroke="#392a20" stroke-width=".7"/>
  <rect x="29" y="62" width="5" height="4" rx=".5" fill="#c2a86c" stroke="#665437" stroke-width=".7"/>
  <path d="M19 64 L17 72 Q21 76 25 71 L24 64Z" fill="url(#leather)" stroke="#3a2b21" stroke-width="1"/>
+ <g data-detail="workwear-build" stroke-linejoin="round">
+ <!-- Builder: carpenter's leather apron, square, nails and tool pockets. -->
+ <path d="M23 52 L37 52 L40 69 Q30 72 21 68Z" fill="#9a6c43" stroke="#503723" stroke-width="1.1"/>
+ <path d="M24 54 L30 54 L28 67 L22 66Z" fill="#c0925c" opacity=".75"/>
+ <path d="M31 55 L37 55 L38 65 L32 66Z" fill="#69472f"/>
+ <path d="M22 55 Q31 58 39 54" stroke="#4a3525" stroke-width="3" fill="none"/>
+ <rect x="30" y="55" width="4.2" height="3.6" rx=".5" fill="#d8bc7a" stroke="#60462c" stroke-width=".6"/>
+ <path d="M20 60 L20 68 L26 68 M20 63 L24 63" stroke="#d3c6a4" stroke-width="1.5" fill="none"/>
+ <path d="M35 60 L35 65 M37 59 L37 64" stroke="#c4c7bb" stroke-width="1.4"/>
+ <path d="M17 26 Q29 24 41 26" stroke="#d1a260" stroke-width="2.3" fill="none"/>
+ <path d="M27 24 L34 24" stroke="#65432d" stroke-width="1.2"/>
+</g>
  <!-- Animated build pose 3 with articulated arms and held tool. -->
  <path d="M21 45 Q18 54 19 65" stroke="#69533a" stroke-width="7" fill="none" stroke-linecap="round"/>
  <ellipse cx="19" cy="65" rx="3.2" ry="3.5" fill="url(#skin)"/>
