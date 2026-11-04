@@ -646,7 +646,10 @@ M.addEventListener('pointerdown',e=>{
  if(minimapPointer!==null)return;
  if(typeof e.preventDefault==='function')e.preventDefault();
  minimapPointer=e.pointerId;
- if(typeof M.setPointerCapture==='function')M.setPointerCapture(e.pointerId);
+ // Safari may reject capture during a touch/gesture transition; panning must still work.
+ if(typeof M.setPointerCapture==='function'){
+  try{M.setPointerCapture(e.pointerId)}catch(error){/* pointer capture unavailable */}
+ }
  panMinimap(e.clientX,e.clientY);
 });
 M.addEventListener('pointermove',e=>{
@@ -654,7 +657,13 @@ M.addEventListener('pointermove',e=>{
  if(typeof e.preventDefault==='function')e.preventDefault();panMinimap(e.clientX,e.clientY);
 });
 for(const type of ['pointerup','pointercancel','lostpointercapture']){
- M.addEventListener(type,e=>{if(e.pointerId===minimapPointer)minimapPointer=null});
+ M.addEventListener(type,e=>{
+  if(e.pointerId!==minimapPointer)return;
+  minimapPointer=null;
+  if(type!=='lostpointercapture'&&typeof M.hasPointerCapture==='function'&&M.hasPointerCapture(e.pointerId)){
+   try{M.releasePointerCapture(e.pointerId)}catch(error){/* already released */}
+  }
+ });
 }
 const TW=74,TH=38;
 // Texturas pré-renderizadas: tons, sombras e microdetalhes sem custo por quadro.
