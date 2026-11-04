@@ -11155,6 +11155,23 @@ function drawMeadowGrassTufts(px,py,ww,hh,x,y,b,season){
  }
  ctx.restore();
 }
+// v6.213: low-cost, deterministic field stones add readable ground scale at close zoom.
+function drawMeadowFieldStones(px,py,ww,hh,x,y,b,season){
+ if((b!==1&&b!==2)||ww<88||rnd(x,y,804)>.28)return;
+ const a=rnd(x*17,y*13,805),v=rnd(x*23,y*29,806);
+ const ox=(a-.5)*ww*.48,oy=(v-.5)*hh*.36;
+ if(Math.abs(ox)/(ww*.5)+Math.abs(oy)/(hh*.5)>.67)return;
+ const sx=px+ox,sy=py+oy,rad=Math.min(3.5,ww*.027);
+ ctx.save();
+ ctx.globalAlpha=season===3?.55:.78;
+ ctx.fillStyle='#17241d55';
+ ctx.beginPath();ctx.ellipse(sx+rad*.35,sy+rad*.28,rad*1.15,rad*.45,-.12,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=season===3?'#a4a9a3':season===2?'#9c9075':'#8d9987';
+ ctx.beginPath();ctx.ellipse(sx,sy,rad,rad*.61,-.2,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle='#e4e0c380';ctx.lineWidth=Math.max(.55,rad*.22);
+ ctx.beginPath();ctx.moveTo(sx-rad*.63,sy-rad*.18);ctx.quadraticCurveTo(sx,sy-rad*.6,sx+rad*.42,sy-rad*.26);ctx.stroke();
+ ctx.restore();
+}
 function drawMeadowFlowers(px,py,ww,hh,x,y,b,season){
  if((b!==1&&b!==2)||ww<46||season===3||rnd(x,y,781)<.73)return;
  const amount=ww>=85?5:ww>=62?3:2;
@@ -11196,7 +11213,7 @@ for(let sum=bounds.minX+bounds.minY;sum<=bounds.maxX+bounds.maxY;sum++){let lo=M
 // Nevoa nao explorada: sem atlas, ruinas ou efeitos sob a cobertura opaca.
 if(!exploredFog[y*W+x])continue;
 let b=biome(x,y),q=rnd(x,y,6),ruinKind=ruinAt(x,y,b);
-ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b);if(visibleFog[y*W+x]&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){drawMeadowGrassTufts(px,py,ww,hh,x,y,b,forestSeason());drawMeadowFlowers(px,py,ww,hh,x,y,b,forestSeason());} // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
+ctx.drawImage(tileArt[b][Math.floor(q*TERRAIN_VARIANTS)],px-ww*.5-1,py-hh*.5-1,ww+2,hh+2);if(visibleFog[y*W+x]&&b>0&&b<5&&mountainFootMask[y*W+x])drawMountainFoothillTransition(px,py,ww,hh,x,y,mountainFootMask[y*W+x],forestSeason(),(dayClock%120)/120,structures.has(key(x,y))||roadTiles.has(key(x,y)));if(visibleFog[y*W+x]&&!roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTerrainMicroRelief(px,py,ww,hh,x,y,b,forestSeason());if(b!==0)drawSeasonalGround(px,py,ww,hh,x,y,b);if(visibleFog[y*W+x]&&!structures.has(key(x,y))&&!roadTiles.has(key(x,y))){drawMeadowGrassTufts(px,py,ww,hh,x,y,b,forestSeason());drawMeadowFlowers(px,py,ww,hh,x,y,b,forestSeason());drawMeadowFieldStones(px,py,ww,hh,x,y,b,forestSeason());} // A névoa cobre terrenos desconhecidos: evita desenhar objetos invisíveis.
  if(biomeSeams[y*W+x])drawBiomeSeam(px,py,ww,hh,x,y,biomeSeams[y*W+x]);if(tributaryMask[y*W+x]&&b!==0)drawTributary(px,py,ww,hh,x,y,tributaryMask[y*W+x],forestSeason(),frameTime);if(tributaryMask[y*W+x]&&b!==0&&!roadTiles.has(key(x,y)))drawTributaryBanks(px,py,ww,hh,x,y,tributaryMask[y*W+x],forestSeason());if(b===4||b===5)drawHighlandCliff(px,py,ww,hh,x,y,b);if(roadTiles.has(key(x,y)))drawRoad(px,py,ww,hh,x,y);if(tributaryMask[y*W+x]&&b!==0&&roadTiles.has(key(x,y))&&!structures.has(key(x,y)))drawTributaryCrossing(px,py,ww,hh,x,y,tributaryMask[y*W+x],roadLinks.get(key(x,y))||[],game.era,forestSeason());
  if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y)))drawSettlementFootpath(px,py,ww,hh,x,y,settlementPaths.get(key(x,y)),game.era,forestSeason(),rainLevel);
 if(visibleFog[y*W+x]&&!ruinKind&&settlementPaths.has(key(x,y))){
