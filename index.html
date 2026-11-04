@@ -8187,7 +8187,7 @@ if(harvesting&&r>=7.5){
  ctx.restore();
 }
 // Poeira discreta nos passos: animação local sem partículas persistentes e com LOD.
-if(moving&&z>.8&&biome(Math.floor(u.x),Math.floor(u.y))!==0){
+if(moving&&z>.8&&forestSeason()!==3&&biome(Math.floor(u.x),Math.floor(u.y))!==0&&!(typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches)){
  const clock=now*.0018+u.x*.41+u.y*.27;
  ctx.save();
  for(let i=0;i<3;i++){
