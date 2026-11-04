@@ -11157,19 +11157,32 @@ function drawMeadowGrassTufts(px,py,ww,hh,x,y,b,season){
 }
 // v6.213: low-cost, deterministic field stones add readable ground scale at close zoom.
 function drawMeadowFieldStones(px,py,ww,hh,x,y,b,season){
+ // Faceted low-poly field stones: top, shaded side and contact shadow share the isometric light direction.
  if((b!==1&&b!==2)||ww<88||rnd(x,y,804)>.28)return;
  const a=rnd(x*17,y*13,805),v=rnd(x*23,y*29,806);
  const ox=(a-.5)*ww*.48,oy=(v-.5)*hh*.36;
  if(Math.abs(ox)/(ww*.5)+Math.abs(oy)/(hh*.5)>.67)return;
  const sx=px+ox,sy=py+oy,rad=Math.min(3.5,ww*.027);
+ const depth=rad*.36;
+ const winter=season===3,autumn=season===2;
  ctx.save();
- ctx.globalAlpha=season===3?.55:.78;
+ ctx.globalAlpha=winter?.55:.78;
  ctx.fillStyle='#17241d55';
- ctx.beginPath();ctx.ellipse(sx+rad*.35,sy+rad*.28,rad*1.15,rad*.45,-.12,0,Math.PI*2);ctx.fill();
- ctx.fillStyle=season===3?'#a4a9a3':season===2?'#9c9075':'#8d9987';
- ctx.beginPath();ctx.ellipse(sx,sy,rad,rad*.61,-.2,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='#e4e0c380';ctx.lineWidth=Math.max(.55,rad*.22);
- ctx.beginPath();ctx.moveTo(sx-rad*.63,sy-rad*.18);ctx.quadraticCurveTo(sx,sy-rad*.6,sx+rad*.42,sy-rad*.26);ctx.stroke();
+ ctx.beginPath();ctx.ellipse(sx+rad*.35,sy+rad*.30,rad*1.2,rad*.48,-.12,0,Math.PI*2);ctx.fill();
+ // Right-facing facet is darker than the sunlit top plane.
+ ctx.fillStyle=winter?'#747e7b':autumn?'#706852':'#596d5c';
+ ctx.beginPath();ctx.moveTo(sx+rad*.9,sy-rad*.10);
+ ctx.lineTo(sx+rad*.72,sy+depth);ctx.lineTo(sx-rad*.18,sy+rad*.62+depth);
+ ctx.lineTo(sx-rad*.18,sy+rad*.44);ctx.closePath();ctx.fill();
+ ctx.fillStyle=winter?'#a4a9a3':autumn?'#9c9075':'#8d9987';
+ ctx.beginPath();ctx.moveTo(sx-rad*.92,sy+rad*.12);
+ ctx.lineTo(sx-rad*.48,sy-rad*.50);ctx.lineTo(sx+rad*.38,sy-rad*.64);
+ ctx.lineTo(sx+rad*.9,sy-rad*.10);ctx.lineTo(sx-rad*.18,sy+rad*.44);
+ ctx.closePath();ctx.fill();
+ ctx.strokeStyle=winter?'#e0e6dc99':'#e4e0c380';
+ ctx.lineWidth=Math.max(.55,rad*.22);
+ ctx.beginPath();ctx.moveTo(sx-rad*.65,sy-rad*.13);
+ ctx.lineTo(sx-rad*.39,sy-rad*.39);ctx.lineTo(sx+rad*.30,sy-rad*.51);ctx.stroke();
  ctx.restore();
 }
 function drawMeadowFlowers(px,py,ww,hh,x,y,b,season){
