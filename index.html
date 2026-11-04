@@ -178,17 +178,17 @@ for(let ty=0;ty<H;ty++)for(let tx=0;tx<W;tx++)terrain[ty*W+tx]=terrainAt(tx,ty);
 function biome(x,y){if(x<0||y<0||x>=W||y>=H)return 0;return terrain[y*W+x]}
 // Máscaras de margem calculadas uma única vez; bit 1=NO, 2=NE, 4=SE, 8=SO.
 const shoreMask=new Uint8Array(W*H);
-for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if(biome(x,y)===0){shoreMask[y*W+x]=(biome(x-1,y)!==0?1:0)|(biome(x,y-1)!==0?2:0)|(biome(x+1,y)!==0?4:0)|(biome(x,y+1)!==0?8:0)}
+for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(biome(x,y)===0){shoreMask[y*W+x]=(biome(x-1,y)!==0?1:0)|(biome(x,y-1)!==0?2:0)|(biome(x+1,y)!==0?4:0)|(biome(x,y+1)!==0?8:0)}
 // Cache da vegetação de margem em terra firme: bits 1=O, 2=N, 4=L, 8=S.
 const riparianMask=new Uint8Array(W*H);
-for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if(biome(x,y)===1||biome(x,y)===2){
+for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(biome(x,y)===1||biome(x,y)===2){
  riparianMask[y*W+x]=(biome(x-1,y)===0?1:0)|(biome(x,y-1)===0?2:0)|
                      (biome(x+1,y)===0?4:0)|(biome(x,y+1)===0?8:0);
 }
 // Máscaras de transição entre biomas terrestres (N, L, S, O): pré-calculadas para dispositivos móveis.
 const biomeSeams=new Uint8Array(W*H);
 const seamDirs=[[0,-1],[1,0],[0,1],[-1,0]];
-for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){
  const here=biome(x,y);if(here===0)continue;
  let mask=0;for(let i=0;i<4;i++){const [dx,dy]=seamDirs[i],there=biome(x+dx,y+dy);
   if(there!==0&&there!==here)mask|=1<<i}
@@ -196,7 +196,7 @@ for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
 }
 // Faixa de transição nas bases das montanhas, calculada uma única vez.
 const mountainFootMask=new Uint8Array(W*H);
-for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){
  const i=y*W+x,b=biome(x,y);
  if(b===0||b===5)continue;
  mountainFootMask[i]=(biome(x,y-1)===5?1:0)|(biome(x+1,y)===5?2:0)|
