@@ -655,7 +655,7 @@ function resize(){
  const mobileViewport=w<700||(typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches);
  const maxPixels=mobileViewport?2600000:6000000;
  dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(maxPixels/(w*h)))*(typeof renderResolutionScale==='number'?renderResolutionScale:1);
- const bw=Math.round(w*dpr),bh=Math.round(h*dpr);
+ const bw=Math.max(1,Math.round(w*dpr)),bh=Math.max(1,Math.round(h*dpr));
  if(C.width!==bw)C.width=bw;
  if(C.height!==bh)C.height=bh;
  dirty=true;
