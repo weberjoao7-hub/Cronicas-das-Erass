@@ -12135,6 +12135,17 @@ addEventListener('pageshow',event=>{
  if(event.persisted)restoreViewportAfterResume();
 });
 addEventListener('orientationchange',restoreViewportAfterResume);
+// Safari can discard a 2D canvas backing store under memory pressure.
+// Prevent the default permanent loss and redraw only after restoration.
+for(const surface of [canvas,minimap]){
+ surface.addEventListener('contextlost',event=>{
+  event.preventDefault();
+  dirty=true;
+ });
+ surface.addEventListener('contextrestored',()=>{
+  restoreViewportAfterResume();
+ });
+}
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden)save();
  else restoreViewportAfterResume();
