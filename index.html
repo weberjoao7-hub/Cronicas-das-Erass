@@ -1095,6 +1095,24 @@ function drawTerrainMicroRelief(px,py,ww,hh,x,y,b,season=forestSeason()){
   }
  }
 
+ // Fileiras de vegetação seguem a projeção do terreno em zoom próximo.
+ if(b===2&&ww>=94&&!winter){
+  const bands=ww>=145?5:3;
+  for(let k=0;k<bands;k++){
+   const bx=px+(k-(bands-1)/2)*ww*.115;
+   const by=py+(rnd(x+k*7,y,1531)-.5)*hh*.23;
+   const len=ww*(.038+rnd(x,y+k*3,1532)*.026);
+   ctx.strokeStyle=autumn?'#b09a5a9c':'#4f814ca3';
+   ctx.lineWidth=Math.max(.8,ww*.008);ctx.lineCap='round';
+   ctx.beginPath();ctx.moveTo(bx-len,by+hh*.021);
+   ctx.quadraticCurveTo(bx,by-hh*.033,bx+len,by-hh*.017);ctx.stroke();
+   ctx.strokeStyle=autumn?'#d0b575b0':'#a6bd78a8';
+   ctx.beginPath();ctx.moveTo(bx-len*.58,by+hh*.008);
+   ctx.lineTo(bx-len*.42,by-hh*.027);
+   ctx.moveTo(bx+len*.20,by-hh*.015);
+   ctx.lineTo(bx+len*.42,by-hh*.046);ctx.stroke();
+  }
+ }
  for(let i=0;i<count;i++){
   const rx=rnd(x+i*13,y-i*3,813),ry=rnd(x-i*7,y+i*11,814);
   const sx=px+(rx-.5)*ww*.66,sy=py+(ry-.5)*hh*.50;
