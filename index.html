@@ -3958,10 +3958,13 @@ function watchtowerSentryAnchor(px,py,ww,hh,era,stride){
 function drawWatchtowerSentry(px,py,ww,hh,era=0,now=Date.now(),season=0,tileX=0,tileY=0){
  if(ww<39||hh<12)return 0;
  const z=ww/74,modern=era>=6,stone=era>=2;
- const clock=now*.00052+tileX*.43+tileY*.29;
- const stride=Math.sin(clock),direction=Math.cos(clock)>=0?1:-1;
+ // Respeita a preferência de movimento reduzido também nos guardas das torres.
+ // Mantém uma postura estável por torre, sem depender do relógio do renderizador.
+ const reduceMotion=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const clock=reduceMotion?tileX*.43+tileY*.29:now*.00052+tileX*.43+tileY*.29;
+ const stride=reduceMotion?0:Math.sin(clock),direction=Math.cos(clock)>=0?1:-1;
  const {x,ground}=watchtowerSentryAnchor(px,py,ww,hh,era,stride);
- const step=Math.sin(clock*9)*z*2.5;
+ const step=reduceMotion?0:Math.sin(clock*9)*z*2.5;
  const armor=modern?'#526e70':stone?'#617781':'#ad8554';
  const trim=modern?'#b3c9c4':stone?'#d5c49a':'#e0bb80';
  ctx.save();
