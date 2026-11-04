@@ -385,7 +385,25 @@ function updateVisibility(){
  fogCtx.putImageData(fogImage,0,0);
  fogRevision++;dirty=true;fogInitialized=true;
 }
-function save(){try{game.explored=Array.from(exploredFog,v=>v?'1':'0').join('');localStorage.setItem('cronicas-v04',JSON.stringify(game))}catch(e){}}
+// Report storage failures instead of silently claiming that progress was saved.
+let lastSaveFailureNotice=0;
+function save(){
+ try{
+  game.explored=Array.from(exploredFog,v=>v?'1':'0').join('');
+  localStorage.setItem('cronicas-v04',JSON.stringify(game));
+ }catch(error){
+  console.error('[Crônicas das Eras] Falha ao salvar progresso local',error);
+  const now=Date.now();
+  if(now-lastSaveFailureNotice>60000){
+   lastSaveFailureNotice=now;
+   const tip=document.getElementById('tip');
+   if(tip){
+    tip.textContent='⚠️ Progresso não salvo. Verifique o armazenamento do Safari.';
+    tip.style.display='block';tip.style.background='#782d28';tip.style.color='#fff';
+   }
+  }
+ }
+}
 function spawnEnemyGuard(){if(!game.enemy||game.enemy.hp<=0)return false;game.enemyUnits=game.enemyUnits||[];if(game.enemyUnits.length>=4)return false;for(let radius=1;radius<=5;radius++){for(let dx=-radius;dx<=radius;dx++)for(let dy=-radius;dy<=radius;dy++){let x=game.enemy.x+dx,y=game.enemy.y+dy;if(Math.max(Math.abs(dx),Math.abs(dy))!==radius||!passable(x,y))continue;if(game.enemyUnits.some(u=>Math.floor(u.x)===x&&Math.floor(u.y)===y))continue;// Um arqueiro por guarnição, inclusive ao continuar partidas antigas.
  const archer=game.enemyUnits.length>0&&!game.enemyUnits.some(e=>e.kind==='archer');
  game.enemyUnits.push({x:x+.5,y:y+.5,hp:archer?50:65,kind:archer?'archer':'warrior',homeX:x+.5,homeY:y+.5});return true}}return false}
