@@ -644,6 +644,19 @@ function resize(){
 }
 addEventListener('resize',resize);
 if(typeof visualViewport!=='undefined')visualViewport.addEventListener('resize',resize);
+// Safari can change the CSS canvas size when its address bar, safe area or
+// landscape controls change without dispatching a window resize event.
+// Observe the rendered box rather than polling on every animation frame.
+if(typeof ResizeObserver==='function'){
+ const canvasSizeObserver=new ResizeObserver(entries=>{
+  const entry=entries[0];
+  if(!entry)return;
+  const nextWidth=Math.max(1,entry.contentRect.width);
+  const nextHeight=Math.max(1,entry.contentRect.height);
+  if(Math.abs(nextWidth-w)>.5||Math.abs(nextHeight-h)>.5)resize();
+ });
+ canvasSizeObserver.observe(C);
+}
 resize();redrawMinimap();
 // Arraste no minimapa com toque ou mouse para navegar pelo mundo inteiro.
 let minimapPointer=null;
