@@ -992,8 +992,18 @@ function drawMeadowWildflowers(px,py,ww,hh,x,y,b,season=forestSeason()){
    const a=p*Math.PI*.5;
    ctx.beginPath();ctx.ellipse(sx+Math.cos(a)*size*.52,sy-size*.48+Math.sin(a)*size*.52,size*.45,size*.32,a,0,Math.PI*2);ctx.fill();
   }
+  // Folhas em dois planos e um centro elevado dão volume sem usar texturas externas.
+  if(ww>=105){
+   ctx.fillStyle=autumn?'#8b874b':'#5b9953';
+   ctx.beginPath();ctx.ellipse(sx-size*.32,sy+size*.35,size*.40,size*.17,-.5,0,Math.PI*2);ctx.fill();
+   ctx.beginPath();ctx.ellipse(sx+size*.30,sy+size*.15,size*.35,size*.15,.55,0,Math.PI*2);ctx.fill();
+  }
   ctx.fillStyle=autumn?'#7b512a':'#d4a448';
   ctx.beginPath();ctx.arc(sx,sy-size*.48,size*.28,0,Math.PI*2);ctx.fill();
+  if(ww>=120){
+   ctx.fillStyle=autumn?'#f3d58b':'#fff3c5';
+   ctx.beginPath();ctx.arc(sx-size*.08,sy-size*.56,size*.085,0,Math.PI*2);ctx.fill();
+  }
  }
  ctx.restore();return count;
 }
