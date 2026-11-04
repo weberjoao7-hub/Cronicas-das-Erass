@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   syntax:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, aquapilot]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -43,4 +43,24 @@ jobs:
           } finally {
             fs.rmSync(dir, { recursive: true, force: true });
           }
+          NODE
+
+      - name: Validate RTS document and mobile controls
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const assert = require('node:assert/strict');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const ids = [...html.matchAll(/\\bid=["']([^"']+)["']/g)].map(m => m[1]);
+          assert.equal(new Set(ids).size, ids.length, 'Duplicate HTML id');
+          for (const id of ['world','minimap','panel','home','build','army','help','zoom','cancelPlacement','res']) {
+            assert.ok(ids.includes(id), 'Missing essential game control: '+id);
+          }
+          assert.match(html, /viewport-fit=cover/, 'Missing iPhone safe-area viewport');
+          assert.match(html, /touch-action\\s*:\\s*none/, 'Missing touch gesture support');
+          assert.match(html, /prefers-reduced-motion/, 'Missing reduced motion support');
+          assert.match(html, /ResizeObserver/, 'Missing dynamic canvas resize handling');
+          assert.match(html, /const W=160,H=160/, 'Map dimensions changed: review smoke assumptions');
+          console.log('RTS HTML and mobile control smoke checks passed.');
           NODE
