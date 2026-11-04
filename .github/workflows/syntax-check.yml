@@ -1,0 +1,46 @@
+name: Validate browser JavaScript
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check inline JavaScript syntax
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const cp = require('node:child_process');
+          const os = require('node:os');
+          const path = require('node:path');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
+            .filter(([, attrs]) => !/\bsrc\s*=/.test(attrs))
+            .filter(([, attrs]) => !/\btype\s*=\s*["'](?:application\/json|application\/ld\+json|importmap)["']/.test(attrs));
+          if (!scripts.length) throw new Error('No inline scripts found in index.html');
+          const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rts-syntax-'));
+          try {
+            for (let i = 0; i < scripts.length; i++) {
+              const [, attrs, source] = scripts[i];
+              const file = path.join(dir, 'script-' + i + (/\btype\s*=\s*["']module["']/.test(attrs) ? '.mjs' : '.js'));
+              fs.writeFileSync(file, source);
+              cp.execFileSync(process.execPath, ['--check', file], { stdio: 'inherit' });
+            }
+            console.log('Validated ' + scripts.length + ' inline script(s).');
+          } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+          }
+          NODE
