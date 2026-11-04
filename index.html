@@ -11137,6 +11137,21 @@ function drawMeadowGrassTufts(px,py,ww,hh,x,y,b,season){
   ctx.moveTo(gx,gy);
   ctx.quadraticCurveTo(gx+size*.55,gy-size*.55,gx+size,gy-size*.65);
   ctx.stroke();
+  // Additional sun-facing blade and seed head at close zoom only.
+  if(ww>=110){
+   ctx.strokeStyle=season===2?'#c0a66a':i%2?'#8eae65':'#a1bd76';
+   ctx.lineWidth=Math.max(.55,Math.min(1.05,ww*.007));
+   ctx.beginPath();
+   ctx.moveTo(gx,gy-size*.12);
+   ctx.quadraticCurveTo(gx+size*.10,gy-size*.75,gx+size*.2,gy-size*1.22);
+   ctx.stroke();
+   if(rnd(x+i*7,y-i*11,793)>.54){
+    ctx.fillStyle=season===2?'#c5ae79':'#b6b98b';
+    ctx.beginPath();
+    ctx.ellipse(gx+size*.2,gy-size*1.27,size*.13,size*.28,-.22,0,Math.PI*2);
+    ctx.fill();
+   }
+  }
  }
  ctx.restore();
 }
