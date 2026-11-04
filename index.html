@@ -1077,6 +1077,24 @@ function drawTerrainMicroRelief(px,py,ww,hh,x,y,b,season=forestSeason()){
  ctx.save();
  ctx.beginPath();ctx.moveTo(px,py-hh*.49);ctx.lineTo(px+ww*.49,py);
  ctx.lineTo(px,py+hh*.49);ctx.lineTo(px-ww*.49,py);ctx.closePath();ctx.clip();
+ // Flores de campo procedurais, discretas e estáveis em zoom próximo.
+ if((b===2||b===3)&&ww>=100&&!autumn&&!winter&&rnd(x,y,1220)>.39){
+  const flowers=ww>=145?3:2;
+  for(let f=0;f<flowers;f++){
+   const fx=px+(rnd(x+f*17,y,1221)-.5)*ww*.58;
+   const fy=py+(rnd(x,y+f*19,1222)-.5)*hh*.43;
+   const size=Math.max(1.1,ww*.0105),hue=rnd(x+f,y,1223);
+   ctx.strokeStyle='#315b37';ctx.lineWidth=Math.max(.65,ww*.006);
+   ctx.beginPath();ctx.moveTo(fx,fy+size*1.6);ctx.lineTo(fx,fy);ctx.stroke();
+   ctx.fillStyle=hue>.6?'#f6d49a':hue>.3?'#eee4ed':'#d5e7b1';
+   for(let petal=0;petal<4;petal++){
+    const angle=petal*Math.PI/2;
+    ctx.beginPath();ctx.ellipse(fx+Math.cos(angle)*size*.72,fy+Math.sin(angle)*size*.55,size*.62,size*.43,angle,0,Math.PI*2);ctx.fill();
+   }
+   ctx.fillStyle='#d8a34c';ctx.beginPath();ctx.arc(fx,fy,size*.34,0,Math.PI*2);ctx.fill();
+  }
+ }
+
  for(let i=0;i<count;i++){
   const rx=rnd(x+i*13,y-i*3,813),ry=rnd(x-i*7,y+i*11,814);
   const sx=px+(rx-.5)*ww*.66,sy=py+(ry-.5)*hh*.50;
