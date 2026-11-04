@@ -1025,6 +1025,25 @@ function drawMeadowWildflowers(px,py,ww,hh,x,y,b,season=forestSeason()){
  ctx.beginPath();ctx.moveTo(px,py-hh*.48);ctx.lineTo(px+ww*.48,py);
  ctx.lineTo(px,py+hh*.48);ctx.lineTo(px-ww*.48,py);ctx.closePath();ctx.clip();
  ctx.lineCap='round';
+ // Tufos de capim em camadas dão textura ao campo sem carregar imagens.
+ // As posições são estáveis por célula; o detalhe cresce apenas com o zoom.
+ const tuftCount=ww>=128?9:ww>=105?6:3;
+ ctx.lineJoin='round';
+ for(let t=0;t<tuftCount;t++){
+  const tx=px+(rnd(x+t*17,y-t*7,941)-.5)*ww*.73;
+  const ty=py+(rnd(x-t*5,y+t*19,942)-.5)*hh*.55;
+  const blade=ww*(.017+rnd(x+t,y-t,943)*.010);
+  ctx.strokeStyle=autumn?(t%3===0?'#d1a66b':'#8d8850'):(t%3===0?'#9dbb65':'#568b4b');
+  ctx.lineWidth=Math.max(.7,ww*.006);
+  ctx.beginPath();
+  ctx.moveTo(tx-blade*.46,ty+blade*.17);
+  ctx.quadraticCurveTo(tx-blade*.55,ty-blade*.55,tx-blade*.87,ty-blade*.80);
+  ctx.moveTo(tx,ty+blade*.2);
+  ctx.quadraticCurveTo(tx+blade*.04,ty-blade*.48,tx+blade*.24,ty-blade);
+  ctx.moveTo(tx+blade*.42,ty+blade*.16);
+  ctx.quadraticCurveTo(tx+blade*.64,ty-blade*.38,tx+blade*.88,ty-blade*.57);
+  ctx.stroke();
+ }
  for(let i=0;i<count;i++){
   const seed=i*19+331,rx=rnd(x+seed,y,332),ry=rnd(x,y+seed,333);
   const sx=px+(rx-.5)*ww*.63,sy=py+(ry-.5)*hh*.53;
