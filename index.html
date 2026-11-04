@@ -11331,6 +11331,28 @@ function drawMeadowFieldStones(px,py,ww,hh,x,y,b,season){
  ctx.lineWidth=Math.max(.55,rad*.22);
  ctx.beginPath();ctx.moveTo(sx-rad*.65,sy-rad*.13);
  ctx.lineTo(sx-rad*.39,sy-rad*.39);ctx.lineTo(sx+rad*.30,sy-rad*.51);ctx.stroke();
+ // Close-up rock weathering: fissures and moss follow the same deterministic tile seed.
+ // Skip the extra strokes at distant zoom to keep Safari Canvas draw calls bounded.
+ if(ww>=112){
+  ctx.globalAlpha=winter?.38:.68;
+  ctx.strokeStyle=autumn?'#534d3e':'#405345';
+  ctx.lineWidth=Math.max(.48,rad*.13);
+  ctx.beginPath();
+  ctx.moveTo(sx-rad*.16,sy-rad*.37);
+  ctx.lineTo(sx+rad*.02,sy-rad*.12);
+  ctx.lineTo(sx-rad*.08,sy+rad*.12);
+  if(rnd(x,y,807)>.55){
+   ctx.moveTo(sx+rad*.02,sy-rad*.12);
+   ctx.lineTo(sx+rad*.35,sy-rad*.18);
+  }
+  ctx.stroke();
+  if(!winter&&rnd(x,y,808)>.4){
+   ctx.fillStyle=autumn?'#81734b':'#66815c';
+   ctx.beginPath();
+   ctx.ellipse(sx-rad*.48,sy+rad*.11,rad*.26,rad*.13,-.3,0,Math.PI*2);
+   ctx.fill();
+  }
+ }
  ctx.restore();
 }
 function drawMeadowFlowers(px,py,ww,hh,x,y,b,season){
