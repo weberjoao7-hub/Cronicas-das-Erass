@@ -18,7 +18,7 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
 <aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · aldeias e patrulhas · arraste / pinça para navegar</p></aside>
 <div id="status" role="status">Carregando atlas…</div>
-<canvas id="minimap" width="150" height="150" aria-label="Minimapa navegável: toque para centralizar a câmera"></canvas>
+<canvas id="minimap" width="150" height="150" tabindex="0" role="button" aria-label="Minimapa navegável: setas movem a câmera; Enter centraliza o mapa"></canvas>
 <script>
 'use strict';
 const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
@@ -127,8 +127,8 @@ canvas.addEventListener('pointermove',e=>{
   pinch=dist;
  }
 });
-function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===1){const p=[...pointers.values()][0];p.x=Number(p.x);p.y=Number(p.y)}}
-canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
+function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
+canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 function navigateMinimap(e){
  const r=minimap.getBoundingClientRect(),x=Math.max(0,Math.min(SIZE,(e.clientX-r.left)/r.width*SIZE)),y=Math.max(0,Math.min(SIZE,(e.clientY-r.top)/r.height*SIZE));
@@ -136,6 +136,16 @@ function navigateMinimap(e){
 }
 minimap.addEventListener('pointerdown',e=>{minimap.setPointerCapture(e.pointerId);navigateMinimap(e)});
 minimap.addEventListener('pointermove',e=>{if(e.buttons)navigateMinimap(e)});
+minimap.addEventListener('keydown',e=>{
+ const step=e.shiftKey?180:60;
+ if(e.key==='ArrowLeft')offsetX+=step;
+ else if(e.key==='ArrowRight')offsetX-=step;
+ else if(e.key==='ArrowUp')offsetY+=step;
+ else if(e.key==='ArrowDown')offsetY-=step;
+ else if(e.key==='Enter'||e.key===' '){offsetX=0;offsetY=0}
+ else return;
+ e.preventDefault();draw();
+});
 atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 4.096 células · 4 biomas · 7 construções · 28 tropas';draw()};
 atlas.onerror=()=>{status.textContent='Falha ao carregar assets/cronicas_biomas_iso_atlas.svg'};
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
