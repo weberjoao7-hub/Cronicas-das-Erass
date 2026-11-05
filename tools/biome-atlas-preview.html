@@ -96,12 +96,14 @@ function draw(){
   ctx.restore();
  }
  for(const t of tiles){
-  while(oi<objects.length&&objects[oi].x+objects[oi].y<t.x+t.y)renderObject(objects[oi++]);
+  // Draw terrain first at each depth. Units and buildings at the same
+  // depth must appear in front of the ground, not be covered by it.
   const px=(t.x-t.y)*112,py=(t.x+t.y-SIZE)*56;
   const sx=(t.biome%2)*256,sy=Math.floor(t.biome/2)*192;
   const left=width/2+offsetX+(px-128)*scale,top=height/2+offsetY+(py-89)*scale;
-  if(left>width||top>height||left+256*scale<0||top+192*scale<0)continue;
-  ctx.drawImage(atlas,sx,sy,256,192,px-128,py-89,256,192);
+  if(!(left>width||top>height||left+256*scale<0||top+192*scale<0))
+   ctx.drawImage(atlas,sx,sy,256,192,px-128,py-89,256,192);
+  while(oi<objects.length&&objects[oi].x+objects[oi].y<=t.x+t.y)renderObject(objects[oi++]);
  }
  while(oi<objects.length)renderObject(objects[oi++]);
  ctx.restore();
