@@ -257,10 +257,14 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)return;
  const p=worldAt(e.clientX,e.clientY);
  const target={x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))};
- const route=findPath(troops[selectedTroop],target);
+ const previous=e.shiftKey?orders.get(selectedTroop):null;
+ // For queued commands, plan from the last destination rather than the unit's current position.
+ const origin=previous&&previous.route.length?previous.route[previous.route.length-1]:troops[selectedTroop];
+ const route=findPath(origin,target);
  if(!route){status.textContent='Destino bloqueado ou sem caminho';return;}
- orders.set(selectedTroop,{route,index:0});
- status.textContent='Ordem por clique direito · '+route.length+' pontos';draw();
+ if(previous){previous.route.push(...route);status.textContent='Pontos adicionados à fila · '+previous.route.length+' pontos';}
+ else{orders.set(selectedTroop,{route,index:0});status.textContent='Ordem por clique direito · '+route.length+' pontos';}
+ draw();
 });
 addEventListener('keydown',e=>{if(e.key==='Escape'&&selectedTroop>=0){selectedTroop=-1;status.textContent='Seleção cancelada';draw();}});
 function navigateMinimap(e){
