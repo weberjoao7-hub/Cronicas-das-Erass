@@ -14,7 +14,7 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 </head>
 <body>
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
-<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · arraste para mover · pinça ou roda para zoom</p></aside>
+<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · aldeias e patrulhas · arraste / pinça para navegar</p></aside>
 <div id="status" role="status">Carregando atlas…</div>
 <script>
 'use strict';
@@ -22,6 +22,10 @@ const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
 const status=document.getElementById('status'),atlas=new Image();
 let width=0,height=0,scale=1,offsetX=0,offsetY=0,ready=false;
 const SIZE=64,tiles=[];
+// Settlements and patrols are deterministic and share the terrain depth pass.
+const structures=[{x:21,y:22,type:'hall'},{x:24,y:22,type:'house'},{x:20,y:25,type:'house'},{x:26,y:24,type:'tower'},{x:43,y:37,type:'hall'},{x:46,y:38,type:'tower'},{x:42,y:40,type:'house'}];
+const troops=Array.from({length:16},(_,i)=>({x:19+(i%8)*1.25,y:28+Math.floor(i/8)*1.4,team:0})).concat(Array.from({length:12},(_,i)=>({x:40+(i%6)*1.3,y:43+Math.floor(i/6)*1.5,team:1})));
+let animationStart=performance.now();
 function hash(x,y){let v=Math.imul(x+37,374761393)+Math.imul(y+19,668265263);v=Math.imul(v^(v>>>13),1274126177);return (v^(v>>>16)>>>0)/4294967296}
 for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
  // Low-frequency, deterministic climate bands make contiguous regions instead of a checkerboard.
@@ -34,6 +38,7 @@ for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
 }
 // Render back-to-front: tall trees must not be painted over nearer terrain.
 tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
+const objects=[...structures.map(v=>({...v,kind:'building'})),...troops.map(v=>({...v,kind:'troop'}))].sort((a,b)=>(a.x+a.y)-(b.x+b.y));
 function resize(){
  const dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(3500000/Math.max(1,innerWidth*innerHeight)));
  width=innerWidth;height=innerHeight;
@@ -45,13 +50,39 @@ function draw(){
  ctx.fillStyle='#102421';ctx.fillRect(0,0,width,height);
  if(!ready)return;
  ctx.save();ctx.translate(width/2+offsetX,height/2+offsetY);ctx.scale(scale,scale);
+ const now=(performance.now()-animationStart)*.001;
+ let oi=0;
+ function renderObject(o){
+  const px=(o.x-o.y)*112,py=(o.x+o.y-SIZE)*56;
+  if(Math.abs(px*scale+width/2+offsetX)>width+160||Math.abs(py*scale+height/2+offsetY)>height+160)return;
+  ctx.save();ctx.translate(px,py);
+  if(o.kind==='building'){
+   const hall=o.type==='hall',tower=o.type==='tower',w=hall?55:tower?22:33,h=hall?44:tower?69:27;
+   ctx.fillStyle='#15262288';ctx.beginPath();ctx.ellipse(4,8,w*.7,15,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#a89168';ctx.beginPath();ctx.moveTo(-w,0);ctx.lineTo(0,w*.36);ctx.lineTo(0,-h+w*.36);ctx.lineTo(-w,-h);ctx.closePath();ctx.fill();
+   ctx.fillStyle='#715c48';ctx.beginPath();ctx.moveTo(0,w*.36);ctx.lineTo(w,0);ctx.lineTo(w,-h);ctx.lineTo(0,-h+w*.36);ctx.closePath();ctx.fill();
+   ctx.fillStyle=tower?'#7b8791':'#874c3c';ctx.beginPath();ctx.moveTo(-w-7,-h);ctx.lineTo(0,-h-w*.45);ctx.lineTo(w+7,-h);ctx.lineTo(0,-h+w*.3);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#d8c69a';ctx.lineWidth=2;ctx.stroke();
+   ctx.fillStyle='#302e2a';ctx.fillRect(w*.34,-h*.53,9,12);
+   if(hall){ctx.fillStyle='#e4bb68';ctx.fillRect(-5,-h-32,4,32);ctx.fillStyle='#a93d32';ctx.fillRect(-1,-h-32,24,14)}
+  }else{
+   const bob=Math.sin(now*3+o.x)*1.4;
+   ctx.fillStyle='#071b1a80';ctx.beginPath();ctx.ellipse(0,3,10,4,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=o.team?'#b95245':'#4788c1';ctx.fillRect(-5,-16+bob,10,13);
+   ctx.fillStyle='#e5c49a';ctx.beginPath();ctx.arc(0,-20+bob,5,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#c7c4b0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(8,-14+bob);ctx.lineTo(12,-30+bob);ctx.stroke();
+  }
+  ctx.restore();
+ }
  for(const t of tiles){
+  while(oi<objects.length&&objects[oi].x+objects[oi].y<t.x+t.y)renderObject(objects[oi++]);
   const px=(t.x-t.y)*112,py=(t.x+t.y-SIZE)*56;
   const sx=(t.biome%2)*256,sy=Math.floor(t.biome/2)*192;
   const left=width/2+offsetX+(px-128)*scale,top=height/2+offsetY+(py-89)*scale;
   if(left>width||top>height||left+256*scale<0||top+192*scale<0)continue;
   ctx.drawImage(atlas,sx,sy,256,192,px-128,py-89,256,192);
  }
+ while(oi<objects.length)renderObject(objects[oi++]);
  ctx.restore();
 }
 function zoom(factor,x,y){
@@ -75,10 +106,12 @@ canvas.addEventListener('pointermove',e=>{
 function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===1){const p=[...pointers.values()][0];p.x=Number(p.x);p.y=Number(p.y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
-atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 4.096 células · 4 biomas';draw()};
+atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 4.096 células · 4 biomas · 7 construções · 28 tropas';draw()};
 atlas.onerror=()=>{status.textContent='Falha ao carregar assets/cronicas_biomas_iso_atlas.svg'};
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
 addEventListener('resize',resize);resize();
+// Throttle animation when the tab is hidden and avoid rendering before the atlas loads.
+let lastFrame=0;function tick(ts){if(ready&&!document.hidden&&ts-lastFrame>80){lastFrame=ts;draw()}requestAnimationFrame(tick)}requestAnimationFrame(tick);
 </script>
 </body>
 </html>
