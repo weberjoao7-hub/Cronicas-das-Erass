@@ -64,6 +64,6 @@ test('touching a map destination actually executes the army command',()=>{
  assert.equal(result.dirty,true);
 });
 test('marching dust has zoom LOD and archer formation markers are included',()=>{
- assert.match(html,/if\(moving&&z>\.8&&biome\(/);
+ assert.match(html,/if\(moving&&z>\.8&&forestSeason\(/);
  assert.match(html,/if\(!isMilitary\(u\.kind\)\|\|!Array\.isArray\(u\.path\)/);
 });
