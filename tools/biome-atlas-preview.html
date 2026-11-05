@@ -55,6 +55,41 @@ function worldAt(sx,sy){
  const a=(sx-width/2-offsetX)/scale/112,b=(sy-height/2-offsetY)/scale/56+SIZE;
  return {x:(a+b)/2,y:(b-a)/2};
 }
+// Grid A*: buildings are impassable; diagonal corner-cutting is forbidden.
+const blocked=new Set(structures.flatMap(b=>{
+ const cells=[];for(let y=Math.floor(b.y)-1;y<=Math.floor(b.y)+1;y++)
+ for(let x=Math.floor(b.x)-1;x<=Math.floor(b.x)+1;x++)cells.push(y*SIZE+x);
+ return cells;
+}));
+function findPath(start,target){
+ const cell=(p)=>({x:Math.max(0,Math.min(SIZE-1,Math.floor(p.x))),y:Math.max(0,Math.min(SIZE-1,Math.floor(p.y)))});
+ const a=cell(start),b=cell(target),key=(x,y)=>y*SIZE+x;
+ const valid=(x,y)=>x>=0&&y>=0&&x<SIZE&&y<SIZE&&!blocked.has(key(x,y));
+ if(!valid(b.x,b.y))return null;
+ const startKey=key(a.x,a.y),goal=key(b.x,b.y),open=[startKey],came=new Map(),cost=new Map([[startKey,0]]),score=new Map([[startKey,Math.hypot(a.x-b.x,a.y-b.y)]]);
+ const closed=new Set();
+ while(open.length){
+  let best=0;for(let i=1;i<open.length;i++)if(score.get(open[i])<score.get(open[best]))best=i;
+  const current=open.splice(best,1)[0];
+  if(current===goal){
+   const route=[];let k=current;
+   while(k!==startKey){route.push({x:k%SIZE+.5,y:Math.floor(k/SIZE)+.5});k=came.get(k);if(k===undefined)return null;}
+   route.reverse();route.push({x:target.x,y:target.y});return route;
+  }
+  closed.add(current);
+  const x=current%SIZE,y=Math.floor(current/SIZE);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   if(!dx&&!dy)continue;
+   const nx=x+dx,ny=y+dy,nk=key(nx,ny);
+   if(!valid(nx,ny)||closed.has(nk)||(dx&&dy&&(!valid(x+dx,y)||!valid(x,y+dy))))continue;
+   const next=cost.get(current)+(dx&&dy?Math.SQRT2:1);
+   if(next>=(cost.get(nk)??Infinity))continue;
+   came.set(nk,current);cost.set(nk,next);score.set(nk,next+Math.hypot(nx-b.x,ny-b.y));
+   if(!open.includes(nk))open.push(nk);
+  }
+ }
+ return null;
+}
 function issueOrder(sx,sy){
  const p=worldAt(sx,sy);
  const nearest=troops.reduce((best,o,i)=>{
@@ -67,8 +102,11 @@ function issueOrder(sx,sy){
   return;
  }
  if(selectedTroop<0)return;
- orders.set(selectedTroop,{x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))});
- status.textContent='Ordem de marcha enviada à unidade '+(selectedTroop+1);
+ const target={x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))};
+ const route=findPath(troops[selectedTroop],target);
+ if(!route){status.textContent='Destino bloqueado ou sem caminho';return;}
+ orders.set(selectedTroop,{route,index:0});
+ status.textContent='Rota calculada ('+route.length+' pontos) · unidade '+(selectedTroop+1);
 }
 
 function updatePatrols(seconds){
@@ -78,9 +116,14 @@ function updatePatrols(seconds){
   const origin=patrolOrigins[i],phase=seconds*.32+i*.71;
   const order=orders.get(i);
   if(order){
-   const dx=order.x-o.x,dy=order.y-o.y,dist=Math.hypot(dx,dy);
-   if(dist<.08){orders.delete(i);patrolOrigins[i]={x:o.x,y:o.y};}
-   else {const step=Math.min(dist,1.35*dt);o.x+=dx/dist*step;o.y+=dy/dist*step;}
+   let remaining=1.35*dt;
+   while(remaining>0&&order.index<order.route.length){
+    const waypoint=order.route[order.index],dx=waypoint.x-o.x,dy=waypoint.y-o.y,dist=Math.hypot(dx,dy);
+    if(dist<.001){order.index++;continue;}
+    const step=Math.min(dist,remaining);o.x+=dx/dist*step;o.y+=dy/dist*step;remaining-=step;
+    if(step>=dist-.001)order.index++;
+   }
+   if(order.index>=order.route.length){orders.delete(i);patrolOrigins[i]={x:o.x,y:o.y};}
   }else if(i!==selectedTroop){
    o.x=origin.x+Math.cos(phase)*1.15;
    o.y=origin.y+Math.sin(phase)*.8;
