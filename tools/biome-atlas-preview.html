@@ -29,7 +29,7 @@ for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
  tiles.push({x,y,biome});
 }
 function resize(){
- const dpr=Math.min(devicePixelRatio||1,2);
+ const dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(3500000/Math.max(1,innerWidth*innerHeight)));
  width=innerWidth;height=innerHeight;
  canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
  ctx.setTransform(dpr,0,0,dpr,0,0);draw();
@@ -42,6 +42,8 @@ function draw(){
  for(const t of tiles){
   const px=(t.x-t.y)*112,py=(t.x+t.y-SIZE)*56;
   const sx=(t.biome%2)*256,sy=Math.floor(t.biome/2)*192;
+  const left=width/2+offsetX+(px-128)*scale,top=height/2+offsetY+(py-89)*scale;
+  if(left>width||top>height||left+256*scale<0||top+192*scale<0)continue;
   ctx.drawImage(atlas,sx,sy,256,192,px-128,py-89,256,192);
  }
  ctx.restore();
@@ -53,18 +55,18 @@ function zoom(factor,x,y){
  scale=next;draw();
 }
 const pointers=new Map();let pinch=0;
-canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});pinch=0});
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
 canvas.addEventListener('pointermove',e=>{
  const prev=pointers.get(e.pointerId);if(!prev)return;
  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pointers.size===1){offsetX+=e.clientX-prev.x;offsetY+=e.clientY-prev.y;draw()}
  else if(pointers.size===2){
   const pts=[...pointers.values()],dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
-  if(pinch>0)zoom(dist/pinch,(pts[0].x+pts[1].x)/2,(pts[0].y+pts[1].y)/2);
+  if(pinch>1&&dist>1)zoom(dist/pinch,(pts[0].x+pts[1].x)/2,(pts[0].y+pts[1].y)/2);
   pinch=dist;
  }
 });
-function end(e){pointers.delete(e.pointerId);pinch=0}
+function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===1){const p=[...pointers.values()][0];p.x=Number(p.x);p.y=Number(p.y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 324 células · 4 biomas';draw()};
