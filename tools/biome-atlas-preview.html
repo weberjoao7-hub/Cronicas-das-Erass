@@ -65,8 +65,25 @@ function findPath(start,target){
  const cell=(p)=>({x:Math.max(0,Math.min(SIZE-1,Math.floor(p.x))),y:Math.max(0,Math.min(SIZE-1,Math.floor(p.y)))});
  const a=cell(start),b=cell(target),key=(x,y)=>y*SIZE+x;
  const valid=(x,y)=>x>=0&&y>=0&&x<SIZE&&y<SIZE&&!blocked.has(key(x,y));
- if(!valid(b.x,b.y))return null;
- const startKey=key(a.x,a.y),goal=key(b.x,b.y),open=[startKey],came=new Map(),cost=new Map([[startKey,0]]),score=new Map([[startKey,Math.hypot(a.x-b.x,a.y-b.y)]]);
+ // Find the closest traversable destination when a building occupies the tap.
+ // Never silently walk through a building to reach an invalid final waypoint.
+ let goalCell=b;
+ if(!valid(b.x,b.y)){
+  let found=null;
+  for(let radius=1;radius<SIZE&&!found;radius++){
+   const candidates=[];
+   for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+    const x=b.x+dx,y=b.y+dy;
+    if(valid(x,y))candidates.push({x,y,distance:Math.hypot(x+.5-target.x,y+.5-target.y)});
+   }
+   candidates.sort((p,q)=>p.distance-q.distance);
+   if(candidates.length)found=candidates[0];
+  }
+  if(!found)return null;
+  goalCell=found;
+ }
+ const startKey=key(a.x,a.y),goal=key(goalCell.x,goalCell.y),open=[startKey],came=new Map(),cost=new Map([[startKey,0]]),score=new Map([[startKey,Math.hypot(a.x-goalCell.x,a.y-goalCell.y)]]);
  const closed=new Set();
  while(open.length){
   let best=0;for(let i=1;i<open.length;i++)if(score.get(open[i])<score.get(open[best]))best=i;
@@ -74,7 +91,11 @@ function findPath(start,target){
   if(current===goal){
    const route=[];let k=current;
    while(k!==startKey){route.push({x:k%SIZE+.5,y:Math.floor(k/SIZE)+.5});k=came.get(k);if(k===undefined)return null;}
-   route.reverse();route.push({x:target.x,y:target.y});return route;
+   route.reverse();
+   // Exact pointer destination is safe only when its cell is traversable.
+   // The fallback remains at the center of the closest walkable tile.
+   if(goalCell.x===b.x&&goalCell.y===b.y)route.push({x:target.x,y:target.y});
+   return route;
   }
   closed.add(current);
   const x=current%SIZE,y=Math.floor(current/SIZE);
@@ -84,7 +105,7 @@ function findPath(start,target){
    if(!valid(nx,ny)||closed.has(nk)||(dx&&dy&&(!valid(x+dx,y)||!valid(x,y+dy))))continue;
    const next=cost.get(current)+(dx&&dy?Math.SQRT2:1);
    if(next>=(cost.get(nk)??Infinity))continue;
-   came.set(nk,current);cost.set(nk,next);score.set(nk,next+Math.hypot(nx-b.x,ny-b.y));
+   came.set(nk,current);cost.set(nk,next);score.set(nk,next+Math.hypot(nx-goalCell.x,ny-goalCell.y));
    if(!open.includes(nk))open.push(nk);
   }
  }
@@ -217,7 +238,7 @@ function zoom(factor,x,y){
  scale=next;draw();
 }
 const pointers=new Map();let pinch=0,dragged=false,downPoint=null,gestureWasMultitouch=false;
-canvas.addEventListener('pointerdown',e=>{if(pointers.size===0){dragged=false;gestureWasMultitouch=false;downPoint={x:e.clientX,y:e.clientY}}canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){gestureWasMultitouch=true;dragged=true;const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(pointers.size===0){dragged=false;gestureWasMultitouch=false;downPoint={x:e.clientX,y:e.clientY}}canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){gestureWasMultitouch=true;dragged=true;const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
 canvas.addEventListener('pointermove',e=>{
  const prev=pointers.get(e.pointerId);if(!prev)return;
  if(downPoint&&Math.hypot(e.clientX-downPoint.x,e.clientY-downPoint.y)>8)dragged=true;
@@ -229,7 +250,7 @@ canvas.addEventListener('pointermove',e=>{
   pinch=dist;
  }
 });
-function end(e){if(e.type==='pointerup'&&!dragged&&!gestureWasMultitouch&&pointers.size===1)issueOrder(e.clientX,e.clientY);pointers.delete(e.pointerId);if(pointers.size===0){downPoint=null;pinch=0;gestureWasMultitouch=false}else if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
+function end(e){if(e.type==='pointerup'&&e.button===0&&!dragged&&!gestureWasMultitouch&&pointers.size===1)issueOrder(e.clientX,e.clientY);pointers.delete(e.pointerId);if(pointers.size===0){downPoint=null;pinch=0;gestureWasMultitouch=false}else if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 // Desktop RTS shortcuts: right-click orders the selected unit; Escape clears selection.
