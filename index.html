@@ -592,14 +592,22 @@ function drawMinimap(){
   mc.fillStyle=u.kind==='cannon'?'#ed8f58':u.kind==='cavalry'?'#f7bb68':u.kind==='warrior'?'#8bbcff':u.kind==='archer'?'#a9df9a':'#f9e6a0';
   mc.fillRect(u.x-.8,u.y-.8,1.6,1.6);
  }
- if(game.enemy&&game.enemy.hp>0){
+ // Tropas inimigas continuam visíveis mesmo após a derrota do comandante.
+ // Saves antigos podem conter unidades removidas ou posições inválidas.
+ const validMinimapUnit=u=>u&&u.hp>0&&Number.isFinite(u.x)&&Number.isFinite(u.y)&&
+  u.x>=0&&u.y>=0&&u.x<W&&u.y<H;
+ if(validMinimapUnit(game.enemy)&&visibleAt(game.enemy.x+.5,game.enemy.y+.5)){
   mc.fillStyle='#f36b61';
-  if(visibleAt(game.enemy.x+.5,game.enemy.y+.5))mc.fillRect(game.enemy.x-2,game.enemy.y-2,5,5);
-  for(const e of game.enemyUnits||[])if(visibleAt(e.x,e.y)){mc.fillStyle=e.kind==='archer'?'#d9a4ec':'#f36b61';mc.fillRect(e.x-1,e.y-1,2,2);}
+  mc.fillRect(game.enemy.x-2,game.enemy.y-2,5,5);
+ }
+ for(const e of game.enemyUnits||[]){
+  if(!validMinimapUnit(e)||!visibleAt(e.x,e.y))continue;
+  mc.fillStyle=e.kind==='archer'?'#d9a4ec':'#f36b61';
+  mc.fillRect(e.x-1,e.y-1,2,2);
  }
  // Unidade ativa diferenciada das demais no minimapa.
  const leader=game.units[selectedUnit];
- if(leader&&Number.isFinite(leader.x)&&Number.isFinite(leader.y)){
+ if(validMinimapUnit(leader)){
   mc.beginPath();mc.arc(leader.x,leader.y,3.3,0,Math.PI*2);
   mc.strokeStyle='#fff5d0';mc.lineWidth=1.35;mc.stroke();
  }
