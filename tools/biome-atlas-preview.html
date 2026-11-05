@@ -28,6 +28,8 @@ for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
  const biome=(x+y<10)?3:(x>12&&y<10)?2:(n>.56?1:0);
  tiles.push({x,y,biome});
 }
+// Render back-to-front: tall trees must not be painted over nearer terrain.
+tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
 function resize(){
  const dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(3500000/Math.max(1,innerWidth*innerHeight)));
  width=innerWidth;height=innerHeight;
