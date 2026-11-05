@@ -9,17 +9,21 @@ html,body{margin:0;height:100%;overflow:hidden;background:#102421;color:#f6e9c8;
 canvas{display:block;width:100%;height:100%;touch-action:none}
 aside{position:fixed;top:env(safe-area-inset-top);left:env(safe-area-inset-left);padding:12px 16px;background:#102922ed;border:1px solid #b89c67;border-radius:0 0 12px 0;pointer-events:none}
 h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
-#status{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;background:#102922e8;padding:7px 10px;border-radius:8px}
+#status{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;background:#102922e8;padding:7px 10px;border-radius:8px;pointer-events:none}
+#minimap{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:150px;height:150px;max-width:28vw;max-height:28vw;border:2px solid #c6ab74;border-radius:9px;background:#142b28;touch-action:none;box-shadow:0 4px 18px #0009;cursor:crosshair}
+@media(max-width:600px){aside{padding:8px 10px;max-width:70vw}h1{font-size:14px}#status{font-size:11px;max-width:52vw}}
 </style>
 </head>
 <body>
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
 <aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · aldeias e patrulhas · arraste / pinça para navegar</p></aside>
 <div id="status" role="status">Carregando atlas…</div>
+<canvas id="minimap" width="150" height="150" aria-label="Minimapa navegável: toque para centralizar a câmera"></canvas>
 <script>
 'use strict';
 const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
 const status=document.getElementById('status'),atlas=new Image();
+const minimap=document.getElementById('minimap'),miniCtx=minimap.getContext('2d');
 let width=0,height=0,scale=1,offsetX=0,offsetY=0,ready=false;
 const SIZE=64,tiles=[];
 // Settlements and patrols are deterministic and share the terrain depth pass.
@@ -39,6 +43,23 @@ for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
 // Render back-to-front: tall trees must not be painted over nearer terrain.
 tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
 const objects=[...structures.map(v=>({...v,kind:'building'})),...troops.map(v=>({...v,kind:'troop'}))].sort((a,b)=>(a.x+a.y)-(b.x+b.y));
+function renderMinimap(){
+ const m=150,cell=m/SIZE;
+ miniCtx.clearRect(0,0,m,m);
+ const colors=['#719457','#315f47','#c5a36b','#dce6e6'];
+ for(const t of tiles){miniCtx.fillStyle=colors[t.biome];miniCtx.fillRect(t.x*cell,t.y*cell,cell+0.5,cell+0.5)}
+ for(const o of structures){miniCtx.fillStyle='#f8d786';miniCtx.fillRect(o.x*cell-2,o.y*cell-2,5,5)}
+ for(const o of troops){miniCtx.fillStyle=o.team?'#d95549':'#5ab2f2';miniCtx.fillRect(o.x*cell-1,o.y*cell-1,3,3)}
+ // Inverse isometric projection of the four viewport corners.
+ miniCtx.beginPath();
+ const corners=[[0,0],[width,0],[width,height],[0,height]];
+ corners.forEach(([sx,sy],i)=>{
+  const a=(sx-width/2-offsetX)/scale/112,b=(sy-height/2-offsetY)/scale/56+SIZE;
+  const mx=(a+b)/2*cell,my=(b-a)/2*cell;
+  if(i===0)miniCtx.moveTo(mx,my);else miniCtx.lineTo(mx,my);
+ });
+ miniCtx.closePath();miniCtx.strokeStyle='#fff6d5';miniCtx.lineWidth=1.5;miniCtx.stroke();
+}
 function resize(){
  const dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(3500000/Math.max(1,innerWidth*innerHeight)));
  width=innerWidth;height=innerHeight;
@@ -84,6 +105,7 @@ function draw(){
  }
  while(oi<objects.length)renderObject(objects[oi++]);
  ctx.restore();
+ renderMinimap();
 }
 function zoom(factor,x,y){
  const next=Math.max(.3,Math.min(2.2,scale*factor)),ratio=next/scale;
@@ -106,6 +128,12 @@ canvas.addEventListener('pointermove',e=>{
 function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===1){const p=[...pointers.values()][0];p.x=Number(p.x);p.y=Number(p.y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
+function navigateMinimap(e){
+ const r=minimap.getBoundingClientRect(),x=Math.max(0,Math.min(SIZE,(e.clientX-r.left)/r.width*SIZE)),y=Math.max(0,Math.min(SIZE,(e.clientY-r.top)/r.height*SIZE));
+ offsetX=-(x-y)*112*scale;offsetY=-(x+y-SIZE)*56*scale;draw();
+}
+minimap.addEventListener('pointerdown',e=>{minimap.setPointerCapture(e.pointerId);navigateMinimap(e)});
+minimap.addEventListener('pointermove',e=>{if(e.buttons)navigateMinimap(e)});
 atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 4.096 células · 4 biomas · 7 construções · 28 tropas';draw()};
 atlas.onerror=()=>{status.textContent='Falha ao carregar assets/cronicas_biomas_iso_atlas.svg'};
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
