@@ -42,11 +42,15 @@ for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
 }
 // Render back-to-front: tall trees must not be painted over nearer terrain.
 tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
-const objects=[...structures.map(v=>({...v,kind:'building'})),...troops.map(v=>({...v,kind:'troop'}))];
+// Keep render objects linked to live troop coordinates instead of detached copies.
+for(const v of structures)v.kind='building';
+for(const v of troops)v.kind='troop';
+const objects=[...structures,...troops];
 // Keep troop positions mutable: their depth order changes as patrols move.
 const patrolOrigins=troops.map(o=>({x:o.x,y:o.y}));
 let selectedTroop=-1;
 const orders=new Map();
+let lastSimulationSeconds=null;
 function worldAt(sx,sy){
  const a=(sx-width/2-offsetX)/scale/112,b=(sy-height/2-offsetY)/scale/56+SIZE;
  return {x:(a+b)/2,y:(b-a)/2};
@@ -68,13 +72,15 @@ function issueOrder(sx,sy){
 }
 
 function updatePatrols(seconds){
+ const dt=lastSimulationSeconds===null?0:Math.max(0,Math.min(.15,seconds-lastSimulationSeconds));
+ lastSimulationSeconds=seconds;
  troops.forEach((o,i)=>{
   const origin=patrolOrigins[i],phase=seconds*.32+i*.71;
   const order=orders.get(i);
   if(order){
    const dx=order.x-o.x,dy=order.y-o.y,dist=Math.hypot(dx,dy);
    if(dist<.08){orders.delete(i);patrolOrigins[i]={x:o.x,y:o.y};}
-   else {const step=Math.min(dist,.11);o.x+=dx/dist*step;o.y+=dy/dist*step;}
+   else {const step=Math.min(dist,1.35*dt);o.x+=dx/dist*step;o.y+=dy/dist*step;}
   }else if(i!==selectedTroop){
    o.x=origin.x+Math.cos(phase)*1.15;
    o.y=origin.y+Math.sin(phase)*.8;
