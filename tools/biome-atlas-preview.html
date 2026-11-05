@@ -16,7 +16,7 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 </head>
 <body>
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
-<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · patrulhas em movimento · arraste / pinça para navegar</p></aside>
+<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · toque em tropa azul e depois no destino · arraste / pinça</p></aside>
 <div id="status" role="status">Carregando atlas…</div>
 <canvas id="minimap" width="150" height="150" tabindex="0" role="button" aria-label="Minimapa navegável: setas movem a câmera; Enter centraliza o mapa"></canvas>
 <script>
@@ -45,11 +45,40 @@ tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
 const objects=[...structures.map(v=>({...v,kind:'building'})),...troops.map(v=>({...v,kind:'troop'}))];
 // Keep troop positions mutable: their depth order changes as patrols move.
 const patrolOrigins=troops.map(o=>({x:o.x,y:o.y}));
+let selectedTroop=-1;
+const orders=new Map();
+function worldAt(sx,sy){
+ const a=(sx-width/2-offsetX)/scale/112,b=(sy-height/2-offsetY)/scale/56+SIZE;
+ return {x:(a+b)/2,y:(b-a)/2};
+}
+function issueOrder(sx,sy){
+ const p=worldAt(sx,sy);
+ const nearest=troops.reduce((best,o,i)=>{
+  const dist=Math.hypot((o.x-p.x)*112,(o.y-p.y)*56);
+  return dist<best.dist?{i,dist}:best;
+ },{i:-1,dist:Infinity});
+ if(nearest.dist<22&&troops[nearest.i].team===0){
+  selectedTroop=nearest.i;
+  status.textContent='Unidade '+(selectedTroop+1)+' selecionada · toque no destino';
+  return;
+ }
+ if(selectedTroop<0)return;
+ orders.set(selectedTroop,{x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))});
+ status.textContent='Ordem de marcha enviada à unidade '+(selectedTroop+1);
+}
+
 function updatePatrols(seconds){
  troops.forEach((o,i)=>{
   const origin=patrolOrigins[i],phase=seconds*.32+i*.71;
-  o.x=origin.x+Math.cos(phase)*1.15;
-  o.y=origin.y+Math.sin(phase)*.8;
+  const order=orders.get(i);
+  if(order){
+   const dx=order.x-o.x,dy=order.y-o.y,dist=Math.hypot(dx,dy);
+   if(dist<.08){orders.delete(i);patrolOrigins[i]={x:o.x,y:o.y};}
+   else {const step=Math.min(dist,.11);o.x+=dx/dist*step;o.y+=dy/dist*step;}
+  }else if(i!==selectedTroop){
+   o.x=origin.x+Math.cos(phase)*1.15;
+   o.y=origin.y+Math.sin(phase)*.8;
+  }
  });
  objects.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
 }
@@ -99,6 +128,7 @@ function draw(){
   }else{
    const bob=Math.sin(now*3+o.x)*1.4;
    ctx.fillStyle='#071b1a80';ctx.beginPath();ctx.ellipse(0,3,10,4,0,0,Math.PI*2);ctx.fill();
+   if(o===troops[selectedTroop]){ctx.strokeStyle='#f5d16b';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,3,16,7,0,0,Math.PI*2);ctx.stroke();}
    ctx.fillStyle=o.team?'#b95245':'#4788c1';ctx.fillRect(-5,-16+bob,10,13);
    ctx.fillStyle='#e5c49a';ctx.beginPath();ctx.arc(0,-20+bob,5,0,Math.PI*2);ctx.fill();
    ctx.strokeStyle='#c7c4b0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(8,-14+bob);ctx.lineTo(12,-30+bob);ctx.stroke();
@@ -127,10 +157,11 @@ function zoom(factor,x,y){
  offsetY=(offsetY+height/2-y)*ratio+y-height/2;
  scale=next;draw();
 }
-const pointers=new Map();let pinch=0;
-canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
+const pointers=new Map();let pinch=0,dragged=false,downPoint=null;
+canvas.addEventListener('pointerdown',e=>{dragged=false;downPoint={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
 canvas.addEventListener('pointermove',e=>{
  const prev=pointers.get(e.pointerId);if(!prev)return;
+ if(downPoint&&Math.hypot(e.clientX-downPoint.x,e.clientY-downPoint.y)>8)dragged=true;
  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pointers.size===1){offsetX+=e.clientX-prev.x;offsetY+=e.clientY-prev.y;draw()}
  else if(pointers.size===2){
@@ -139,7 +170,7 @@ canvas.addEventListener('pointermove',e=>{
   pinch=dist;
  }
 });
-function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
+function end(e){if(e.type==='pointerup'&&!dragged&&pointers.size===1)issueOrder(e.clientX,e.clientY);pointers.delete(e.pointerId);downPoint=null;pinch=0;if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 function navigateMinimap(e){
