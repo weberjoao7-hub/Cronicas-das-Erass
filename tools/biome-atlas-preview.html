@@ -166,12 +166,24 @@ function updatePatrols(seconds){
  });
  objects.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
 }
+// Cache static terrain and structures once; only units and viewport change per frame.
+const minimapTerrain=document.createElement('canvas');
+minimapTerrain.width=minimapTerrain.height=150;
+const terrainCtx=minimapTerrain.getContext('2d');
+const minimapCell=150/SIZE;
+const minimapColors=['#719457','#315f47','#c5a36b','#dce6e6'];
+for(const t of tiles){
+ terrainCtx.fillStyle=minimapColors[t.biome];
+ terrainCtx.fillRect(t.x*minimapCell,t.y*minimapCell,minimapCell+.5,minimapCell+.5);
+}
+for(const o of structures){
+ terrainCtx.fillStyle='#f8d786';
+ terrainCtx.fillRect(o.x*minimapCell-2,o.y*minimapCell-2,5,5);
+}
 function renderMinimap(){
- const m=150,cell=m/SIZE;
+ const m=150,cell=minimapCell;
  miniCtx.clearRect(0,0,m,m);
- const colors=['#719457','#315f47','#c5a36b','#dce6e6'];
- for(const t of tiles){miniCtx.fillStyle=colors[t.biome];miniCtx.fillRect(t.x*cell,t.y*cell,cell+0.5,cell+0.5)}
- for(const o of structures){miniCtx.fillStyle='#f8d786';miniCtx.fillRect(o.x*cell-2,o.y*cell-2,5,5)}
+ miniCtx.drawImage(minimapTerrain,0,0);
  for(const o of troops){miniCtx.fillStyle=o.team?'#d95549':'#5ab2f2';miniCtx.fillRect(o.x*cell-1,o.y*cell-1,3,3)}
  // Inverse isometric projection of the four viewport corners.
  miniCtx.beginPath();
