@@ -16,7 +16,7 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 </head>
 <body>
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
-<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · aldeias e patrulhas · arraste / pinça para navegar</p></aside>
+<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · patrulhas em movimento · arraste / pinça para navegar</p></aside>
 <div id="status" role="status">Carregando atlas…</div>
 <canvas id="minimap" width="150" height="150" tabindex="0" role="button" aria-label="Minimapa navegável: setas movem a câmera; Enter centraliza o mapa"></canvas>
 <script>
@@ -42,7 +42,17 @@ for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
 }
 // Render back-to-front: tall trees must not be painted over nearer terrain.
 tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
-const objects=[...structures.map(v=>({...v,kind:'building'})),...troops.map(v=>({...v,kind:'troop'}))].sort((a,b)=>(a.x+a.y)-(b.x+b.y));
+const objects=[...structures.map(v=>({...v,kind:'building'})),...troops.map(v=>({...v,kind:'troop'}))];
+// Keep troop positions mutable: their depth order changes as patrols move.
+const patrolOrigins=troops.map(o=>({x:o.x,y:o.y}));
+function updatePatrols(seconds){
+ troops.forEach((o,i)=>{
+  const origin=patrolOrigins[i],phase=seconds*.32+i*.71;
+  o.x=origin.x+Math.cos(phase)*1.15;
+  o.y=origin.y+Math.sin(phase)*.8;
+ });
+ objects.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.x-b.x);
+}
 function renderMinimap(){
  const m=150,cell=m/SIZE;
  miniCtx.clearRect(0,0,m,m);
@@ -153,7 +163,7 @@ atlas.onerror=()=>{status.textContent='Falha ao carregar assets/cronicas_biomas_
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
 addEventListener('resize',resize);resize();
 // Throttle animation when the tab is hidden and avoid rendering before the atlas loads.
-let lastFrame=0;function tick(ts){if(ready&&!document.hidden&&ts-lastFrame>80){lastFrame=ts;draw()}requestAnimationFrame(tick)}requestAnimationFrame(tick);
+let lastFrame=0;function tick(ts){if(ready&&!document.hidden&&ts-lastFrame>80){lastFrame=ts;updatePatrols((ts-animationStart)/1000);draw()}requestAnimationFrame(tick)}requestAnimationFrame(tick);
 </script>
 </body>
 </html>
