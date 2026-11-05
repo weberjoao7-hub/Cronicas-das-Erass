@@ -120,6 +120,12 @@ nav button{min-width:0;max-width:none;min-height:46px;padding:8px 6px;
  #minimap{width:82px;height:82px}
  #mapLabel{top:calc(178px + env(safe-area-inset-top));font-size:9px}
 }
+/* Keyboard accessibility: visible minimap focus without obscuring the tactical view. */
+#minimap:focus-visible{outline:3px solid #ffe5a2;outline-offset:3px;box-shadow:0 0 0 5px #102421,0 5px 18px #000b}
+@media (forced-colors:active){
+ #minimap:focus-visible{outline:3px solid Highlight;outline-offset:3px}
+ button:focus-visible{outline:3px solid Highlight;outline-offset:2px}
+}
 @media(prefers-reduced-motion:reduce){button{transition:none}}
 </style></head><body><canvas id="world"></canvas><canvas id="minimap" width="160" height="160" tabindex="0" role="application" aria-label="Minimapa interativo: use as setas para mover a câmera, Shift para deslocamento maior e Home para centralizar"></canvas><div id="mapLabel">🟢 Seu território · 🔴 Inimigo</div><div id="perfHud" aria-live="off"></div><header><div><strong>⚔️ CRÔNICAS DAS ERAS</strong><div><small id="era">Era Primordial · Dia 1</small></div></div><div class="resources" id="res"></div></header><div id="toast"></div><div id="tip">Arraste o mapa · segure e arraste para selecionar tropas · pinça para zoom</div><div id="panel"></div><button id="cancelPlacement" type="button">✕ Cancelar construção</button><nav><button id="home">🏠 Aldeia</button><button id="build">🔨 Construir</button><button id="army">⚔️ Tropas</button><button id="help">❔ Ajuda</button><button id="zoom">🔎 Zoom</button></nav>
 <script>
