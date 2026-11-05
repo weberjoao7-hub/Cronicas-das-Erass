@@ -14,18 +14,22 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 </head>
 <body>
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
-<aside><h1>Laboratório de biomas</h1><p>Arraste para mover · pinça ou roda para zoom</p></aside>
+<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · arraste para mover · pinça ou roda para zoom</p></aside>
 <div id="status" role="status">Carregando atlas…</div>
 <script>
 'use strict';
 const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
 const status=document.getElementById('status'),atlas=new Image();
 let width=0,height=0,scale=1,offsetX=0,offsetY=0,ready=false;
-const SIZE=18,tiles=[];
+const SIZE=64,tiles=[];
 function hash(x,y){let v=Math.imul(x+37,374761393)+Math.imul(y+19,668265263);v=Math.imul(v^(v>>>13),1274126177);return (v^(v>>>16)>>>0)/4294967296}
 for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){
- const n=hash(Math.floor(x/4),Math.floor(y/4))*.7+hash(x,y)*.3;
- const biome=(x+y<10)?3:(x>12&&y<10)?2:(n>.56?1:0);
+ // Low-frequency, deterministic climate bands make contiguous regions instead of a checkerboard.
+ const latitude=y/SIZE,longitude=x/SIZE;
+ const moisture=hash(Math.floor(x/12),Math.floor(y/12))*.55+
+                hash(Math.floor(x/6),Math.floor(y/6))*.30+hash(x,y)*.15;
+ const temperature=.72-latitude*.62+Math.sin(longitude*Math.PI*2)*.18;
+ const biome=temperature<.29?3:temperature>.65&&moisture<.43?2:moisture>.54?1:0;
  tiles.push({x,y,biome});
 }
 // Render back-to-front: tall trees must not be painted over nearer terrain.
@@ -71,7 +75,7 @@ canvas.addEventListener('pointermove',e=>{
 function end(e){pointers.delete(e.pointerId);pinch=0;if(pointers.size===1){const p=[...pointers.values()][0];p.x=Number(p.x);p.y=Number(p.y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
-atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 324 células · 4 biomas';draw()};
+atlas.onload=()=>{ready=true;status.textContent='Atlas carregado · 4.096 células · 4 biomas';draw()};
 atlas.onerror=()=>{status.textContent='Falha ao carregar assets/cronicas_biomas_iso_atlas.svg'};
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
 addEventListener('resize',resize);resize();
