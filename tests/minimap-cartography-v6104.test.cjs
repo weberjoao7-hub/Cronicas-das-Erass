@@ -14,7 +14,7 @@ function scene(){
  });
  const W=160,H=160,terrain=new Uint8Array(W*H).fill(2),waterDepth=new Uint8Array(W*H).fill(1),riparianMask=new Uint8Array(W*H);
  const regions=new Set(['6,6','7,6']);
- const game={buildings:[{x:80,y:80}],units:[{x:80.5,y:80.5,kind:'worker'}],ruinsExplored:[],enemy:{x:91,y:86,hp:100},enemyUnits:[]};
+ const game={buildings:[{x:80,y:80}],units:[{x:80.5,y:80.5,kind:'worker',hp:100}],ruinsExplored:[],enemy:{x:91,y:86,hp:100},enemyUnits:[]};
  const factory=new Function('mc','terrain','waterDepth','riparianMask','rnd','W','H','REGION_SIZE','ownedRegions','game','ruinSites','visibleAt','key','fogCanvas','tileAt','w','h','selectedUnit','miniBase',code+'return {minimapTerrainColor,minimapRegionSegments,redrawMinimap,drawMinimap};');
  const api=factory(mc,terrain,waterDepth,riparianMask,(x,y,z)=>{let n=Math.sin(x*127.1+y*311.7+z*78.233)*43758.5453;return n-Math.floor(n)},W,H,12,()=>regions,game,[],()=>true,(x,y)=>x+','+y,{},(x,y)=>({x:x/5,y:y/5}),390,844,0,null);
  return {api,calls,styles,terrain,waterDepth,riparianMask,regions,game};
