@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="384" viewBox="0 0 512 384">
+<title>Crônicas das Eras — atlas isométrico de terreno, 4 biomas</title>
+<desc>Quatro tiles isométricos de 256 por 192 pixels: pradaria, floresta, deserto e neve. Centros em (128,96), (384,96), (128,288), (384,288). Transparência preservada para Canvas.</desc>
+<defs>
+<linearGradient id="grass" x2="0" y2="1"><stop stop-color="#a8b86b"/><stop offset="1" stop-color="#5f8e50"/></linearGradient>
+<linearGradient id="forest" x2="0" y2="1"><stop stop-color="#6d9a56"/><stop offset="1" stop-color="#365c40"/></linearGradient>
+<linearGradient id="sand" x2="0" y2="1"><stop stop-color="#e6cf87"/><stop offset="1" stop-color="#c29b57"/></linearGradient>
+<linearGradient id="snow" x2="0" y2="1"><stop stop-color="#f0f5ee"/><stop offset="1" stop-color="#c1d9dc"/></linearGradient>
+<linearGradient id="pine" x2="0" y2="1"><stop stop-color="#3f7455"/><stop offset="1" stop-color="#163e35"/></linearGradient>
+<g id="tuft" fill="none" stroke="#355e39" stroke-width="2" stroke-linecap="round"><path d="M-5 0l-3-5M-3 0l1-8M0 0l4-6M2 0l7-3"/></g>
+<g id="tree"><ellipse cx="0" cy="5" rx="17" ry="6" fill="#142f2c" opacity=".35"/><path d="M-3 3V-25h6V3" fill="#694b35"/><path d="M0-68L-24-29H-14L-29-12H29L14-29H24Z" fill="url(#pine)" stroke="#173d32" stroke-width="2"/><path d="M0-68L-3-29L-12-13H0Z" fill="#7baf77" opacity=".38"/></g>
+</defs>
+<!-- Grassland -->
+<g transform="translate(0 0)">
+<path d="M128 29L247 89 128 149 9 89Z" fill="url(#grass)" stroke="#344d36" stroke-width="2"/>
+<path d="M9 89L128 149V161L9 101Z" fill="#496d3f"/><path d="M128 149L247 89V101L128 161Z" fill="#31583c"/>
+<path d="M25 89L128 37 231 89 128 141Z" fill="none" stroke="#d7d18c" stroke-opacity=".28"/>
+<g opacity=".75"><use href="#tuft" x="78" y="89"/><use href="#tuft" x="149" y="65"/><use href="#tuft" x="168" y="108"/><use href="#tuft" x="116" y="115"/></g>
+<g fill="#f4e1a5"><circle cx="95" cy="72" r="2"/><circle cx="181" cy="86" r="2"/><circle cx="136" cy="121" r="2"/></g>
+</g>
+<!-- Forest -->
+<g transform="translate(256 0)">
+<path d="M128 29L247 89 128 149 9 89Z" fill="url(#forest)" stroke="#274735" stroke-width="2"/>
+<path d="M9 89L128 149V161L9 101Z" fill="#355c3c"/><path d="M128 149L247 89V101L128 161Z" fill="#203f34"/>
+<path d="M35 88Q89 60 128 47Q181 65 217 88Q173 109 128 131Q79 113 35 88Z" fill="#a5bd73" opacity=".16"/>
+<use href="#tree" x="94" y="94"/><use href="#tree" x="148" y="81" transform="translate(148 81) scale(.8) translate(-148 -81)"/><use href="#tree" x="163" y="111" transform="translate(163 111) scale(.65) translate(-163 -111)"/>
+</g>
+<!-- Desert -->
+<g transform="translate(0 192)">
+<path d="M128 29L247 89 128 149 9 89Z" fill="url(#sand)" stroke="#9e7e4b" stroke-width="2"/>
+<path d="M9 89L128 149V161L9 101Z" fill="#b18a51"/><path d="M128 149L247 89V101L128 161Z" fill="#967348"/>
+<path d="M39 91Q85 72 126 88T219 87M60 106Q113 90 160 113" fill="none" stroke="#f8e6ad" stroke-width="3" opacity=".45"/>
+<g fill="#9e8056"><ellipse cx="95" cy="81" rx="9" ry="4"/><ellipse cx="165" cy="104" rx="7" ry="3"/><circle cx="139" cy="65" r="3"/></g>
+<path d="M115 115v-19m0 10q-12 0-12-10m12 5q11 0 11-11" fill="none" stroke="#477651" stroke-width="5" stroke-linecap="round"/>
+</g>
+<!-- Snow -->
+<g transform="translate(256 192)">
+<path d="M128 29L247 89 128 149 9 89Z" fill="url(#snow)" stroke="#9eb8bb" stroke-width="2"/>
+<path d="M9 89L128 149V161L9 101Z" fill="#9cb9bf"/><path d="M128 149L247 89V101L128 161Z" fill="#7e9ea7"/>
+<path d="M39 89L128 44 214 89 128 133Z" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="2"/>
+<path d="M66 93l22-9 13 4m61 24 19-10 14 1" fill="none" stroke="#91b4c1" stroke-width="2"/>
+<g fill="#fff"><circle cx="115" cy="72" r="3"/><circle cx="155" cy="91" r="2"/><circle cx="103" cy="114" r="2"/></g>
+<use href="#tree" x="167" y="95" transform="translate(167 95) scale(.62) translate(-167 -95)"/>
+<path d="M151 62l16-7 15 7m-23 5 9-5 8 4" fill="none" stroke="#f7fcf8" stroke-width="4" stroke-linecap="round"/>
+</g>
+</svg>
