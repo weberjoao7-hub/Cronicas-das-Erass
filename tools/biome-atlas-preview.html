@@ -93,12 +93,13 @@ function findPath(start,target){
 function issueOrder(sx,sy){
  const p=worldAt(sx,sy);
  const nearest=troops.reduce((best,o,i)=>{
+  if(o.team!==0)return best;
   const screenX=width/2+offsetX+(o.x-o.y)*112*scale;
   const screenY=height/2+offsetY+(o.x+o.y-SIZE)*56*scale-13*scale;
   const dist=Math.hypot(screenX-sx,screenY-sy);
   return dist<best.dist?{i,dist}:best;
  },{i:-1,dist:Infinity});
- if(nearest.dist<Math.max(22,24*scale)&&troops[nearest.i].team===0){
+ if(nearest.i>=0&&nearest.dist<Math.max(22,24*scale)){
   selectedTroop=nearest.i;
   status.textContent='Unidade '+(selectedTroop+1)+' selecionada · toque no destino';
   return;
@@ -231,6 +232,16 @@ canvas.addEventListener('pointermove',e=>{
 function end(e){if(e.type==='pointerup'&&!dragged&&!gestureWasMultitouch&&pointers.size===1)issueOrder(e.clientX,e.clientY);pointers.delete(e.pointerId);if(pointers.size===0){downPoint=null;pinch=0;gestureWasMultitouch=false}else if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
+// Desktop RTS shortcuts: right-click orders the selected unit; Escape clears selection.
+canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)return;
+ const p=worldAt(e.clientX,e.clientY);
+ const target={x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))};
+ const route=findPath(troops[selectedTroop],target);
+ if(!route){status.textContent='Destino bloqueado ou sem caminho';return;}
+ orders.set(selectedTroop,{route,index:0});
+ status.textContent='Ordem por clique direito · '+route.length+' pontos';draw();
+});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&selectedTroop>=0){selectedTroop=-1;status.textContent='Seleção cancelada';draw();}});
 function navigateMinimap(e){
  const r=minimap.getBoundingClientRect(),x=Math.max(0,Math.min(SIZE,(e.clientX-r.left)/r.width*SIZE)),y=Math.max(0,Math.min(SIZE,(e.clientY-r.top)/r.height*SIZE));
  offsetX=-(x-y)*112*scale;offsetY=-(x+y-SIZE)*56*scale;draw();
