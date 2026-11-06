@@ -329,6 +329,38 @@ function draw(){
     ctx.beginPath();ctx.moveTo(px,py-56);ctx.lineTo(px+112,py);
     ctx.lineTo(px,py+56);ctx.lineTo(px-112,py);ctx.closePath();ctx.fill();
     ctx.strokeStyle='#10242144';ctx.lineWidth=1;ctx.stroke();
+    // Deterministic terrain details: no extra downloads or per-frame randomness.
+    // Clip to the diamond so rocks, grass and snow never spill into adjacent tiles.
+    ctx.save();ctx.beginPath();ctx.moveTo(px,py-56);ctx.lineTo(px+112,py);
+    ctx.lineTo(px,py+56);ctx.lineTo(px-112,py);ctx.closePath();ctx.clip();
+    const seed=hash(t.x,t.y),dry=t.biome===2,snow=t.biome===3,forest=t.biome===1;
+    for(let n=0;n<5;n++){
+     const h=hash(t.x*11+n,t.y*13+n),v=hash(t.x*7+n,t.y*17+n);
+     const dx=(h-.5)*155,dy=(v-.5)*70;
+     ctx.strokeStyle=snow?'#ffffff77':dry?'#795f3b77':forest?'#9bc27a77':'#d1d88b88';
+     ctx.lineWidth=1.5+(n%2);
+     ctx.beginPath();ctx.moveTo(px+dx,py+dy);ctx.lineTo(px+dx+3,py+dy-3-(n%3)*2);ctx.stroke();
+    }
+    if(seed>.65){
+     const dx=(hash(t.x+4,t.y+8)-.5)*90,dy=(hash(t.x+9,t.y+3)-.5)*34;
+     ctx.fillStyle=snow?'#b7c9ce':dry?'#8d7959':'#526957';
+     ctx.beginPath();ctx.ellipse(px+dx,py+dy,7,3.5,-.2,0,Math.PI*2);ctx.fill();
+     ctx.fillStyle=snow?'#f8ffff':'#b6aa84';
+     ctx.beginPath();ctx.moveTo(px+dx-6,py+dy);ctx.lineTo(px+dx-2,py+dy-7);
+     ctx.lineTo(px+dx+6,py+dy-2);ctx.closePath();ctx.fill();
+    }
+    ctx.restore();
+    // Sparse conifers give the forest biome a recognizable silhouette.
+    if(forest&&seed>.82){
+     const tx=px+(hash(t.x+19,t.y)-.5)*50,ty=py-10;
+     ctx.fillStyle='#3c3025';ctx.fillRect(tx-2,ty-25,4,27);
+     ctx.fillStyle='#183f31';ctx.beginPath();ctx.moveTo(tx,ty-67);
+     ctx.lineTo(tx-22,ty-17);ctx.lineTo(tx+22,ty-17);ctx.closePath();ctx.fill();
+     ctx.fillStyle='#2e6445';ctx.beginPath();ctx.moveTo(tx,ty-56);
+     ctx.lineTo(tx-17,ty-28);ctx.lineTo(tx+17,ty-28);ctx.closePath();ctx.fill();
+     ctx.strokeStyle='#8db17c';ctx.lineWidth=1;ctx.beginPath();
+     ctx.moveTo(tx,ty-67);ctx.lineTo(tx-9,ty-44);ctx.stroke();
+    }
    }
   }
   while(oi<objects.length&&objects[oi].x+objects[oi].y===depth)renderObject(objects[oi++]);
