@@ -57,6 +57,8 @@ let queueEnabled=false;
 const queueButton=document.getElementById('queueMode');
 queueButton.addEventListener('click',()=>{queueEnabled=!queueEnabled;queueButton.setAttribute('aria-pressed',String(queueEnabled));queueButton.textContent=queueEnabled?'Fila: ligada':'Fila: desligada';status.textContent=queueEnabled?'Próximos destinos serão adicionados à fila':'Próxima ordem substituirá a rota atual';});
 const orders=new Map();
+// Once a player stops or moves a unit, it stays at its commanded position.
+const holdingPosition=new Set();
 let lastSimulationSeconds=null;
 function worldAt(sx,sy){
  const a=(sx-width/2-offsetX)/scale/112,b=(sy-height/2-offsetY)/scale/56+SIZE;
@@ -158,6 +160,7 @@ stopButton.addEventListener('click',()=>{
  if(selectedTroop<0)return;
  const unit=troops[selectedTroop];
  orders.delete(selectedTroop);
+ holdingPosition.add(selectedTroop);
  patrolOrigins[selectedTroop]={x:unit.x,y:unit.y};
  status.textContent='Unidade '+(selectedTroop+1)+' parada · rota cancelada';
  draw();
@@ -168,6 +171,7 @@ function enqueueMove(target,append){
  const origin=previous&&previous.route.length?previous.route[previous.route.length-1]:troops[selectedTroop];
  const route=findPath(origin,target);
  if(!route){status.textContent='Destino bloqueado ou sem caminho';return;}
+ holdingPosition.add(selectedTroop);
  if(previous){previous.route=previous.route.slice(previous.index);previous.index=0;previous.route.push(...route);status.textContent='Fila atualizada · '+previous.route.length+' pontos restantes';}
  else{orders.set(selectedTroop,{route,index:0});status.textContent='Rota calculada · '+route.length+' pontos';}
  draw();
@@ -187,7 +191,7 @@ function updatePatrols(seconds){
     if(step>=dist-.001)order.index++;
    }
    if(order.index>=order.route.length){orders.delete(i);patrolOrigins[i]={x:o.x,y:o.y};}
-  }else if(i!==selectedTroop){
+  }else if(i!==selectedTroop&&!holdingPosition.has(i)){
    o.x=origin.x+Math.cos(phase)*1.15;
    o.y=origin.y+Math.sin(phase)*.8;
   }
