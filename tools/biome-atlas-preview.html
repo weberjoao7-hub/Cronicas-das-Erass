@@ -343,6 +343,12 @@ function draw(){
  ctx.restore();
  renderMinimap();
 }
+// Zoom anchors are canvas-local CSS pixels, not viewport client coordinates.
+// Safari's browser chrome and the HUD can shift the canvas away from (0,0).
+function canvasPoint(clientX,clientY){
+ const r=canvas.getBoundingClientRect();
+ return {x:clientX-r.left,y:clientY-r.top};
+}
 function zoom(factor,x,y){
  const next=Math.max(.3,Math.min(2.2,scale*factor)),ratio=next/scale;
  offsetX=(offsetX+width/2-x)*ratio+x-width/2;
@@ -365,7 +371,7 @@ canvas.addEventListener('pointermove',e=>{
   const previousMidY=other?(prev.y+other.y)/2:(pts[0].y+pts[1].y)/2;
   const midX=(pts[0].x+pts[1].x)/2,midY=(pts[0].y+pts[1].y)/2;
   offsetX+=midX-previousMidX;offsetY+=midY-previousMidY;
-  if(pinch>1&&dist>1)zoom(dist/pinch,midX,midY);
+  if(pinch>1&&dist>1){const p=canvasPoint(midX,midY);zoom(dist/pinch,p.x,p.y);}
   else draw();
   pinch=dist;
  }
@@ -386,7 +392,7 @@ document.addEventListener('visibilitychange',()=>{
  // Avoid a stale simulation clock after Safari suspends the page.
  lastSimulationSeconds=null;
 });
-canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();const p=canvasPoint(e.clientX,e.clientY);zoom(Math.exp(-e.deltaY*.001),p.x,p.y)},{passive:false});
 // Desktop RTS shortcuts: right-click orders the selected unit; Escape clears selection.
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)return;
  const p=worldAt(e.clientX,e.clientY);
