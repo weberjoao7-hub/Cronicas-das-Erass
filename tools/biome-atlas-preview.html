@@ -69,6 +69,21 @@ function findPath(start,target){
  const cell=(p)=>({x:Math.max(0,Math.min(SIZE-1,Math.floor(p.x))),y:Math.max(0,Math.min(SIZE-1,Math.floor(p.y)))});
  const a=cell(start),b=cell(target),key=(x,y)=>y*SIZE+x;
  const valid=(x,y)=>x>=0&&y>=0&&x<SIZE&&y<SIZE&&!blocked.has(key(x,y));
+ // Units can start inside a building footprint after a patrol or map edit.
+ // Find a walkable origin rather than letting A* escape through blocked corners.
+ if(!valid(a.x,a.y)){
+  let nearest=null;
+  for(let radius=1;radius<SIZE&&!nearest;radius++){
+   for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+    const x=a.x+dx,y=a.y+dy;
+    if(valid(x,y)&&(!nearest||Math.hypot(x-start.x,y-start.y)<nearest.distance))
+     nearest={x,y,distance:Math.hypot(x-start.x,y-start.y)};
+   }
+  }
+  if(!nearest)return null;
+  a.x=nearest.x;a.y=nearest.y;
+ }
  // Find the closest traversable destination when a building occupies the tap.
  // Never silently walk through a building to reach an invalid final waypoint.
  let goalCell=b;
@@ -141,7 +156,7 @@ function enqueueMove(target,append){
  const origin=previous&&previous.route.length?previous.route[previous.route.length-1]:troops[selectedTroop];
  const route=findPath(origin,target);
  if(!route){status.textContent='Destino bloqueado ou sem caminho';return;}
- if(previous){previous.route.push(...route);status.textContent='Fila atualizada · '+(previous.route.length-previous.index)+' pontos restantes';}
+ if(previous){previous.route=previous.route.slice(previous.index);previous.index=0;previous.route.push(...route);status.textContent='Fila atualizada · '+previous.route.length+' pontos restantes';}
  else{orders.set(selectedTroop,{route,index:0});status.textContent='Rota calculada · '+route.length+' pontos';}
  draw();
 }
