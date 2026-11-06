@@ -252,6 +252,14 @@ function renderMinimap(){
  miniCtx.closePath();miniCtx.strokeStyle='#fff6d5';miniCtx.lineWidth=1.5;miniCtx.stroke();
 }
 function resize(){
+ // Keep the 150-unit minimap coordinate system while rendering sharply on Retina displays.
+ // CSS controls its visual size; backing pixels track DPR independently of scene resolution.
+ const miniDpr=Math.min(window.devicePixelRatio||1,3);
+ const miniPixels=Math.round(150*miniDpr);
+ if(minimap.width!==miniPixels||minimap.height!==miniPixels){
+  minimap.width=miniPixels;minimap.height=miniPixels;
+ }
+ miniCtx.setTransform(miniDpr,0,0,miniDpr,0,0);
  const dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(3500000/Math.max(1,innerWidth*innerHeight)));
  width=innerWidth;height=innerHeight;
  canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
