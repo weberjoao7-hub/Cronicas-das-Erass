@@ -448,9 +448,13 @@ const mobileFrameBudget=matchMedia('(pointer: coarse)').matches;
 let lastFrame=0;
 function tick(ts){
  if(ready&&!document.hidden){
-  const frameInterval=mobileFrameBudget?50:33.333;
-  if(ts-lastFrame>=frameInterval){
-   lastFrame=ts;
+  const frameInterval=mobileFrameBudget?50:1000/30;
+  // RAF timestamps can land a fraction of a millisecond before the target.
+  // Carry the fractional remainder forward instead of accidentally rendering
+  // every third 60 Hz refresh (~20 FPS) on a nominal 30 FPS desktop budget.
+  const elapsed=ts-lastFrame;
+  if(elapsed>=frameInterval-1){
+   lastFrame=ts-Math.max(0,elapsed-frameInterval)%frameInterval;
    updatePatrols((ts-animationStart)/1000);
    draw();
   }
