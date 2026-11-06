@@ -136,6 +136,7 @@ function findPath(start,target){
  return null;
 }
 function issueOrder(sx,sy){
+ // sx/sy are canvas-local CSS pixels, shared by selection and pathfinding.
  const p=worldAt(sx,sy);
  const nearest=troops.reduce((best,o,i)=>{
   if(o.team!==0)return best;
@@ -376,7 +377,7 @@ canvas.addEventListener('pointermove',e=>{
   pinch=dist;
  }
 });
-function end(e){if(e.type==='pointerup'&&e.button===0&&!dragged&&!gestureWasMultitouch&&pointers.size===1)issueOrder(e.clientX,e.clientY);pointers.delete(e.pointerId);if(pointers.size===0){downPoint=null;pinch=0;gestureWasMultitouch=false}else if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
+function end(e){if(e.type==='pointerup'&&e.button===0&&!dragged&&!gestureWasMultitouch&&pointers.size===1){const p=canvasPoint(e.clientX,e.clientY);issueOrder(p.x,p.y); }pointers.delete(e.pointerId);if(pointers.size===0){downPoint=null;pinch=0;gestureWasMultitouch=false}else if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
 // A browser interruption (app switch, incoming call, lost focus) must not leave
 // stale fingers in the gesture map and break the next drag or pinch on iOS.
@@ -395,7 +396,8 @@ document.addEventListener('visibilitychange',()=>{
 canvas.addEventListener('wheel',e=>{e.preventDefault();const p=canvasPoint(e.clientX,e.clientY);zoom(Math.exp(-e.deltaY*.001),p.x,p.y)},{passive:false});
 // Desktop RTS shortcuts: right-click orders the selected unit; Escape clears selection.
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)return;
- const p=worldAt(e.clientX,e.clientY);
+ const local=canvasPoint(e.clientX,e.clientY);
+ const p=worldAt(local.x,local.y);
  const target={x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))};
  enqueueMove(target,e.shiftKey||queueEnabled);
 });
