@@ -293,7 +293,15 @@ canvas.addEventListener('pointermove',e=>{
  if(pointers.size===1&&dragged){offsetX+=e.clientX-prev.x;offsetY+=e.clientY-prev.y;draw()}
  else if(pointers.size===2){
   const pts=[...pointers.values()],dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
-  if(pinch>1&&dist>1)zoom(dist/pinch,(pts[0].x+pts[1].x)/2,(pts[0].y+pts[1].y)/2);
+  // Translate the camera with the pinch midpoint as well as scaling it.
+  // This keeps two-finger panning responsive on iPhone Safari.
+  const other=[...pointers.entries()].find(([id])=>id!==e.pointerId)?.[1];
+  const previousMidX=other?(prev.x+other.x)/2:(pts[0].x+pts[1].x)/2;
+  const previousMidY=other?(prev.y+other.y)/2:(pts[0].y+pts[1].y)/2;
+  const midX=(pts[0].x+pts[1].x)/2,midY=(pts[0].y+pts[1].y)/2;
+  offsetX+=midX-previousMidX;offsetY+=midY-previousMidY;
+  if(pinch>1&&dist>1)zoom(dist/pinch,midX,midY);
+  else draw();
   pinch=dist;
  }
 });
@@ -312,7 +320,9 @@ function navigateMinimap(e){
  offsetX=-(x-y)*112*scale;offsetY=-(x+y-SIZE)*56*scale;draw();
 }
 minimap.addEventListener('pointerdown',e=>{minimap.setPointerCapture(e.pointerId);navigateMinimap(e)});
-minimap.addEventListener('pointermove',e=>{if(e.buttons)navigateMinimap(e)});
+minimap.addEventListener('pointermove',e=>{if(minimap.hasPointerCapture(e.pointerId))navigateMinimap(e)});
+minimap.addEventListener('pointerup',e=>{if(minimap.hasPointerCapture(e.pointerId))minimap.releasePointerCapture(e.pointerId)});
+minimap.addEventListener('pointercancel',e=>{if(minimap.hasPointerCapture(e.pointerId))minimap.releasePointerCapture(e.pointerId)});
 minimap.addEventListener('keydown',e=>{
  const step=e.shiftKey?180:60;
  if(e.key==='ArrowLeft')offsetX+=step;
