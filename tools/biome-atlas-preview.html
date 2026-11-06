@@ -442,7 +442,25 @@ atlas.onerror=()=>{atlasLoaded=false;ready=true;status.textContent='Atlas indisp
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
 addEventListener('resize',resize);resize();
 // Throttle animation when the tab is hidden and avoid rendering before the atlas loads.
-let lastFrame=0;function tick(ts){if(ready&&!document.hidden&&ts-lastFrame>80){lastFrame=ts;updatePatrols((ts-animationStart)/1000);draw()}requestAnimationFrame(tick)}requestAnimationFrame(tick);
+// Adaptive frame pacing: the previous fixed 80 ms interval capped every device at ~12 FPS.
+// Favor smoother desktop motion while keeping a conservative mobile budget.
+const mobileFrameBudget=matchMedia('(pointer: coarse)').matches;
+let lastFrame=0;
+function tick(ts){
+ if(ready&&!document.hidden){
+  const frameInterval=mobileFrameBudget?50:33.333;
+  if(ts-lastFrame>=frameInterval){
+   lastFrame=ts;
+   updatePatrols((ts-animationStart)/1000);
+   draw();
+  }
+ }else{
+  // Resume without a large accumulated delta or a burst of catch-up frames.
+  lastFrame=ts;
+ }
+ requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
 </script>
 </body>
 </html>
