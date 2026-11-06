@@ -156,7 +156,7 @@ function issueOrder(sx,sy){
 }
 
 // Stop immediately, discard queued waypoints and make the current position the new idle anchor.
-stopButton.addEventListener('click',()=>{
+function stopSelectedTroop(){
  if(selectedTroop<0)return;
  const unit=troops[selectedTroop];
  orders.delete(selectedTroop);
@@ -164,7 +164,8 @@ stopButton.addEventListener('click',()=>{
  patrolOrigins[selectedTroop]={x:unit.x,y:unit.y};
  status.textContent='Unidade '+(selectedTroop+1)+' parada · rota cancelada';
  draw();
-});
+}
+stopButton.addEventListener('click',stopSelectedTroop);
 function enqueueMove(target,append){
  if(selectedTroop<0)return;
  const previous=append?orders.get(selectedTroop):null;
@@ -405,6 +406,8 @@ addEventListener('keydown',e=>{
  if(e.altKey||e.ctrlKey||e.metaKey||document.activeElement===minimap||/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(document.activeElement?.tagName||''))return;
  if(e.key==='Escape'&&selectedTroop>=0){selectedTroop=-1;syncStopButton();status.textContent='Seleção cancelada';draw();return;}
  if(e.key.toLowerCase()==='f'){focusSelectedTroop();return;}
+ // X is the RTS stop shortcut; S remains available for camera panning.
+ if(e.key.toLowerCase()==='x'&&selectedTroop>=0){e.preventDefault();stopSelectedTroop();return;}
  const step=e.shiftKey?110:48;
  const key=e.key.toLowerCase();
  if(key==='arrowleft'||key==='a')offsetX+=step;
