@@ -338,6 +338,20 @@ canvas.addEventListener('pointermove',e=>{
 });
 function end(e){if(e.type==='pointerup'&&e.button===0&&!dragged&&!gestureWasMultitouch&&pointers.size===1)issueOrder(e.clientX,e.clientY);pointers.delete(e.pointerId);if(pointers.size===0){downPoint=null;pinch=0;gestureWasMultitouch=false}else if(pointers.size===2){const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);
+// A browser interruption (app switch, incoming call, lost focus) must not leave
+// stale fingers in the gesture map and break the next drag or pinch on iOS.
+function resetCanvasGesture(){
+ for(const id of pointers.keys()){
+  if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
+ }
+ pointers.clear();downPoint=null;pinch=0;dragged=false;gestureWasMultitouch=false;
+}
+addEventListener('blur',resetCanvasGesture);
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden)resetCanvasGesture();
+ // Avoid a stale simulation clock after Safari suspends the page.
+ lastSimulationSeconds=null;
+});
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.001),e.clientX,e.clientY)},{passive:false});
 // Desktop RTS shortcuts: right-click orders the selected unit; Escape clears selection.
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)return;
