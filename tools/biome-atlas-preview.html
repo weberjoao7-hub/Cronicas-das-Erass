@@ -184,7 +184,31 @@ function renderMinimap(){
  const m=150,cell=minimapCell;
  miniCtx.clearRect(0,0,m,m);
  miniCtx.drawImage(minimapTerrain,0,0);
- for(const o of troops){miniCtx.fillStyle=o.team?'#d95549':'#5ab2f2';miniCtx.fillRect(o.x*cell-1,o.y*cell-1,3,3)}
+ // Draw queued waypoints on the minimap to make long RTS orders readable on phones.
+ const activeOrder=orders.get(selectedTroop);
+ if(activeOrder&&selectedTroop>=0){
+  const unit=troops[selectedTroop];
+  miniCtx.save();
+  miniCtx.strokeStyle='#ffe49c';miniCtx.lineWidth=1.5;
+  miniCtx.setLineDash([3,3]);miniCtx.beginPath();
+  miniCtx.moveTo(unit.x*cell,unit.y*cell);
+  for(let i=activeOrder.index;i<activeOrder.route.length;i++){
+   const p=activeOrder.route[i];miniCtx.lineTo(p.x*cell,p.y*cell);
+  }
+  miniCtx.stroke();miniCtx.setLineDash([]);
+  const destination=activeOrder.route[activeOrder.route.length-1];
+  if(destination){miniCtx.fillStyle='#ffe49c';miniCtx.beginPath();miniCtx.arc(destination.x*cell,destination.y*cell,3,0,Math.PI*2);miniCtx.fill();}
+  miniCtx.restore();
+ }
+ for(let i=0;i<troops.length;i++){
+  const o=troops[i];
+  miniCtx.fillStyle=o.team?'#d95549':'#5ab2f2';
+  miniCtx.fillRect(o.x*cell-1,o.y*cell-1,3,3);
+  if(i===selectedTroop){
+   miniCtx.strokeStyle='#ffe49c';miniCtx.lineWidth=1.5;
+   miniCtx.beginPath();miniCtx.arc(o.x*cell+.5,o.y*cell+.5,4.5,0,Math.PI*2);miniCtx.stroke();
+  }
+ }
  // Inverse isometric projection of the four viewport corners.
  miniCtx.beginPath();
  const corners=[[0,0],[width,0],[width,height],[0,height]];
