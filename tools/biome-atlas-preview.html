@@ -285,7 +285,36 @@ function draw(){
    ctx.fillStyle='#715c48';ctx.beginPath();ctx.moveTo(0,w*.36);ctx.lineTo(w,0);ctx.lineTo(w,-h);ctx.lineTo(0,-h+w*.36);ctx.closePath();ctx.fill();
    ctx.fillStyle=tower?'#7b8791':'#874c3c';ctx.beginPath();ctx.moveTo(-w-7,-h);ctx.lineTo(0,-h-w*.45);ctx.lineTo(w+7,-h);ctx.lineTo(0,-h+w*.3);ctx.closePath();ctx.fill();
    ctx.strokeStyle='#d8c69a';ctx.lineWidth=2;ctx.stroke();
-   ctx.fillStyle='#302e2a';ctx.fillRect(w*.34,-h*.53,9,12);
+   // Architectural details are painted in the same depth pass as the building.
+   // Roof ridge, timber framing and windows distinguish each settlement at RTS zoom.
+   ctx.strokeStyle=tower?'#d6dfe0':'#d6a36c';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(0,-h-w*.45);ctx.lineTo(0,-h+w*.3);ctx.stroke();
+   ctx.strokeStyle='#4b352b';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(-w*.76,-h*.78);ctx.lineTo(-w*.76,-h*.22);
+   ctx.moveTo(-w*.76,-h*.52);ctx.lineTo(-w*.16,-h*.39);ctx.stroke();
+   ctx.fillStyle='#2b3532';
+   ctx.fillRect(w*.34,-h*.53,9,12);
+   ctx.fillStyle='#f4c778';ctx.fillRect(w*.34+2,-h*.53+2,5,6);
+   ctx.strokeStyle='#47392e';ctx.lineWidth=1;
+   ctx.beginPath();ctx.moveTo(w*.34+4.5,-h*.53);ctx.lineTo(w*.34+4.5,-h*.53+9);ctx.stroke();
+   if(tower){
+    // Crenellations make the defensive tower legible even on small screens.
+    ctx.fillStyle='#aeb5b4';
+    for(let battlement=0;battlement<4;battlement++){
+     ctx.fillRect(-w+4+battlement*12,-h-5,7,8);
+    }
+    ctx.fillStyle='#202b2c';ctx.fillRect(-3,-h*.83,6,17);
+   }else{
+    // Warm entrance and stone footing anchor houses and halls to the ground.
+    ctx.fillStyle='#5c5344';ctx.fillRect(-w*.6,-8,w*1.25,8);
+    ctx.fillStyle='#392e27';ctx.fillRect(-w*.44,-h*.39,13,h*.39);
+    ctx.fillStyle='#bb905b';ctx.fillRect(-w*.44+9,-h*.24,2,2);
+    if(hall){
+     ctx.fillStyle='#f1c66e';
+     ctx.fillRect(-w*.78,-h*.66,8,8);
+     ctx.fillStyle='#483a2d';ctx.fillRect(-w*.78+3,-h*.66,2,8);
+    }
+   }
    if(hall){ctx.fillStyle='#e4bb68';ctx.fillRect(-5,-h-32,4,32);ctx.fillStyle='#a93d32';ctx.fillRect(-1,-h-32,24,14)}
   }else{
    const bob=Math.sin(now*3+o.x)*1.4;
