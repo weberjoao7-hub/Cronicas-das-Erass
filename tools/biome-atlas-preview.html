@@ -265,9 +265,24 @@ function draw(){
    const bob=Math.sin(now*3+o.x)*1.4;
    ctx.fillStyle='#071b1a80';ctx.beginPath();ctx.ellipse(0,3,10,4,0,0,Math.PI*2);ctx.fill();
    if(o===troops[selectedTroop]){ctx.strokeStyle='#f5d16b';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,3,16,7,0,0,Math.PI*2);ctx.stroke();}
-   ctx.fillStyle=o.team?'#b95245':'#4788c1';ctx.fillRect(-5,-16+bob,10,13);
-   ctx.fillStyle='#e5c49a';ctx.beginPath();ctx.arc(0,-20+bob,5,0,Math.PI*2);ctx.fill();
-   ctx.strokeStyle='#c7c4b0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(8,-14+bob);ctx.lineTo(12,-30+bob);ctx.stroke();
+   // Layered soldier silhouette: cloak, torso, shield, helmet and spear.
+   // Keep details legible at the default mobile zoom without external assets.
+   const blue=o.team===0,cloth=blue?'#356eaa':'#a3473c',trim=blue?'#a9d4f0':'#f1b49a';
+   ctx.fillStyle=blue?'#24466b':'#682e2a';
+   ctx.beginPath();ctx.moveTo(-5,-14+bob);ctx.lineTo(-10,-3+bob);ctx.lineTo(7,-3+bob);ctx.lineTo(5,-14+bob);ctx.fill();
+   ctx.strokeStyle='#2b2924';ctx.lineWidth=3;
+   ctx.beginPath();ctx.moveTo(-3,-5+bob);ctx.lineTo(-4,1+bob);ctx.moveTo(3,-5+bob);ctx.lineTo(5,1+bob);ctx.stroke();
+   ctx.fillStyle=cloth;ctx.fillRect(-6,-17+bob,12,13);
+   ctx.fillStyle=trim;ctx.fillRect(-5,-16+bob,10,2);
+   ctx.fillStyle='#e5c49a';ctx.beginPath();ctx.arc(0,-21+bob,5,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=blue?'#849ca9':'#8c8580';
+   ctx.beginPath();ctx.moveTo(-6,-22+bob);ctx.quadraticCurveTo(-5,-31+bob,0,-30+bob);ctx.quadraticCurveTo(6,-29+bob,6,-22+bob);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#e5d4a8';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-29+bob);ctx.lineTo(0,-34+bob);ctx.stroke();
+   ctx.strokeStyle='#4d3829';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(9,-7+bob);ctx.lineTo(11,-37+bob);ctx.stroke();
+   ctx.fillStyle='#d2d5d1';ctx.beginPath();ctx.moveTo(11,-42+bob);ctx.lineTo(8,-35+bob);ctx.lineTo(14,-35+bob);ctx.closePath();ctx.fill();
+   ctx.fillStyle=blue?'#537c9b':'#9e5c48';ctx.beginPath();ctx.ellipse(-8,-12+bob,6,9,-.2,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle=trim;ctx.lineWidth=1.7;ctx.stroke();
+   ctx.fillStyle='#e6d9af';ctx.beginPath();ctx.arc(-8,-12+bob,2,0,Math.PI*2);ctx.fill();
   }
   ctx.restore();
  }
