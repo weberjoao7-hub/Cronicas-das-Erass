@@ -315,7 +315,30 @@ canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)
  const target={x:Math.max(0,Math.min(SIZE-1,p.x)),y:Math.max(0,Math.min(SIZE-1,p.y))};
  enqueueMove(target,e.shiftKey||queueEnabled);
 });
-addEventListener('keydown',e=>{if(e.key==='Escape'&&selectedTroop>=0){selectedTroop=-1;status.textContent='Seleção cancelada';draw();}});
+// Keyboard camera controls work without a mouse and avoid browser scrolling.
+function focusSelectedTroop(){
+ if(selectedTroop<0){status.textContent='Selecione uma tropa para centralizar';return;}
+ const unit=troops[selectedTroop];
+ offsetX=-(unit.x-unit.y)*112*scale;
+ offsetY=-(unit.x+unit.y-SIZE)*56*scale;
+ status.textContent='Câmera centralizada na unidade '+(selectedTroop+1);
+ draw();
+}
+addEventListener('keydown',e=>{
+ if(e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||''))return;
+ if(e.key==='Escape'&&selectedTroop>=0){selectedTroop=-1;status.textContent='Seleção cancelada';draw();return;}
+ if(e.key.toLowerCase()==='f'){focusSelectedTroop();return;}
+ const step=e.shiftKey?110:48;
+ const key=e.key.toLowerCase();
+ if(key==='arrowleft'||key==='a')offsetX+=step;
+ else if(key==='arrowright'||key==='d')offsetX-=step;
+ else if(key==='arrowup'||key==='w')offsetY+=step;
+ else if(key==='arrowdown'||key==='s')offsetY-=step;
+ else if(key==='+'||key==='='){e.preventDefault();zoom(1.15,width/2,height/2);return;}
+ else if(key==='-'||key==='_'){e.preventDefault();zoom(1/1.15,width/2,height/2);return;}
+ else return;
+ e.preventDefault();draw();
+});
 function navigateMinimap(e){
  const r=minimap.getBoundingClientRect(),x=Math.max(0,Math.min(SIZE,(e.clientX-r.left)/r.width*SIZE)),y=Math.max(0,Math.min(SIZE,(e.clientY-r.top)/r.height*SIZE));
  offsetX=-(x-y)*112*scale;offsetY=-(x+y-SIZE)*56*scale;draw();
