@@ -12301,8 +12301,25 @@ C.addEventListener('contextmenu',e=>{
  e.preventDefault();
  if(placing){stopPlacement();toast('Construção cancelada');return}
  const u=game.units[selectedUnit];if(!u)return toast('Recrute uma unidade para comandar');
- const {x,y}=tileAt(e.clientX,e.clientY);
- if(x<0||y<0||x>=W||y>=H||!passable(x,y))return toast('Destino inacessível');
+ const target=tileAt(e.clientX,e.clientY);
+ // Clique em água ou montanha: procura uma margem transitável sem atravessar o obstáculo.
+ // Limita a busca a quatro células para evitar ordens inesperadas em locais distantes.
+ let {x,y}=target;
+ if(x<0||y<0||x>=W||y>=H)return toast('Destino fora do mapa');
+ if(!passable(x,y)){
+  let nearest=null;
+  for(let radius=1;radius<=4&&!nearest;radius++){
+   for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+    const nx=x+dx,ny=y+dy;
+    if(!passable(nx,ny))continue;
+    const dist=dx*dx+dy*dy;
+    if(!nearest||dist<nearest.dist)nearest={x:nx,y:ny,dist};
+   }
+  }
+  if(!nearest)return toast('Não há terreno acessível próximo');
+  x=nearest.x;y=nearest.y;
+ }
  if(e.shiftKey){moveArmyTo(x,y);command=null;panel.classList.remove('show')}else if(selectedGroup.size>1){moveArmyTo(x,y,selectedGroup);command=null;panel.classList.remove('show')}else if(assignRoute(u,x,y)){command=null;panel.classList.remove('show');dirty=true;save();toast('Unidade enviada ao destino')}
  else toast('Não existe rota terrestre até este local');
 });
