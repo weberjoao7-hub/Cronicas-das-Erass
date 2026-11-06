@@ -445,8 +445,31 @@ minimap.addEventListener('keydown',e=>{
  else return;
  e.preventDefault();draw();
 });
-atlas.onload=()=>{atlasLoaded=true;ready=true;status.textContent='Atlas carregado · 4.096 células · 4 biomas · 7 construções · 28 tropas';draw()};
-atlas.onerror=()=>{atlasLoaded=false;ready=true;status.textContent='Atlas indisponível · terreno alternativo ativo · tropas e controles disponíveis';draw()};
+// Safari can leave an SVG image request pending without firing load or error.
+// Make the procedural terrain available after a bounded wait, and recover if
+// the atlas eventually loads. A zero-sized decoded image is not drawable.
+let atlasTimeout=null;
+function activateTerrainFallback(reason){
+ if(atlasLoaded)return;
+ ready=true;
+ status.textContent=reason+' · terreno alternativo ativo · tropas e controles disponíveis';
+ draw();
+}
+atlas.onload=()=>{
+ if(atlasTimeout!==null){clearTimeout(atlasTimeout);atlasTimeout=null;}
+ if(!atlas.naturalWidth||!atlas.naturalHeight){
+  activateTerrainFallback('Atlas sem dimensões válidas');
+  return;
+ }
+ atlasLoaded=true;ready=true;
+ status.textContent='Atlas carregado · 4.096 células · 4 biomas · 7 construções · 28 tropas';
+ draw();
+};
+atlas.onerror=()=>{
+ if(atlasTimeout!==null){clearTimeout(atlasTimeout);atlasTimeout=null;}
+ activateTerrainFallback('Atlas indisponível');
+};
+atlasTimeout=setTimeout(()=>{atlasTimeout=null;activateTerrainFallback('Tempo de carregamento excedido');},5000);
 atlas.src='../assets/cronicas_biomas_iso_atlas.svg';
 addEventListener('resize',resize);resize();
 // Throttle animation when the tab is hidden and avoid rendering before the atlas loads.
