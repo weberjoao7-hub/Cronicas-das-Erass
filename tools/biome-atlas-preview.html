@@ -127,6 +127,7 @@ function issueOrder(sx,sy){
  if(nearest.i>=0&&nearest.dist<Math.max(22,24*scale)){
   selectedTroop=nearest.i;
   status.textContent='Unidade '+(selectedTroop+1)+' selecionada · toque no destino';
+  draw();
   return;
  }
  if(selectedTroop<0)return;
@@ -230,13 +231,6 @@ function draw(){
  ctx.fillStyle='#102421';ctx.fillRect(0,0,width,height);
  if(!ready)return;
  ctx.save();ctx.translate(width/2+offsetX,height/2+offsetY);ctx.scale(scale,scale);
- // Draw the active RTS move order beneath units, in world coordinates.
- const active=orders.get(selectedTroop);
- if(active){const unit=troops[selectedTroop];const path=[{x:unit.x,y:unit.y},...active.route.slice(active.index)];
-  ctx.save();ctx.strokeStyle='#ffe49c';ctx.lineWidth=2/scale;ctx.setLineDash([7/scale,5/scale]);ctx.beginPath();
-  path.forEach((p,i)=>{const x=(p.x-p.y)*112,y=(p.x+p.y-SIZE)*56;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});
-  ctx.stroke();ctx.setLineDash([]);const dest=path[path.length-1];ctx.beginPath();ctx.ellipse((dest.x-dest.y)*112,(dest.x+dest.y-SIZE)*56,15,8,0,0,Math.PI*2);ctx.stroke();ctx.restore();
- }
  const now=(performance.now()-animationStart)*.001;
  let oi=0;
  function renderObject(o){
@@ -275,6 +269,13 @@ function draw(){
   while(oi<objects.length&&objects[oi].x+objects[oi].y===depth)renderObject(objects[oi++]);
  }
  while(oi<objects.length)renderObject(objects[oi++]);
+ // Draw queued RTS orders above terrain so their waypoints remain visible.
+ const active=orders.get(selectedTroop);
+ if(active){const unit=troops[selectedTroop];const path=[{x:unit.x,y:unit.y},...active.route.slice(active.index)];
+  ctx.save();ctx.strokeStyle='#ffe49c';ctx.lineWidth=2/scale;ctx.setLineDash([7/scale,5/scale]);ctx.beginPath();
+  path.forEach((p,i)=>{const x=(p.x-p.y)*112,y=(p.x+p.y-SIZE)*56;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});
+  ctx.stroke();ctx.setLineDash([]);const dest=path[path.length-1];ctx.beginPath();ctx.ellipse((dest.x-dest.y)*112,(dest.x+dest.y-SIZE)*56,15,8,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+ }
  ctx.restore();
  renderMinimap();
 }
