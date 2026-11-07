@@ -5,7 +5,7 @@
 header{position:fixed;top:env(safe-area-inset-top);left:env(safe-area-inset-left);max-width:calc(100vw - 110px);padding:10px 14px;background:#10251fef;border:1px solid #ae925f;border-radius:0 0 12px 0;pointer-events:none}h1{font:700 17px Georgia,serif;margin:0 0 4px}p{margin:0;color:#d5c69e;font-size:11px}#hud{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left));padding:9px 12px;background:#10251fe9;border:1px solid #ae925f;border-radius:9px;max-width:calc(100vw - 20px)}button{min-height:44px;min-width:44px;background:#25483b;color:#f5e8c8;border:1px solid #b89a64;border-radius:8px;font-size:18px;touch-action:manipulation}#controls{position:fixed;right:calc(10px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));display:flex;gap:6px}
 </style></head><body><canvas id="world" aria-label="Mapa isométrico interativo com quatro biomas, construções e tropas"></canvas>
 <header><h1>Crônicas das Eras · RTS</h1><p>Protótipo visual · arraste para explorar · toque na tropa e no destino</p></header>
-<div id="controls"><button id="plus" aria-label="Aproximar">+</button><button id="minus" aria-label="Afastar">−</button></div>
+<div id="controls"><button id="unit" aria-label="Selecionar próxima tropa" title="Próxima tropa">⚔</button><button id="focus" aria-label="Centralizar tropa selecionada" title="Centralizar tropa">◎</button><button id="plus" aria-label="Aproximar">+</button><button id="minus" aria-label="Afastar">−</button></div>
 <div id="hud" role="status">Mapa 72 × 72 · quatro biomas · toque em uma tropa</div>
 <canvas id="minimap" aria-label="Minimapa navegável" style="position:fixed;right:calc(10px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));width:132px;height:132px;border:1px solid #b89a64;border-radius:8px;background:#142c27;touch-action:none"></canvas>
 <script>
@@ -252,7 +252,7 @@ canvas.addEventListener('pointerup',e=>{
  const wasTap=!!drag&&drag.id===e.pointerId&&!drag.moved&&!gestureMoved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;
  pointers.delete(e.pointerId);drag=null;pinchDistance=0;
  if(pointers.size)gestureMoved=true;
- if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;const destination=path[path.length-1]||{x:sx,y:sy};u.tx=destination.x;u.ty=destination.y;hud.textContent='Tropa '+(selected+1)+' → '+destination.x+', '+destination.y+(destination.x!==x||destination.y!==y?' · aproximação ao alvo':'')+' · '+path.length+' passos'}else hud.textContent='Destino inacessível (raio de 5 células)'}});
+ if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selectUnit(best);return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;const destination=path[path.length-1]||{x:sx,y:sy};u.tx=destination.x;u.ty=destination.y;hud.textContent='Tropa '+(selected+1)+' → '+destination.x+', '+destination.y+(destination.x!==x||destination.y!==y?' · aproximação ao alvo':'')+' · '+path.length+' passos'}else hud.textContent='Destino inacessível (raio de 5 células)'}});
 function resetGesture(){pointers.clear();drag=null;pinchDistance=0;gestureMoved=false}
 canvas.addEventListener('pointercancel',resetGesture);
 window.addEventListener('blur',resetGesture);
@@ -264,6 +264,18 @@ function zoomAt(factor,px=width/2,py=height/2){
  const after=screen(before.x,before.y);
  cx+=px-after.x;cy+=py-after.y;
 }
+// Tactical controls work on touchscreens and desktop without interfering with map gestures.
+function selectUnit(index){
+ selected=(index+units.length)%units.length;
+ hud.textContent='Tropa '+(selected+1)+' selecionada · toque no destino';
+}
+function focusSelected(){
+ if(selected<0)selectUnit(0);
+ const p=screen(units[selected].x,units[selected].y);
+ cx+=width/2-p.x;cy+=height/2-p.y;
+}
+document.getElementById('unit').onclick=()=>selectUnit(selected+1);
+document.getElementById('focus').onclick=focusSelected;
 document.getElementById('plus').onclick=()=>zoomAt(1.2);
 document.getElementById('minus').onclick=()=>zoomAt(1/1.2);
 // Desktop: wheel zoom and WASD/arrow panning; ignore browser shortcuts.
@@ -276,6 +288,9 @@ const held=new Set();
 window.addEventListener('keydown',e=>{
  if(e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||''))return;
  const k=e.key.toLowerCase();
+ if(/^[1-4]$/.test(k)){selectUnit(Number(k)-1);e.preventDefault();return}
+ if(k==='f'){focusSelected();e.preventDefault();return}
+ if(k==='tab'&&!e.shiftKey&&document.activeElement===document.body){selectUnit(selected+1);e.preventDefault();return}
  if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)){held.add(k);e.preventDefault()}
 });
 window.addEventListener('keyup',e=>held.delete(e.key.toLowerCase()));
