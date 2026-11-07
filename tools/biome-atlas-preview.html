@@ -520,10 +520,28 @@ function navigateMinimap(e){
  const r=minimap.getBoundingClientRect(),x=Math.max(0,Math.min(SIZE,(e.clientX-r.left)/r.width*SIZE)),y=Math.max(0,Math.min(SIZE,(e.clientY-r.top)/r.height*SIZE));
  offsetX=-(x-y)*112*scale;offsetY=-(x+y-SIZE)*56*scale;draw();
 }
-minimap.addEventListener('pointerdown',e=>{if(e.button!==0)return;minimap.setPointerCapture(e.pointerId);navigateMinimap(e)});
-minimap.addEventListener('pointermove',e=>{if(minimap.hasPointerCapture(e.pointerId))navigateMinimap(e)});
-minimap.addEventListener('pointerup',e=>{if(minimap.hasPointerCapture(e.pointerId))minimap.releasePointerCapture(e.pointerId)});
-minimap.addEventListener('pointercancel',e=>{if(minimap.hasPointerCapture(e.pointerId))minimap.releasePointerCapture(e.pointerId)});
+// Keep minimap drag navigation usable when Safari rejects pointer capture.
+// Track the active pointer explicitly so an unrelated touch cannot move the camera.
+let minimapPointer=null;
+minimap.addEventListener('pointerdown',e=>{
+ if(e.button!==0||minimapPointer!==null)return;
+ minimapPointer=e.pointerId;
+ try{minimap.setPointerCapture(e.pointerId)}catch(err){/* Navigation still works on the initial tap. */}
+ navigateMinimap(e);
+});
+minimap.addEventListener('pointermove',e=>{
+ if(e.pointerId===minimapPointer)navigateMinimap(e);
+});
+function endMinimapPointer(e){
+ if(e.pointerId!==minimapPointer)return;
+ minimapPointer=null;
+ try{if(minimap.hasPointerCapture(e.pointerId))minimap.releasePointerCapture(e.pointerId)}catch(err){/* Capture may already be lost after interruption. */}
+}
+minimap.addEventListener('pointerup',endMinimapPointer);
+minimap.addEventListener('pointercancel',endMinimapPointer);
+minimap.addEventListener('lostpointercapture',endMinimapPointer);
+addEventListener('blur',()=>{minimapPointer=null});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)minimapPointer=null});
 minimap.addEventListener('keydown',e=>{
  const step=e.shiftKey?180:60;
  if(e.key==='ArrowLeft')offsetX+=step;
