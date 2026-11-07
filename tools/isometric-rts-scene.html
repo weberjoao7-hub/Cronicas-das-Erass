@@ -60,7 +60,7 @@ function soldier(u,p,i){const s=zoom;ctx.fillStyle='#142a2580';ctx.beginPath();c
  ctx.fillStyle='#d2b08b';ctx.beginPath();ctx.arc(p.x,p.y-17*s,4*s,0,Math.PI*2);ctx.fill();
  ctx.strokeStyle='#c2d5db';ctx.lineWidth=2*s;ctx.beginPath();ctx.moveTo(p.x+5*s,p.y-11*s);ctx.lineTo(p.x+10*s,p.y-23*s);ctx.stroke();
  if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,11*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
-function draw(now){const dt=Math.min((now-last)/1000,.05);last=now;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
+function draw(now){const dt=Math.min((now-last)/1000,.05);last=now;keyboardPan(dt);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
  for(const u of units){if(!u.path.length)continue;const target=u.path[0],dx=target.x-u.x,dy=target.y-u.y,d=Math.hypot(dx,dy);if(d<.001){u.x=target.x;u.y=target.y;u.path.shift();continue}const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step;if(step>=d-.001){u.x=target.x;u.y=target.y;u.path.shift()}}
  // Project all four viewport corners: two opposite corners alone miss isometric side regions.
  const margin=TW*zoom*2,corners=[
@@ -116,7 +116,35 @@ canvas.addEventListener('pointerdown',e=>{drag={id:e.pointerId,x:e.clientX,y:e.c
 canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;moveCamera(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY});
 canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const wasTap=Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;drag=null;if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;u.tx=x;u.ty=y;hud.textContent='Tropa '+(selected+1)+' → '+x+', '+y+' · '+path.length+' passos'}else hud.textContent='Destino bloqueado ou sem caminho'}});
 canvas.addEventListener('pointercancel',()=>drag=null);window.addEventListener('blur',()=>drag=null);
-document.getElementById('plus').onclick=()=>zoom=clamp(zoom*1.2,.45,2);
-document.getElementById('minus').onclick=()=>zoom=clamp(zoom/1.2,.45,2);
+// Keep the terrain point under the cursor stationary while changing zoom.
+function zoomAt(factor,px=width/2,py=height/2){
+ const before=world(px,py);
+ zoom=clamp(zoom*factor,.45,2);
+ const after=screen(before.x,before.y);
+ cx+=px-after.x;cy+=py-after.y;
+}
+document.getElementById('plus').onclick=()=>zoomAt(1.2);
+document.getElementById('minus').onclick=()=>zoomAt(1/1.2);
+// Desktop: wheel zoom and WASD/arrow panning; ignore browser shortcuts.
+canvas.addEventListener('wheel',e=>{
+ e.preventDefault();
+ const r=canvas.getBoundingClientRect();
+ zoomAt(Math.exp(-clamp(e.deltaY,-200,200)*.0015),e.clientX-r.left,e.clientY-r.top);
+},{passive:false});
+const held=new Set();
+window.addEventListener('keydown',e=>{
+ if(e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||''))return;
+ const k=e.key.toLowerCase();
+ if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)){held.add(k);e.preventDefault()}
+});
+window.addEventListener('keyup',e=>held.delete(e.key.toLowerCase()));
+window.addEventListener('blur',()=>held.clear());
+function keyboardPan(dt){
+ const speed=420*dt;
+ const left=held.has('arrowleft')||held.has('a'),right=held.has('arrowright')||held.has('d');
+ const up=held.has('arrowup')||held.has('w'),down=held.has('arrowdown')||held.has('s');
+ if(left!==right)cx+=(left?1:-1)*speed;
+ if(up!==down)cy+=(up?1:-1)*speed;
+}
 window.addEventListener('resize',resize);resize();const center=screen(27,27);cx+=width/2-center.x;cy+=height/2-center.y;requestAnimationFrame(draw);
 </script></body></html>
