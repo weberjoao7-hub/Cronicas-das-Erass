@@ -52,8 +52,34 @@ function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:2
  poly([[p.x-w,p.y],[p.x,p.y+9*s],[p.x,p.y-h+9*s],[p.x-w,p.y-h]],'#7b735b');
  poly([[p.x,p.y+9*s],[p.x+w,p.y],[p.x+w,p.y-h],[p.x,p.y-h+9*s]],'#b7a27a');
  poly([[p.x-w-3*s,p.y-h],[p.x,p.y-h-16*s],[p.x+w+3*s,p.y-h],[p.x,p.y-h+9*s]],b.type==='tower'?'#586c6a':'#744c3b','#352e29');
- ctx.fillStyle='#372e26';ctx.fillRect(p.x+4*s,p.y-10*s,5*s,11*s);
- if(b.type==='hall'){ctx.fillStyle='#e5bf6d';ctx.fillRect(p.x-3*s,p.y-h-12*s,3*s,12*s)}
+ // Architectural silhouettes: masonry courses, timber braces, doorways and lit windows.
+ ctx.save();
+ ctx.strokeStyle='#433a3190';ctx.lineWidth=Math.max(.6,.8*s);
+ for(let row=1;row<4;row++){
+  const yy=p.y-h+row*h/4;
+  ctx.beginPath();ctx.moveTo(p.x+2*s,yy+8*s);ctx.lineTo(p.x+(w-2*s),yy+1*s);ctx.stroke();
+ }
+ ctx.strokeStyle='#4c3527';ctx.lineWidth=Math.max(1,1.5*s);
+ ctx.beginPath();ctx.moveTo(p.x+w*.72,p.y-h*.72);ctx.lineTo(p.x+w*.72,p.y-2*s);
+ ctx.moveTo(p.x+2*s,p.y-h*.58);ctx.lineTo(p.x+w-2*s,p.y-h*.34);ctx.stroke();
+ ctx.fillStyle='#352b25';ctx.fillRect(p.x+3*s,p.y-11*s,7*s,12*s);
+ ctx.fillStyle='#a47a4b';ctx.fillRect(p.x+4*s,p.y-10*s,1.5*s,10*s);
+ ctx.fillStyle='#f2cb77';ctx.fillRect(p.x+w*.55,p.y-h*.65,3*s,4*s);
+ ctx.fillStyle='#453c32';ctx.fillRect(p.x+w*.55+1*s,p.y-h*.65,Math.max(.7,s*.8),4*s);
+ if(b.type==='tower'){
+  // Parapet merlons and narrow arrow slits distinguish the defensive tower.
+  ctx.fillStyle='#c5b69a';
+  for(let k=-1;k<=1;k++)ctx.fillRect(p.x+k*7*s-2*s,p.y-h-7*s,4*s,7*s);
+  ctx.fillStyle='#28342e';ctx.fillRect(p.x+5*s,p.y-h*.55,2*s,8*s);
+ }else{
+  ctx.fillStyle='#493d32';ctx.fillRect(p.x-w*.6,p.y-h-12*s,5*s,9*s);
+  ctx.fillStyle='#c0aa86';ctx.fillRect(p.x-w*.6,p.y-h-13*s,5*s,2*s);
+ }
+ if(b.type==='hall'){
+  ctx.fillStyle='#e5bf6d';ctx.fillRect(p.x-3*s,p.y-h-13*s,3*s,14*s);
+  poly([[p.x,p.y-h-13*s],[p.x+13*s,p.y-h-9*s],[p.x,p.y-h-5*s]],'#b94438','#73392d');
+ }
+ ctx.restore();
 }
 function soldier(u,p,i,now){const s=zoom,moving=u.path.length>0,phase=moving?Math.sin(now*.014+i*1.7)*3*s:0;
  ctx.fillStyle='#10251d88';ctx.beginPath();ctx.ellipse(p.x,p.y+2*s,9*s,3.5*s,0,0,Math.PI*2);ctx.fill();
