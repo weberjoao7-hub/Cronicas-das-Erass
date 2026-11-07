@@ -55,11 +55,19 @@ function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:2
  ctx.fillStyle='#372e26';ctx.fillRect(p.x+4*s,p.y-10*s,5*s,11*s);
  if(b.type==='hall'){ctx.fillStyle='#e5bf6d';ctx.fillRect(p.x-3*s,p.y-h-12*s,3*s,12*s)}
 }
-function soldier(u,p,i){const s=zoom;ctx.fillStyle='#142a2580';ctx.beginPath();ctx.ellipse(p.x,p.y,8*s,3*s,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle=i===selected?'#e5d59b':'#487bba';ctx.fillRect(p.x-4*s,p.y-14*s,8*s,11*s);
- ctx.fillStyle='#d2b08b';ctx.beginPath();ctx.arc(p.x,p.y-17*s,4*s,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='#c2d5db';ctx.lineWidth=2*s;ctx.beginPath();ctx.moveTo(p.x+5*s,p.y-11*s);ctx.lineTo(p.x+10*s,p.y-23*s);ctx.stroke();
- if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,11*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
+function soldier(u,p,i,now){const s=zoom,moving=u.path.length>0,phase=moving?Math.sin(now*.014+i*1.7)*3*s:0;
+ ctx.fillStyle='#10251d88';ctx.beginPath();ctx.ellipse(p.x,p.y+2*s,9*s,3.5*s,0,0,Math.PI*2);ctx.fill();
+ // Animated legs and shield make movement legible even on small mobile screens.
+ ctx.strokeStyle='#42382e';ctx.lineWidth=3*s;ctx.lineCap='round';ctx.beginPath();
+ ctx.moveTo(p.x-2*s,p.y-6*s);ctx.lineTo(p.x-4*s+phase,p.y+1*s);
+ ctx.moveTo(p.x+2*s,p.y-6*s);ctx.lineTo(p.x+4*s-phase,p.y+1*s);ctx.stroke();
+ ctx.fillStyle=i===selected?'#e5d59b':'#487bba';ctx.fillRect(p.x-4*s,p.y-16*s,8*s,12*s);
+ ctx.fillStyle='#294b76';ctx.beginPath();ctx.ellipse(p.x-6*s,p.y-9*s,4*s,6*s,-.2,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle='#d4b76f';ctx.lineWidth=1.2*s;ctx.stroke();
+ ctx.fillStyle='#d2b08b';ctx.beginPath();ctx.arc(p.x,p.y-19*s,4*s,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#a9b6bc';poly([[p.x-5*s,p.y-21*s],[p.x,p.y-26*s],[p.x+5*s,p.y-21*s]],'#9baeb9','#4a5b65');
+ ctx.strokeStyle='#c2d5db';ctx.lineWidth=2*s;ctx.beginPath();ctx.moveTo(p.x+5*s,p.y-12*s);ctx.lineTo(p.x+10*s,p.y-25*s);ctx.stroke();
+ if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,12*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
 function draw(now){const dt=Math.min((now-last)/1000,.05);last=now;keyboardPan(dt);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
  for(const u of units){if(!u.path.length)continue;const target=u.path[0],dx=target.x-u.x,dy=target.y-u.y,d=Math.hypot(dx,dy);if(d<.001){u.x=target.x;u.y=target.y;u.path.shift();continue}const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step;if(step>=d-.001){u.x=target.x;u.y=target.y;u.path.shift()}}
  // Project all four viewport corners: two opposite corners alone miss isometric side regions.
@@ -75,11 +83,11 @@ function draw(now){const dt=Math.min((now-last)/1000,.05);last=now;keyboardPan(d
  for(let x=Math.max(minX,sum-maxY);x<=Math.min(maxX,sum-minY);x++){
  let y=sum-x;const t=terrain[y][x],p=screen(x,y);if(p.x< -TW*zoom||p.x>width+TW*zoom||p.y< -TH*zoom||p.y>height+TH*zoom)continue;
  diamond(p,colors[t.kind][Math.floor(t.noise*3)]);
- if(t.kind==='water'){ctx.strokeStyle='#8bb8b466';ctx.lineWidth=zoom;ctx.beginPath();ctx.moveTo(p.x-7*zoom,p.y);ctx.lineTo(p.x+4*zoom,p.y-2*zoom);ctx.stroke()}
+ if(t.kind==='water'){const wave=Math.sin(now*.0017+x*.9+y*1.3)*2*zoom;ctx.strokeStyle='#a2d2d080';ctx.lineWidth=Math.max(.6,zoom);ctx.beginPath();ctx.moveTo(p.x-8*zoom,p.y+wave);ctx.lineTo(p.x+4*zoom,p.y-2*zoom+wave);ctx.stroke()}
  else if(t.tree&&zoom>.55)tree(p,t.noise>.5);
  else if(t.rock&&zoom>.65)poly([[p.x-6*zoom,p.y],[p.x,p.y-8*zoom],[p.x+7*zoom,p.y]],'#8e9281');
  for(const building of buildings)if(building.x===x&&building.y===y)structure(building,p);
- for(let i=0;i<units.length;i++)if(Math.floor(units[i].x)===x&&Math.floor(units[i].y)===y)soldier(units[i],screen(units[i].x,units[i].y),i);
+ for(let i=0;i<units.length;i++)if(Math.floor(units[i].x)===x&&Math.floor(units[i].y)===y)soldier(units[i],screen(units[i].x,units[i].y),i,now);
  }
  drawMinimap();requestAnimationFrame(draw)}
 // Minimap is cached: terrain is static, only the camera rectangle is redrawn.
