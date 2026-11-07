@@ -576,7 +576,9 @@ function redrawMinimap(){
  mc.putImageData(miniBase,0,0);
 }
 function drawMinimap(){
- mc.save();mc.beginPath();mc.rect(0,0,W,H);mc.clip();
+ mc.save();
+ try{
+ mc.beginPath();mc.rect(0,0,W,H);mc.clip();
  // Somente o perímetro externo da região, mantendo visíveis as texturas naturais.
  const segments=minimapRegionSegments(ownedRegions());
  if(segments.length){
@@ -622,7 +624,12 @@ function drawMinimap(){
  const corners=[[0,0],[w,0],[w,h],[0,h]].map(p=>tileAt(p[0],p[1]));
  mc.beginPath();mc.moveTo(corners[0].x,corners[0].y);
  for(let i=1;i<4;i++)mc.lineTo(corners[i].x,corners[i].y);
- mc.closePath();mc.lineWidth=2;mc.strokeStyle='#ffe7ab';mc.stroke();mc.restore();drawMinimapSelectionOverlay();
+ mc.closePath();mc.lineWidth=2;mc.strokeStyle='#ffe7ab';mc.stroke();}finally{
+  // Restore clipping and drawing state even when a malformed save causes a minimap error.
+  // Otherwise subsequent frames inherit the clipped transform and may appear frozen.
+  mc.restore();
+ }
+ drawMinimapSelectionOverlay();
 }
 
 // v6.188: selecao tática e destinos no minimapa, sem expor regiões sob nevoa.
