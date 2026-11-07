@@ -434,7 +434,7 @@ document.getElementById('zoomIn').addEventListener('click',()=>zoom(1.2,width/2,
 document.getElementById('zoomOut').addEventListener('click',()=>zoom(1/1.2,width/2,height/2));
 document.getElementById('centerMap').addEventListener('click',()=>{offsetX=0;offsetY=0;draw();});
 const pointers=new Map();let pinch=0,dragged=false,downPoint=null,gestureWasMultitouch=false;
-canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(pointers.size===0){dragged=false;gestureWasMultitouch=false;downPoint={x:e.clientX,y:e.clientY}}canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){gestureWasMultitouch=true;dragged=true;const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(pointers.size===0){dragged=false;gestureWasMultitouch=false;downPoint={x:e.clientX,y:e.clientY}}try{canvas.setPointerCapture(e.pointerId)}catch(err){/* Safari may reject capture during interrupted gestures; retain pointer tracking. */}pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){gestureWasMultitouch=true;dragged=true;const pts=[...pointers.values()];pinch=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y)}else pinch=0});
 canvas.addEventListener('pointermove',e=>{
  const prev=pointers.get(e.pointerId);if(!prev)return;
  if(downPoint&&Math.hypot(e.clientX-downPoint.x,e.clientY-downPoint.y)>8)dragged=true;
