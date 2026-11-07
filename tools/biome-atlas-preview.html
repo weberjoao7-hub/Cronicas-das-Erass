@@ -10,7 +10,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 aside{position:fixed;top:env(safe-area-inset-top);left:env(safe-area-inset-left);padding:12px 16px;background:#102922ed;border:1px solid #b89c67;border-radius:0 0 12px 0;pointer-events:none}
 h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 #status{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;background:#102922e8;padding:7px 10px;border-radius:8px;pointer-events:none}
-#stopUnit{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(225px + env(safe-area-inset-bottom));z-index:2;background:#51352e;border:1px solid #d4a187;border-radius:8px;color:#fff0df;padding:10px;min-height:44px;font:600 12px system-ui,sans-serif}#stopUnit:disabled{opacity:.5}#queueMode{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(175px + env(safe-area-inset-bottom));z-index:2;background:#193b30;border:1px solid #c6ab74;border-radius:8px;color:#f6e9c8;padding:10px;min-height:44px;font:600 12px system-ui,sans-serif}#queueMode[aria-pressed="true"]{background:#87662e;color:white}#minimap{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:150px;height:150px;max-width:28vw;max-height:28vw;border:2px solid #c6ab74;border-radius:9px;background:#142b28;touch-action:none;box-shadow:0 4px 18px #0009;cursor:crosshair}
+#focusUnit{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(275px + env(safe-area-inset-bottom));z-index:2;background:#193b30;border:1px solid #c6ab74;border-radius:8px;color:#f6e9c8;padding:10px;min-height:44px;font:600 12px system-ui,sans-serif}#focusUnit:disabled{opacity:.5}#stopUnit{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(225px + env(safe-area-inset-bottom));z-index:2;background:#51352e;border:1px solid #d4a187;border-radius:8px;color:#fff0df;padding:10px;min-height:44px;font:600 12px system-ui,sans-serif}#stopUnit:disabled{opacity:.5}#queueMode{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(175px + env(safe-area-inset-bottom));z-index:2;background:#193b30;border:1px solid #c6ab74;border-radius:8px;color:#f6e9c8;padding:10px;min-height:44px;font:600 12px system-ui,sans-serif}#queueMode[aria-pressed="true"]{background:#87662e;color:white}#minimap{position:fixed;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:150px;height:150px;max-width:28vw;max-height:28vw;border:2px solid #c6ab74;border-radius:9px;background:#142b28;touch-action:none;box-shadow:0 4px 18px #0009;cursor:crosshair}
 #zoomControls{position:fixed;right:calc(12px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top));z-index:3;display:flex;gap:6px}#zoomControls button{min-width:44px;min-height:44px;border:1px solid #c6ab74;border-radius:8px;background:#193b30ed;color:#f6e9c8;font:700 20px system-ui,sans-serif;touch-action:manipulation}#zoomControls button:focus-visible{outline:3px solid #ffe49c;outline-offset:2px}
 @media(max-width:600px){aside{padding:8px 10px;max-width:70vw}h1{font-size:14px}#status{font-size:11px;max-width:52vw}}
 </style>
@@ -20,6 +20,7 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 <aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · selecione tropa azul, toque no destino · botão Fila ou tecla Q para múltiplas ordens</p></aside>
 <div id="zoomControls" role="group" aria-label="Controles da câmera"><button id="zoomIn" type="button" aria-label="Aproximar mapa">+</button><button id="zoomOut" type="button" aria-label="Afastar mapa">−</button><button id="centerMap" type="button" aria-label="Centralizar mapa" style="font-size:16px">⌖</button></div>
 <div id="status" role="status">Carregando atlas…</div>
+<button id="focusUnit" type="button" disabled aria-label="Centralizar câmera na tropa selecionada">Ver tropa</button>
 <button id="stopUnit" type="button" disabled aria-label="Parar tropa selecionada">Parar tropa</button>
 <button id="queueMode" type="button" aria-pressed="false" aria-label="Alternar fila de ordens de movimento">Fila: desligada</button>
 <canvas id="minimap" width="150" height="150" tabindex="0" role="button" aria-label="Minimapa navegável: setas movem a câmera; Enter centraliza o mapa"></canvas>
@@ -54,7 +55,7 @@ const objects=[...structures,...troops];
 const patrolOrigins=troops.map(o=>({x:o.x,y:o.y}));
 let selectedTroop=-1;
 const stopButton=document.getElementById('stopUnit');
-function syncStopButton(){stopButton.disabled=selectedTroop<0;}
+function syncStopButton(){stopButton.disabled=selectedTroop<0;document.getElementById('focusUnit').disabled=selectedTroop<0;}
 let queueEnabled=false;
 const queueButton=document.getElementById('queueMode');
 function toggleQueueMode(){queueEnabled=!queueEnabled;queueButton.setAttribute('aria-pressed',String(queueEnabled));queueButton.textContent=queueEnabled?'Fila: ligada':'Fila: desligada';status.textContent=queueEnabled?'Próximos destinos serão adicionados à fila':'Próxima ordem substituirá a rota atual';}
@@ -488,6 +489,7 @@ canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(selectedTroop<0)
  enqueueMove(target,e.shiftKey||queueEnabled);
 });
 // Keyboard camera controls work without a mouse and avoid browser scrolling.
+document.getElementById('focusUnit').addEventListener('click',()=>focusSelectedTroop());
 function focusSelectedTroop(){
  if(selectedTroop<0){status.textContent='Selecione uma tropa para centralizar';return;}
  const unit=troops[selectedTroop];
