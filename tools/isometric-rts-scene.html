@@ -22,7 +22,26 @@ const terrain=Array.from({length:N},(_,y)=>Array.from({length:N},(_,x)=>{
 }));
 const buildings=[{x:24,y:23,type:'hall'},{x:29,y:25,type:'house'},{x:20,y:28,type:'tower'},{x:48,y:22,type:'house'},{x:42,y:49,type:'tower'},{x:26,y:32,type:'house'}];
 const units=[{x:25,y:27,tx:25,ty:27},{x:27,y:29,tx:27,ty:29},{x:22,y:30,tx:22,ty:30},{x:47,y:26,tx:47,ty:26}].map(u=>({...u,path:[]}));
-const blocked=(x,y)=>x<0||y<0||x>=N||y>=N||terrain[y][x].kind==='water'||buildings.some(b=>b.x===x&&b.y===y);
+// Static occupancy map keeps path searches cheap and prevents soldiers crossing trunks.
+const occupied=new Uint8Array(N*N);
+for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+ const t=terrain[y][x];
+ if(t.kind==='water'||t.tree||t.rock)occupied[y*N+x]=1;
+}
+for(const b of buildings){
+ for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+  const x=b.x+dx,y=b.y+dy;
+  if(x>=0&&y>=0&&x<N&&y<N){
+   occupied[y*N+x]=1;
+   terrain[y][x].tree=false;terrain[y][x].rock=false;
+  }
+ }
+}
+for(const u of units){
+ const x=Math.round(u.x),y=Math.round(u.y);
+ occupied[y*N+x]=0;terrain[y][x].tree=false;terrain[y][x].rock=false;
+}
+const blocked=(x,y)=>x<0||y<0||x>=N||y>=N||occupied[y*N+x]===1;
 function findPath(sx,sy,ex,ey){
  if(blocked(ex,ey))return null;
  const start=sy*N+sx,goal=ey*N+ex,previous=new Int32Array(N*N).fill(-1),queue=new Int32Array(N*N);
@@ -94,6 +113,7 @@ function soldier(u,p,i,now){const s=zoom,moving=u.path.length>0,phase=moving?Mat
  ctx.fillStyle='#a9b6bc';poly([[p.x-5*s,p.y-21*s],[p.x,p.y-26*s],[p.x+5*s,p.y-21*s]],'#9baeb9','#4a5b65');
  ctx.strokeStyle='#c2d5db';ctx.lineWidth=2*s;ctx.beginPath();ctx.moveTo(p.x+5*s,p.y-12*s);ctx.lineTo(p.x+10*s,p.y-25*s);ctx.stroke();
  if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,12*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
+let miniFrame=0;
 function draw(now){const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;keyboardPan(dt);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
  for(const u of units){if(!u.path.length)continue;const target=u.path[0],dx=target.x-u.x,dy=target.y-u.y,d=Math.hypot(dx,dy);if(d<.001){u.x=target.x;u.y=target.y;u.path.shift();continue}const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step;if(step>=d-.001){u.x=target.x;u.y=target.y;u.path.shift()}}
  // Project all four viewport corners: two opposite corners alone miss isometric side regions.
@@ -152,7 +172,7 @@ function draw(now){const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;k
    ctx.restore();
   }
  }
- drawMinimap();requestAnimationFrame(draw)}
+ if((miniFrame++%3)===0)drawMinimap();requestAnimationFrame(draw)}
 // Minimap is cached: terrain is static, only the camera rectangle is redrawn.
 const minimap=document.getElementById('minimap'),miniCtx=minimap.getContext('2d');
 const miniTerrain=document.createElement('canvas');miniTerrain.width=N;miniTerrain.height=N;
