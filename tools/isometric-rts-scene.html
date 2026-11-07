@@ -112,10 +112,38 @@ function endMini(e){if(e.pointerId===miniPointer)miniPointer=null}
 minimap.addEventListener('pointerup',endMini);minimap.addEventListener('pointercancel',endMini);
 window.addEventListener('blur',()=>miniPointer=null);
 function moveCamera(x,y){cx+=x;cy+=y}
-canvas.addEventListener('pointerdown',e=>{drag={id:e.pointerId,x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY};try{canvas.setPointerCapture(e.pointerId)}catch(_){}});
-canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;moveCamera(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY});
-canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const wasTap=Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;drag=null;if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;u.tx=x;u.ty=y;hud.textContent='Tropa '+(selected+1)+' → '+x+', '+y+' · '+path.length+' passos'}else hud.textContent='Destino bloqueado ou sem caminho'}});
-canvas.addEventListener('pointercancel',()=>drag=null);window.addEventListener('blur',()=>drag=null);
+// Track touch pointers independently: two-finger pinch zooms around the gesture midpoint.
+const pointers=new Map();let pinchDistance=0,gestureMoved=false;
+canvas.addEventListener('pointerdown',e=>{
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===1){drag={id:e.pointerId,x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,moved:false};gestureMoved=false}
+ else{drag=null;gestureMoved=true;pinchDistance=0}
+ try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+});
+canvas.addEventListener('pointermove',e=>{
+ const previous=pointers.get(e.pointerId);if(!previous)return;
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===2){
+  const pair=[...pointers.values()],distance=Math.hypot(pair[0].x-pair[1].x,pair[0].y-pair[1].y);
+  const midpoint={x:(pair[0].x+pair[1].x)/2,y:(pair[0].y+pair[1].y)/2};
+  if(pinchDistance>0&&distance>0)zoomAt(distance/pinchDistance,midpoint.x,midpoint.y);
+  const dx=e.clientX-previous.x,dy=e.clientY-previous.y;
+  moveCamera(dx/2,dy/2);pinchDistance=distance;return;
+ }
+ if(!drag||drag.id!==e.pointerId)return;
+ const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>9)drag.moved=true;
+ moveCamera(dx,dy);drag.x=e.clientX;drag.y=e.clientY;
+});
+canvas.addEventListener('pointerup',e=>{
+ const wasTap=!!drag&&drag.id===e.pointerId&&!drag.moved&&!gestureMoved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;
+ pointers.delete(e.pointerId);drag=null;pinchDistance=0;
+ if(pointers.size)gestureMoved=true;
+ if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;u.tx=x;u.ty=y;hud.textContent='Tropa '+(selected+1)+' → '+x+', '+y+' · '+path.length+' passos'}else hud.textContent='Destino bloqueado ou sem caminho'}});
+function resetGesture(){pointers.clear();drag=null;pinchDistance=0;gestureMoved=false}
+canvas.addEventListener('pointercancel',resetGesture);
+window.addEventListener('blur',resetGesture);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)resetGesture()});
 // Keep the terrain point under the cursor stationary while changing zoom.
 function zoomAt(factor,px=width/2,py=height/2){
  const before=world(px,py);
