@@ -17,7 +17,7 @@ h1{font-size:16px;margin:0 0 4px}p{margin:0;font-size:12px;color:#d7c69d}
 </head>
 <body>
 <canvas id="scene" aria-label="Prévia isométrica dos quatro biomas"></canvas>
-<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · selecione tropa azul, toque no destino · botão Fila para múltiplas ordens</p></aside>
+<aside><h1>Laboratório de biomas</h1><p>Mapa 64 × 64 · selecione tropa azul, toque no destino · botão Fila ou tecla Q para múltiplas ordens</p></aside>
 <div id="zoomControls" role="group" aria-label="Controles da câmera"><button id="zoomIn" type="button" aria-label="Aproximar mapa">+</button><button id="zoomOut" type="button" aria-label="Afastar mapa">−</button><button id="centerMap" type="button" aria-label="Centralizar mapa" style="font-size:16px">⌖</button></div>
 <div id="status" role="status">Carregando atlas…</div>
 <button id="stopUnit" type="button" disabled aria-label="Parar tropa selecionada">Parar tropa</button>
@@ -57,7 +57,8 @@ const stopButton=document.getElementById('stopUnit');
 function syncStopButton(){stopButton.disabled=selectedTroop<0;}
 let queueEnabled=false;
 const queueButton=document.getElementById('queueMode');
-queueButton.addEventListener('click',()=>{queueEnabled=!queueEnabled;queueButton.setAttribute('aria-pressed',String(queueEnabled));queueButton.textContent=queueEnabled?'Fila: ligada':'Fila: desligada';status.textContent=queueEnabled?'Próximos destinos serão adicionados à fila':'Próxima ordem substituirá a rota atual';});
+function toggleQueueMode(){queueEnabled=!queueEnabled;queueButton.setAttribute('aria-pressed',String(queueEnabled));queueButton.textContent=queueEnabled?'Fila: ligada':'Fila: desligada';status.textContent=queueEnabled?'Próximos destinos serão adicionados à fila':'Próxima ordem substituirá a rota atual';}
+queueButton.addEventListener('click',toggleQueueMode);
 const orders=new Map();
 // Once a player stops or moves a unit, it stays at its commanded position.
 const holdingPosition=new Set();
@@ -499,6 +500,7 @@ addEventListener('keydown',e=>{
  if(e.altKey||e.ctrlKey||e.metaKey||document.activeElement===minimap||/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(document.activeElement?.tagName||''))return;
  if(e.key==='Escape'&&selectedTroop>=0){selectedTroop=-1;syncStopButton();status.textContent='Seleção cancelada';draw();return;}
  if(e.key.toLowerCase()==='f'){focusSelectedTroop();return;}
+ if(e.key.toLowerCase()==='q'){e.preventDefault();toggleQueueMode();return;}
  // X is the RTS stop shortcut; S remains available for camera panning.
  if(e.key.toLowerCase()==='x'&&selectedTroop>=0){e.preventDefault();stopSelectedTroop();return;}
  const step=e.shiftKey?110:48;
