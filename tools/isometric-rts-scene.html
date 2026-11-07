@@ -42,8 +42,26 @@ for(const u of units){
  occupied[y*N+x]=0;terrain[y][x].tree=false;terrain[y][x].rock=false;
 }
 const blocked=(x,y)=>x<0||y<0||x>=N||y>=N||occupied[y*N+x]===1;
+// If a target is obstructed, approach the closest reachable adjacent tile instead.
 function findPath(sx,sy,ex,ey){
- if(blocked(ex,ey))return null;
+ const requestedX=ex,requestedY=ey;
+ if(blocked(sx,sy))return null;
+ if(blocked(ex,ey)){
+  for(let radius=1;radius<=5;radius++){
+   const candidates=[];
+   for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+    const x=requestedX+dx,y=requestedY+dy;
+    if(!blocked(x,y))candidates.push({x,y,d:dx*dx+dy*dy});
+   }
+   candidates.sort((a,b)=>a.d-b.d);
+   for(const c of candidates){
+    const route=findPath(sx,sy,c.x,c.y);
+    if(route){return route}
+   }
+  }
+  return null;
+ }
  const start=sy*N+sx,goal=ey*N+ex,previous=new Int32Array(N*N).fill(-1),queue=new Int32Array(N*N);
  let head=0,tail=0;queue[tail++]=start;previous[start]=start;
  const dirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
@@ -230,7 +248,7 @@ canvas.addEventListener('pointerup',e=>{
  const wasTap=!!drag&&drag.id===e.pointerId&&!drag.moved&&!gestureMoved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;
  pointers.delete(e.pointerId);drag=null;pinchDistance=0;
  if(pointers.size)gestureMoved=true;
- if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;u.tx=x;u.ty=y;hud.textContent='Tropa '+(selected+1)+' → '+x+', '+y+' · '+path.length+' passos'}else hud.textContent='Destino bloqueado ou sem caminho'}});
+ if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],sx=clamp(Math.round(u.x),0,N-1),sy=clamp(Math.round(u.y),0,N-1),path=findPath(sx,sy,x,y);if(path){u.path=path;const destination=path[path.length-1]||{x:sx,y:sy};u.tx=destination.x;u.ty=destination.y;hud.textContent='Tropa '+(selected+1)+' → '+destination.x+', '+destination.y+(destination.x!==x||destination.y!==y?' · aproximação ao alvo':'')+' · '+path.length+' passos'}else hud.textContent='Destino inacessível (raio de 5 células)'}});
 function resetGesture(){pointers.clear();drag=null;pinchDistance=0;gestureMoved=false}
 canvas.addEventListener('pointercancel',resetGesture);
 window.addEventListener('blur',resetGesture);
