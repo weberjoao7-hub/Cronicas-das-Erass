@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Crônicas das Eras — protótipo RTS isométrico</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101f1c;color:#f5e8c8;font:13px system-ui}canvas{display:block;width:100%;height:100%;touch-action:none}
+header{position:fixed;top:env(safe-area-inset-top);left:env(safe-area-inset-left);max-width:calc(100vw - 110px);padding:10px 14px;background:#10251fef;border:1px solid #ae925f;border-radius:0 0 12px 0;pointer-events:none}h1{font:700 17px Georgia,serif;margin:0 0 4px}p{margin:0;color:#d5c69e;font-size:11px}#hud{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left));padding:9px 12px;background:#10251fe9;border:1px solid #ae925f;border-radius:9px;max-width:calc(100vw - 20px)}button{min-height:44px;min-width:44px;background:#25483b;color:#f5e8c8;border:1px solid #b89a64;border-radius:8px;font-size:18px;touch-action:manipulation}#controls{position:fixed;right:calc(10px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));display:flex;gap:6px}
+</style></head><body><canvas id="world" aria-label="Mapa isométrico interativo com quatro biomas, construções e tropas"></canvas>
+<header><h1>Crônicas das Eras · RTS</h1><p>Protótipo visual · arraste para explorar · toque na tropa e no destino</p></header>
+<div id="controls"><button id="plus" aria-label="Aproximar">+</button><button id="minus" aria-label="Afastar">−</button></div>
+<div id="hud" role="status">Mapa 72 × 72 · quatro biomas · toque em uma tropa</div>
+<script>
+'use strict';
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d'),hud=document.getElementById('hud');
+const N=72,TW=48,TH=24,seed=1729;
+let width=0,height=0,dpr=1,zoom=1,cx=0,cy=0,selected=-1,drag=null,last=performance.now();
+const rand=(x,y,k=0)=>{let v=Math.sin(x*127.1+y*311.7+k*74.7+seed)*43758.5453;return v-Math.floor(v)};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const terrain=Array.from({length:N},(_,y)=>Array.from({length:N},(_,x)=>{
+ const n=Math.sin(x*.17)*.19+Math.cos(y*.14)*.19+Math.sin((x+y)*.095)*.17+rand(Math.floor(x/5),Math.floor(y/5))*.16;
+ const water=n<-.02,desert=x>40&&y<38,high=y>43&&x>30;
+ return {kind:water?'water':desert?'desert':high?'high':'grass',noise:rand(x,y),tree:!water&&rand(x,y,2)>.85,rock:!water&&rand(x,y,3)>.975};
+}));
+const buildings=[{x:24,y:23,type:'hall'},{x:29,y:25,type:'house'},{x:20,y:28,type:'tower'},{x:48,y:22,type:'house'},{x:42,y:49,type:'tower'},{x:26,y:32,type:'house'}];
+const units=[{x:25,y:27,tx:25,ty:27},{x:27,y:29,tx:27,ty:29},{x:22,y:30,tx:22,ty:30},{x:47,y:26,tx:47,ty:26}];
+const colors={water:['#285e68','#316b70','#245661'],grass:['#50774a','#5d8351','#476f45'],desert:['#b49b65','#c2a971','#a98c58'],high:['#657968','#748578','#5c705e']};
+function resize(){const r=canvas.getBoundingClientRect();width=r.width;height=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr)}
+function screen(x,y){return {x:width/2+(x-y)*TW*.5*zoom+cx,y:height*.40+(x+y)*TH*.5*zoom+cy}}
+function world(x,y){let a=(x-width/2-cx)/(TW*.5*zoom),b=(y-height*.40-cy)/(TH*.5*zoom);return {x:(a+b)/2,y:(b-a)/2}}
+function poly(pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=Math.max(.5,zoom*.6);ctx.stroke()}}
+function diamond(p,color){const w=TW*zoom/2,h=TH*zoom/2;poly([[p.x,p.y-h],[p.x+w,p.y],[p.x,p.y+h],[p.x-w,p.y]],color,'#162d2430')}
+function tree(p,variation){const s=zoom;ctx.fillStyle='#493e2c';ctx.fillRect(p.x-2*s,p.y-14*s,4*s,15*s);poly([[p.x,p.y-31*s],[p.x+12*s,p.y-9*s],[p.x,p.y-13*s],[p.x-12*s,p.y-9*s]],variation?'#254d39':'#326443');poly([[p.x,p.y-25*s],[p.x+10*s,p.y-6*s],[p.x-10*s,p.y-6*s]],'#3b7550')}
+function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:20)*s,w=(b.type==='hall'?26:17)*s;
+ poly([[p.x-w,p.y],[p.x,p.y+9*s],[p.x,p.y-h+9*s],[p.x-w,p.y-h]],'#7b735b');
+ poly([[p.x,p.y+9*s],[p.x+w,p.y],[p.x+w,p.y-h],[p.x,p.y-h+9*s]],'#b7a27a');
+ poly([[p.x-w-3*s,p.y-h],[p.x,p.y-h-16*s],[p.x+w+3*s,p.y-h],[p.x,p.y-h+9*s]],b.type==='tower'?'#586c6a':'#744c3b','#352e29');
+ ctx.fillStyle='#372e26';ctx.fillRect(p.x+4*s,p.y-10*s,5*s,11*s);
+ if(b.type==='hall'){ctx.fillStyle='#e5bf6d';ctx.fillRect(p.x-3*s,p.y-h-12*s,3*s,12*s)}
+}
+function soldier(u,p,i){const s=zoom;ctx.fillStyle='#142a2580';ctx.beginPath();ctx.ellipse(p.x,p.y,8*s,3*s,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=i===selected?'#e5d59b':'#487bba';ctx.fillRect(p.x-4*s,p.y-14*s,8*s,11*s);
+ ctx.fillStyle='#d2b08b';ctx.beginPath();ctx.arc(p.x,p.y-17*s,4*s,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle='#c2d5db';ctx.lineWidth=2*s;ctx.beginPath();ctx.moveTo(p.x+5*s,p.y-11*s);ctx.lineTo(p.x+10*s,p.y-23*s);ctx.stroke();
+ if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,11*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
+function draw(now){const dt=Math.min((now-last)/1000,.05);last=now;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
+ for(const u of units){const dx=u.tx-u.x,dy=u.ty-u.y,d=Math.hypot(dx,dy);if(d>.03){const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step}}
+ const a=world(-TW*zoom,height*-0.1),b=world(width+TW*zoom,height*1.1);
+ const lo=clamp(Math.floor(Math.min(a.x,a.y,b.x,b.y))-4,0,N-1),hi=clamp(Math.ceil(Math.max(a.x,a.y,b.x,b.y))+4,0,N-1);
+ for(let sum=lo*2;sum<=hi*2;sum++)for(let x=Math.max(lo,sum-hi);x<=Math.min(hi,sum-lo);x++){let y=sum-x;if(y<0||y>=N)continue;const t=terrain[y][x],p=screen(x,y);if(p.x< -TW*zoom||p.x>width+TW*zoom||p.y< -TH*zoom||p.y>height+TH*zoom)continue;
+ diamond(p,colors[t.kind][Math.floor(t.noise*3)]);
+ if(t.kind==='water'){ctx.strokeStyle='#8bb8b466';ctx.lineWidth=zoom;ctx.beginPath();ctx.moveTo(p.x-7*zoom,p.y);ctx.lineTo(p.x+4*zoom,p.y-2*zoom);ctx.stroke()}
+ else if(t.tree&&zoom>.55)tree(p,t.noise>.5);
+ else if(t.rock&&zoom>.65)poly([[p.x-6*zoom,p.y],[p.x,p.y-8*zoom],[p.x+7*zoom,p.y]],'#8e9281');
+ for(const building of buildings)if(building.x===x&&building.y===y)structure(building,p);
+ for(let i=0;i<units.length;i++)if(Math.floor(units[i].x)===x&&Math.floor(units[i].y)===y)soldier(units[i],screen(units[i].x,units[i].y),i);
+ }
+ requestAnimationFrame(draw)}
+function moveCamera(x,y){cx+=x;cy+=y}
+canvas.addEventListener('pointerdown',e=>{drag={id:e.pointerId,x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY};try{canvas.setPointerCapture(e.pointerId)}catch(_){}});
+canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;moveCamera(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY});
+canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const wasTap=Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;drag=null;if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selected=best;hud.textContent='Tropa '+(best+1)+' selecionada · toque no destino';return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);if(terrain[y][x].kind!=='water'){units[selected].tx=x;units[selected].ty=y;hud.textContent='Tropa '+(selected+1)+' → '+x+', '+y}else hud.textContent='Água: escolha terreno firme'}});
+canvas.addEventListener('pointercancel',()=>drag=null);window.addEventListener('blur',()=>drag=null);
+document.getElementById('plus').onclick=()=>zoom=clamp(zoom*1.2,.45,2);
+document.getElementById('minus').onclick=()=>zoom=clamp(zoom/1.2,.45,2);
+window.addEventListener('resize',resize);resize();const center=screen(27,27);cx+=width/2-center.x;cy+=height/2-center.y;requestAnimationFrame(draw);
+</script></body></html>
