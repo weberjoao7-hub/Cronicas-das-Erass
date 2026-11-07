@@ -61,9 +61,18 @@ function soldier(u,p,i){const s=zoom;ctx.fillStyle='#142a2580';ctx.beginPath();c
  if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,11*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
 function draw(now){const dt=Math.min((now-last)/1000,.05);last=now;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
  for(const u of units){if(!u.path.length)continue;const target=u.path[0],dx=target.x-u.x,dy=target.y-u.y,d=Math.hypot(dx,dy);if(d<.001){u.x=target.x;u.y=target.y;u.path.shift();continue}const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step;if(step>=d-.001){u.x=target.x;u.y=target.y;u.path.shift()}}
- const a=world(-TW*zoom,height*-0.1),b=world(width+TW*zoom,height*1.1);
- const lo=clamp(Math.floor(Math.min(a.x,a.y,b.x,b.y))-4,0,N-1),hi=clamp(Math.ceil(Math.max(a.x,a.y,b.x,b.y))+4,0,N-1);
- for(let sum=lo*2;sum<=hi*2;sum++)for(let x=Math.max(lo,sum-hi);x<=Math.min(hi,sum-lo);x++){let y=sum-x;if(y<0||y>=N)continue;const t=terrain[y][x],p=screen(x,y);if(p.x< -TW*zoom||p.x>width+TW*zoom||p.y< -TH*zoom||p.y>height+TH*zoom)continue;
+ // Project all four viewport corners: two opposite corners alone miss isometric side regions.
+ const margin=TW*zoom*2,corners=[
+  world(-margin,-margin),world(width+margin,-margin),
+  world(-margin,height+margin),world(width+margin,height+margin)
+ ];
+ const minX=clamp(Math.floor(Math.min(...corners.map(p=>p.x)))-3,0,N-1);
+ const maxX=clamp(Math.ceil(Math.max(...corners.map(p=>p.x)))+3,0,N-1);
+ const minY=clamp(Math.floor(Math.min(...corners.map(p=>p.y)))-3,0,N-1);
+ const maxY=clamp(Math.ceil(Math.max(...corners.map(p=>p.y)))+3,0,N-1);
+ for(let sum=minX+minY;sum<=maxX+maxY;sum++)
+ for(let x=Math.max(minX,sum-maxY);x<=Math.min(maxX,sum-minY);x++){
+ let y=sum-x;const t=terrain[y][x],p=screen(x,y);if(p.x< -TW*zoom||p.x>width+TW*zoom||p.y< -TH*zoom||p.y>height+TH*zoom)continue;
  diamond(p,colors[t.kind][Math.floor(t.noise*3)]);
  if(t.kind==='water'){ctx.strokeStyle='#8bb8b466';ctx.lineWidth=zoom;ctx.beginPath();ctx.moveTo(p.x-7*zoom,p.y);ctx.lineTo(p.x+4*zoom,p.y-2*zoom);ctx.stroke()}
  else if(t.tree&&zoom>.55)tree(p,t.noise>.5);
