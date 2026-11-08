@@ -325,6 +325,18 @@ function drawMinimap(){
  if(minimap.width!==w||minimap.height!==h){minimap.width=w;minimap.height=h}
  miniCtx.setTransform(w/N,0,0,h/N,0,0);miniCtx.clearRect(0,0,N,N);
  miniCtx.drawImage(miniTerrain,0,0);
+ // Display the selected unit's queued route and destination on the tactical minimap.
+ const active=units[selected];
+ if(active&&active.path.length){
+  miniCtx.strokeStyle='#ffe08a';miniCtx.lineWidth=.8;miniCtx.lineJoin='round';
+  miniCtx.beginPath();miniCtx.moveTo(active.x+.5,active.y+.5);
+  for(const step of active.path)miniCtx.lineTo(step.x+.5,step.y+.5);
+  miniCtx.stroke();
+  const goal=active.path[active.path.length-1];
+  miniCtx.fillStyle='#ffe08a';miniCtx.beginPath();
+  miniCtx.arc(goal.x+.5,goal.y+.5,1.8,0,Math.PI*2);miniCtx.fill();
+  miniCtx.fillStyle='#253a31';miniCtx.fillRect(goal.x,goal.y,1,1);
+ }
  for(let i=0;i<units.length;i++){
  const u=units[i];miniCtx.fillStyle=i===selected?'#ffe08a':'#ffffff';
  miniCtx.fillRect(u.x-.7,u.y-.7,1.8,1.8);
