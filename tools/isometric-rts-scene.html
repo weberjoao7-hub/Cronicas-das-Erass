@@ -97,7 +97,32 @@ function screen(x,y){return {x:width/2+(x-y)*TW*.5*zoom+cx,y:height*.40+(x+y)*TH
 function world(x,y){let a=(x-width/2-cx)/(TW*.5*zoom),b=(y-height*.40-cy)/(TH*.5*zoom);return {x:(a+b)/2,y:(b-a)/2}}
 function poly(pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=Math.max(.5,zoom*.6);ctx.stroke()}}
 function diamond(p,color){const w=TW*zoom/2,h=TH*zoom/2;poly([[p.x,p.y-h],[p.x+w,p.y],[p.x,p.y+h],[p.x-w,p.y]],color,'#162d2430')}
-function tree(p,variation){const s=zoom;ctx.fillStyle='#493e2c';ctx.fillRect(p.x-2*s,p.y-14*s,4*s,15*s);poly([[p.x,p.y-31*s],[p.x+12*s,p.y-9*s],[p.x,p.y-13*s],[p.x-12*s,p.y-9*s]],variation?'#254d39':'#326443');poly([[p.x,p.y-25*s],[p.x+10*s,p.y-6*s],[p.x-10*s,p.y-6*s]],'#3b7550')}
+function tree(p,variation,kind='grass'){
+ const s=zoom;
+ ctx.save();
+ ctx.fillStyle='#091d1855';ctx.beginPath();ctx.ellipse(p.x+5*s,p.y+3*s,11*s,4*s,-.12,0,Math.PI*2);ctx.fill();
+ if(kind==='desert'){
+  // Sparse desert cacti replace temperate conifers in the arid biome.
+  ctx.strokeStyle='#37664c';ctx.lineWidth=5*s;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x,p.y-23*s);
+  ctx.moveTo(p.x,p.y-11*s);ctx.lineTo(p.x-8*s,p.y-11*s);ctx.lineTo(p.x-8*s,p.y-18*s);
+  ctx.moveTo(p.x,p.y-15*s);ctx.lineTo(p.x+7*s,p.y-15*s);ctx.lineTo(p.x+7*s,p.y-21*s);ctx.stroke();
+  ctx.strokeStyle='#78a16b';ctx.lineWidth=1*s;ctx.beginPath();ctx.moveTo(p.x+1*s,p.y-22*s);ctx.lineTo(p.x+1*s,p.y-3*s);ctx.stroke();
+ }else if(kind==='high'){
+  ctx.fillStyle='#514a3c';ctx.fillRect(p.x-2*s,p.y-17*s,4*s,18*s);
+  poly([[p.x,p.y-38*s],[p.x+12*s,p.y-12*s],[p.x-12*s,p.y-12*s]],variation?'#294d42':'#365b4c');
+  poly([[p.x,p.y-31*s],[p.x+10*s,p.y-8*s],[p.x-10*s,p.y-8*s]],'#48745b');
+  poly([[p.x,p.y-38*s],[p.x+5*s,p.y-27*s],[p.x,p.y-29*s],[p.x-5*s,p.y-27*s]],'#c7d5ca');
+ }else{
+  ctx.fillStyle='#493e2c';ctx.fillRect(p.x-2*s,p.y-15*s,4*s,16*s);
+  ctx.fillStyle=variation?'#264c37':'#346447';
+  for(const [dx,dy,r] of [[-7,-17,8],[7,-18,9],[0,-25,11],[0,-14,10]]){
+   ctx.beginPath();ctx.ellipse(p.x+dx*s,p.y+dy*s,r*s,r*.7*s,0,0,Math.PI*2);ctx.fill();
+  }
+  ctx.fillStyle='#7da36a70';ctx.beginPath();ctx.ellipse(p.x-4*s,p.y-27*s,6*s,3*s,-.3,0,Math.PI*2);ctx.fill();
+ }
+ ctx.restore();
+}
 function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:20)*s,w=(b.type==='hall'?26:17)*s;
  // Ground-contact shadow anchors buildings to the terrain instead of floating.
  ctx.save();ctx.fillStyle='#071b1880';ctx.beginPath();
@@ -207,7 +232,7 @@ function draw(now){const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;k
     ctx.lineTo(p.x+5*s,p.y-1*s);ctx.stroke();
    }
   }
-  if(t.tree&&zoom>.55)tree(p,t.noise>.5);
+  if(t.tree&&zoom>.55)tree(p,t.noise>.5,t.kind);
   else if(t.rock&&zoom>.65)poly([[p.x-6*zoom,p.y],[p.x,p.y-8*zoom],[p.x+7*zoom,p.y]],'#8e9281');
  }
  for(const building of buildings)if(building.x===x&&building.y===y)structure(building,p);
