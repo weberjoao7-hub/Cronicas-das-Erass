@@ -392,7 +392,6 @@ function commandMove(px,py,shiftKey=false){
 // Desktop RTS convention: right-click issues a movement order without changing selection.
 // Shift+right-click appends a waypoint; mobile retains the existing tap workflow.
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(e.pointerType==='touch')return;commandMove(e.clientX,e.clientY,e.shiftKey)});
-;
 function resetGesture(){pointers.clear();drag=null;pinchDistance=0;pinchCenter=null;gestureMoved=false}
 canvas.addEventListener('pointercancel',resetGesture);
 window.addEventListener('blur',resetGesture);
