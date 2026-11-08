@@ -4,7 +4,7 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101f1c;color:#f5e8c8;font:13px system-ui}canvas{display:block;width:100%;height:100%;touch-action:none}
 header{position:fixed;top:env(safe-area-inset-top);left:env(safe-area-inset-left);max-width:calc(100vw - 110px);padding:10px 14px;background:#10251fef;border:1px solid #ae925f;border-radius:0 0 12px 0;pointer-events:none}h1{font:700 17px Georgia,serif;margin:0 0 4px}p{margin:0;color:#d5c69e;font-size:11px}#hud{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left));padding:9px 12px;background:#10251fe9;border:1px solid #ae925f;border-radius:9px;max-width:calc(100vw - 20px)}button{min-height:44px;min-width:44px;background:#25483b;color:#f5e8c8;border:1px solid #b89a64;border-radius:8px;font-size:18px;touch-action:manipulation}#controls{position:fixed;right:calc(10px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));display:flex;gap:6px}
 </style></head><body><canvas id="world" aria-label="Mapa isométrico interativo com quatro biomas, construções e tropas"></canvas>
-<header><h1>Crônicas das Eras · RTS</h1><p>Protótipo visual · arraste para explorar · toque na tropa e no destino · Shift+clique ou Rota adiciona destinos · ■ ou Esc cancela a rota · WASD move a câmera</p></header>
+<header><h1>Crônicas das Eras · RTS</h1><p>Protótipo visual · arraste para explorar · toque na tropa e no destino · botão direito move no desktop · Shift+clique ou Rota adiciona destinos · ■ ou Esc cancela a rota · WASD move a câmera</p></header>
 <div id="controls"><button id="unit" aria-label="Selecionar próxima tropa" title="Próxima tropa">⚔</button><button id="route" aria-label="Ativar ou desativar fila de comandos" aria-pressed="false" title="Adicionar destinos à rota">↪</button><button id="stop" aria-label="Parar tropa selecionada" title="Parar tropa">■</button><button id="focus" aria-label="Centralizar tropa selecionada" title="Centralizar tropa">◎</button><button id="plus" aria-label="Aproximar">+</button><button id="minus" aria-label="Afastar">−</button></div>
 <div id="hud" role="status">Mapa 72 × 72 · quatro biomas · toque em uma tropa</div>
 <canvas id="minimap" aria-label="Minimapa navegável" style="position:fixed;right:calc(10px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));width:132px;height:132px;border:1px solid #b89a64;border-radius:8px;background:#142c27;touch-action:none"></canvas>
@@ -368,21 +368,31 @@ canvas.addEventListener('pointerup',e=>{
  const wasTap=!!drag&&drag.id===e.pointerId&&!drag.moved&&!gestureMoved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;
  pointers.delete(e.pointerId);drag=null;pinchDistance=0;pinchCenter=null;
  if(pointers.size)gestureMoved=true;
- if(!wasTap)return;
+ if(!wasTap||e.button===2)return;
  // Finger taps need a larger target than mouse clicks, especially when zoomed out.
  // Compare in CSS pixels; pointerType distinguishes touch and pen from mouse.
  let best=-1,dist=e.pointerType==='touch'?Math.max(28,20*zoom):Math.max(14,18*zoom);
  for(let i=0;i<units.length;i++){
   const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y-(-12*zoom));
   if(d<dist){best=i;dist=d}
- }if(best>=0){selectUnit(best);return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],queued=(routeMode||e.shiftKey)&&u.path.length>0;
+ }if(best>=0){selectUnit(best);return}if(selected>=0)commandMove(e.clientX,e.clientY,e.shiftKey);
+});
+function commandMove(px,py,shiftKey=false){
+ if(selected<0)return;
+ const p=world(px,py),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);
+ const u=units[selected],queued=(routeMode||shiftKey)&&u.path.length>0;
  const origin=queued?u.path[u.path.length-1]:{x:Math.round(u.x),y:Math.round(u.y)};
  const sx=clamp(origin.x,0,N-1),sy=clamp(origin.y,0,N-1),path=findPath(sx,sy,x,y);
  if(path){
   if(queued)u.path.push(...path);else u.path=path;
   const destination=path[path.length-1]||{x:sx,y:sy};u.tx=destination.x;u.ty=destination.y;
   hud.textContent='Tropa '+(selected+1)+' → '+destination.x+', '+destination.y+(queued?' · rota em fila':'')+(destination.x!==x||destination.y!==y?' · aproximação ao alvo':'')+' · '+u.path.length+' passos';
- }else hud.textContent='Destino inacessível (raio de 5 células)'}});
+ }else hud.textContent='Destino inacessível (raio de 5 células)';
+}
+// Desktop RTS convention: right-click issues a movement order without changing selection.
+// Shift+right-click appends a waypoint; mobile retains the existing tap workflow.
+canvas.addEventListener('contextmenu',e=>{e.preventDefault();if(e.pointerType==='touch')return;commandMove(e.clientX,e.clientY,e.shiftKey)});
+;
 function resetGesture(){pointers.clear();drag=null;pinchDistance=0;pinchCenter=null;gestureMoved=false}
 canvas.addEventListener('pointercancel',resetGesture);
 window.addEventListener('blur',resetGesture);
