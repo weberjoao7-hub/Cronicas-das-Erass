@@ -346,7 +346,14 @@ canvas.addEventListener('pointerup',e=>{
  const wasTap=!!drag&&drag.id===e.pointerId&&!drag.moved&&!gestureMoved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<9;
  pointers.delete(e.pointerId);drag=null;pinchDistance=0;pinchCenter=null;
  if(pointers.size)gestureMoved=true;
- if(!wasTap)return;let best=-1,dist=22;for(let i=0;i<units.length;i++){const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y);if(d<dist){best=i;dist=d}}if(best>=0){selectUnit(best);return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],queued=(routeMode||e.shiftKey)&&u.path.length>0;
+ if(!wasTap)return;
+ // Finger taps need a larger target than mouse clicks, especially when zoomed out.
+ // Compare in CSS pixels; pointerType distinguishes touch and pen from mouse.
+ let best=-1,dist=e.pointerType==='touch'?Math.max(28,20*zoom):Math.max(14,18*zoom);
+ for(let i=0;i<units.length;i++){
+  const p=screen(units[i].x,units[i].y),d=Math.hypot(e.clientX-p.x,e.clientY-p.y-(-12*zoom));
+  if(d<dist){best=i;dist=d}
+ }if(best>=0){selectUnit(best);return}if(selected>=0){const p=world(e.clientX,e.clientY),x=clamp(Math.round(p.x),0,N-1),y=clamp(Math.round(p.y),0,N-1);const u=units[selected],queued=(routeMode||e.shiftKey)&&u.path.length>0;
  const origin=queued?u.path[u.path.length-1]:{x:Math.round(u.x),y:Math.round(u.y)};
  const sx=clamp(origin.x,0,N-1),sy=clamp(origin.y,0,N-1),path=findPath(sx,sy,x,y);
  if(path){
