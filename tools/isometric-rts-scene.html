@@ -99,6 +99,9 @@ function poly(pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);f
 function diamond(p,color){const w=TW*zoom/2,h=TH*zoom/2;poly([[p.x,p.y-h],[p.x+w,p.y],[p.x,p.y+h],[p.x-w,p.y]],color,'#162d2430')}
 function tree(p,variation){const s=zoom;ctx.fillStyle='#493e2c';ctx.fillRect(p.x-2*s,p.y-14*s,4*s,15*s);poly([[p.x,p.y-31*s],[p.x+12*s,p.y-9*s],[p.x,p.y-13*s],[p.x-12*s,p.y-9*s]],variation?'#254d39':'#326443');poly([[p.x,p.y-25*s],[p.x+10*s,p.y-6*s],[p.x-10*s,p.y-6*s]],'#3b7550')}
 function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:20)*s,w=(b.type==='hall'?26:17)*s;
+ // Ground-contact shadow anchors buildings to the terrain instead of floating.
+ ctx.save();ctx.fillStyle='#071b1880';ctx.beginPath();
+ ctx.ellipse(p.x,p.y+5*s,w*1.55,11*s,-.12,0,Math.PI*2);ctx.fill();ctx.restore();
  poly([[p.x-w,p.y],[p.x,p.y+9*s],[p.x,p.y-h+9*s],[p.x-w,p.y-h]],'#7b735b');
  poly([[p.x,p.y+9*s],[p.x+w,p.y],[p.x+w,p.y-h],[p.x,p.y-h+9*s]],'#b7a27a');
  poly([[p.x-w-3*s,p.y-h],[p.x,p.y-h-16*s],[p.x+w+3*s,p.y-h],[p.x,p.y-h+9*s]],b.type==='tower'?'#586c6a':'#744c3b','#352e29');
@@ -133,6 +136,10 @@ function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:2
 }
 function soldier(u,p,i,now){const s=zoom,moving=u.path.length>0,phase=moving?Math.sin(now*.014+i*1.7)*3*s:0;
  ctx.fillStyle='#10251d88';ctx.beginPath();ctx.ellipse(p.x,p.y+2*s,9*s,3.5*s,0,0,Math.PI*2);ctx.fill();
+ // A small contrasting team pennant keeps squads readable against every biome.
+ ctx.strokeStyle='#433729';ctx.lineWidth=Math.max(1,1.2*s);
+ ctx.beginPath();ctx.moveTo(p.x-3*s,p.y-15*s);ctx.lineTo(p.x-3*s,p.y-34*s);ctx.stroke();
+ poly([[p.x-3*s,p.y-34*s],[p.x+8*s,p.y-31*s],[p.x-3*s,p.y-27*s]],i===selected?'#f5d17a':'#a84036');
  // Animated legs and shield make movement legible even on small mobile screens.
  ctx.strokeStyle='#42382e';ctx.lineWidth=3*s;ctx.lineCap='round';ctx.beginPath();
  ctx.moveTo(p.x-2*s,p.y-6*s);ctx.lineTo(p.x-4*s+phase,p.y+1*s);
