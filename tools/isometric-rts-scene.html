@@ -83,7 +83,7 @@ function findPath(sx,sy,ex,ey){
  return path.reverse();
 }
 const colors={water:['#285e68','#316b70','#245661'],grass:['#50774a','#5d8351','#476f45'],desert:['#b49b65','#c2a971','#a98c58'],high:['#657968','#748578','#5c705e']};
-function resize(){const r=canvas.getBoundingClientRect();width=r.width;height=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr)}
+function resize(){const r=canvas.getBoundingClientRect();width=r.width;height=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);constrainCamera()}
 function screen(x,y){return {x:width/2+(x-y)*TW*.5*zoom+cx,y:height*.40+(x+y)*TH*.5*zoom+cy}}
 function world(x,y){let a=(x-width/2-cx)/(TW*.5*zoom),b=(y-height*.40-cy)/(TH*.5*zoom);return {x:(a+b)/2,y:(b-a)/2}}
 function poly(pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=Math.max(.5,zoom*.6);ctx.stroke()}}
@@ -136,7 +136,7 @@ function soldier(u,p,i,now){const s=zoom,moving=u.path.length>0,phase=moving?Mat
  ctx.strokeStyle='#c2d5db';ctx.lineWidth=2*s;ctx.beginPath();ctx.moveTo(p.x+5*s,p.y-12*s);ctx.lineTo(p.x+10*s,p.y-25*s);ctx.stroke();
  if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,12*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
 let miniFrame=0;
-function draw(now){const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;keyboardPan(dt);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
+function draw(now){const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;keyboardPan(dt);constrainCamera();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
  for(const u of units){if(!u.path.length)continue;const target=u.path[0],dx=target.x-u.x,dy=target.y-u.y,d=Math.hypot(dx,dy);if(d<.001){u.x=target.x;u.y=target.y;u.path.shift();continue}const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step;if(step>=d-.001){u.x=target.x;u.y=target.y;u.path.shift()}}
  // Project all four viewport corners: two opposite corners alone miss isometric side regions.
  const margin=TW*zoom*2,corners=[
@@ -216,7 +216,7 @@ function drawMinimap(){
 }
 function jumpMinimap(e){
  const r=minimap.getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width*N,0,N-1),y=clamp((e.clientY-r.top)/r.height*N,0,N-1);
- const p=screen(x,y);cx+=width/2-p.x;cy+=height/2-p.y;
+ const p=screen(x,y);cx+=width/2-p.x;cy+=height/2-p.y;constrainCamera();
 }
 let miniPointer=null;
 minimap.addEventListener('pointerdown',e=>{if(miniPointer!==null)return;miniPointer=e.pointerId;jumpMinimap(e);try{minimap.setPointerCapture(e.pointerId)}catch(_){}});
@@ -224,7 +224,20 @@ minimap.addEventListener('pointermove',e=>{if(e.pointerId===miniPointer)jumpMini
 function endMini(e){if(e.pointerId===miniPointer)miniPointer=null}
 minimap.addEventListener('pointerup',endMini);minimap.addEventListener('pointercancel',endMini);
 window.addEventListener('blur',()=>miniPointer=null);
-function moveCamera(x,y){cx+=x;cy+=y}
+// Prevent the camera from drifting into empty space outside the playable map.
+// A generous margin keeps the diamond edges visible on narrow mobile screens.
+function constrainCamera(){
+ const corners=[[0,0],[N-1,0],[0,N-1],[N-1,N-1]].map(([x,y])=>screen(x,y));
+ const minX=Math.min(...corners.map(p=>p.x)),maxX=Math.max(...corners.map(p=>p.x));
+ const minY=Math.min(...corners.map(p=>p.y)),maxY=Math.max(...corners.map(p=>p.y));
+ const marginX=Math.min(width*.25,180),marginY=Math.min(height*.25,130);
+ const left=width-marginX-maxX,right=marginX-minX;
+ const top=height-marginY-maxY,bottom=marginY-minY;
+ // If the projected world is smaller than the viewport, center it instead.
+ cx+=left>right?(left+right)/2:clamp(0,left,right);
+ cy+=top>bottom?(top+bottom)/2:clamp(0,top,bottom);
+}
+function moveCamera(x,y){cx+=x;cy+=y;constrainCamera()}
 // Keep the gesture centroid and distance stable across individual pointer events.
 const pointers=new Map();let pinchDistance=0,pinchCenter=null,gestureMoved=false;
 canvas.addEventListener('pointerdown',e=>{
@@ -262,7 +275,7 @@ function zoomAt(factor,px=width/2,py=height/2){
  const before=world(px,py);
  zoom=clamp(zoom*factor,.45,2);
  const after=screen(before.x,before.y);
- cx+=px-after.x;cy+=py-after.y;
+ cx+=px-after.x;cy+=py-after.y;constrainCamera();
 }
 // Tactical controls work on touchscreens and desktop without interfering with map gestures.
 function selectUnit(index){
@@ -272,7 +285,7 @@ function selectUnit(index){
 function focusSelected(){
  if(selected<0)selectUnit(0);
  const p=screen(units[selected].x,units[selected].y);
- cx+=width/2-p.x;cy+=height/2-p.y;
+ cx+=width/2-p.x;cy+=height/2-p.y;constrainCamera();
 }
 document.getElementById('unit').onclick=()=>selectUnit(selected+1);
 document.getElementById('focus').onclick=focusSelected;
