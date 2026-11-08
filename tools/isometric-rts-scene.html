@@ -180,6 +180,28 @@ function structure(b,p){const s=zoom,h=(b.type==='tower'?35:b.type==='hall'?29:2
  if(b.type==='hall'){
   ctx.fillStyle='#e5bf6d';ctx.fillRect(p.x-3*s,p.y-h-13*s,3*s,14*s);
   poly([[p.x,p.y-h-13*s],[p.x+13*s,p.y-h-9*s],[p.x,p.y-h-5*s]],'#b94438','#73392d');
+  // A raised ridge, roof shingles and entrance steps distinguish the town hall.
+  ctx.strokeStyle='#c79c67';ctx.lineWidth=Math.max(.8,1.4*s);
+  ctx.beginPath();ctx.moveTo(p.x-w-3*s,p.y-h);ctx.lineTo(p.x,p.y-h-16*s);ctx.lineTo(p.x+w+3*s,p.y-h);ctx.stroke();
+  ctx.strokeStyle='#a86d50';ctx.lineWidth=Math.max(.6,.8*s);
+  for(let k=1;k<=3;k++){
+   const f=k/4;
+   ctx.beginPath();ctx.moveTo(p.x-w*(1-f)-2*s,p.y-h-16*f*s);
+   ctx.lineTo(p.x+w*(1-f)+2*s,p.y-h-16*f*s);ctx.stroke();
+  }
+  poly([[p.x+2*s,p.y+9*s],[p.x+13*s,p.y+3*s],[p.x+17*s,p.y+7*s],[p.x+6*s,p.y+13*s]],'#b7a88b','#685944');
+ }else if(b.type==='tower'){
+  // Crenellations and an inset shield create a distinct defensive silhouette.
+  ctx.fillStyle='#c5b69a';
+  for(let k=0;k<3;k++)ctx.fillRect(p.x-w+(k*7+1)*s,p.y-h-5*s,4*s,5*s);
+  poly([[p.x-8*s,p.y-h*.67],[p.x-2*s,p.y-h*.7],[p.x-2*s,p.y-h*.43],[p.x-5*s,p.y-h*.36],[p.x-8*s,p.y-h*.43]],'#9c4336','#d2b77b');
+  ctx.strokeStyle='#e1c37b';ctx.lineWidth=Math.max(.7,s);
+  ctx.beginPath();ctx.moveTo(p.x-5*s,p.y-h*.63);ctx.lineTo(p.x-5*s,p.y-h*.43);ctx.stroke();
+ }else{
+  // Timber-framed cottages receive a pitched dormer and stone doorstep.
+  poly([[p.x-9*s,p.y-h-5*s],[p.x-3*s,p.y-h-13*s],[p.x+4*s,p.y-h-5*s]],'#85543e','#493429');
+  ctx.fillStyle='#dfba70';ctx.fillRect(p.x-4*s,p.y-h-5*s,3*s,4*s);
+  poly([[p.x+2*s,p.y+9*s],[p.x+11*s,p.y+4*s],[p.x+14*s,p.y+7*s],[p.x+5*s,p.y+12*s]],'#a9a18a');
  }
  ctx.restore();
 }
