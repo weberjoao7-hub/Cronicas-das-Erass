@@ -188,7 +188,7 @@ function soldier(u,p,i,now){const s=zoom,moving=u.path.length>0,phase=moving?Mat
  if(i===selected){ctx.strokeStyle='#f3d375';ctx.lineWidth=2*s;ctx.beginPath();ctx.ellipse(p.x,p.y,12*s,5*s,0,0,Math.PI*2);ctx.stroke()}}
 // Cap minimap redraws to 10 Hz regardless of the display refresh rate.
 let lastMiniDraw=-Infinity;
-function draw(now){const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;if(document.hidden){requestAnimationFrame(draw);return}keyboardPan(dt);constrainCamera();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
+function draw(now){if(document.hidden){frameScheduled=false;return}frameScheduled=true;const dt=Math.max(0,Math.min((now-last)/1000,.05));last=now;keyboardPan(dt);constrainCamera();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.fillStyle='#122b28';ctx.fillRect(0,0,width,height);
  for(const u of units){if(!u.path.length)continue;const target=u.path[0],dx=target.x-u.x,dy=target.y-u.y,d=Math.hypot(dx,dy);if(d<.001){u.x=target.x;u.y=target.y;u.path.shift();continue}const step=Math.min(d,dt*2.2);u.x+=dx/d*step;u.y+=dy/d*step;if(step>=d-.001){u.x=target.x;u.y=target.y;u.path.shift()}}
  // Project all four viewport corners: two opposite corners alone miss isometric side regions.
  const margin=TW*zoom*2,corners=[
@@ -426,8 +426,8 @@ function keyboardPan(dt){
  if(left!==right)cx+=(left?1:-1)*speed;
  if(up!==down)cy+=(up?1:-1)*speed;
 }
-document.addEventListener('visibilitychange',()=>{if(document.hidden){held.clear();return}last=performance.now();lastMiniDraw=-Infinity});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){held.clear();return}last=performance.now();lastMiniDraw=-Infinity;if(!frameScheduled){frameScheduled=true;requestAnimationFrame(draw)}});
 // On mobile, orientation changes can resize the visual viewport independently of window resize.
 if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);
-window.addEventListener('resize',resize);resize();const center=screen(27,27);cx+=width/2-center.x;cy+=height/2-center.y;requestAnimationFrame(draw);
+window.addEventListener('resize',resize);resize();const center=screen(27,27);cx+=width/2-center.x;cy+=height/2-center.y;let frameScheduled=true;requestAnimationFrame(draw);
 </script></body></html>
