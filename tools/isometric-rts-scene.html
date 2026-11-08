@@ -102,7 +102,21 @@ function findPath(sx,sy,ex,ey){
  return path.reverse();
 }
 const colors={water:['#285e68','#316b70','#245661'],grass:['#50774a','#5d8351','#476f45'],desert:['#b49b65','#c2a971','#a98c58'],high:['#657968','#748578','#5c705e']};
-function resize(){const r=canvas.getBoundingClientRect();width=r.width;height=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);constrainCamera()}
+function resize(){
+ // Preserve the world coordinate at the viewport center through rotation and
+ // Safari visual-viewport changes instead of jumping to another map region.
+ const anchor=width>0&&height>0?world(width/2,height/2):null;
+ const r=canvas.getBoundingClientRect();
+ width=r.width;height=r.height;
+ // Bound the backing store on high-density phones to avoid excessive memory.
+ const pixelBudget=3500000;
+ dpr=Math.min(devicePixelRatio||1,2,Math.sqrt(pixelBudget/Math.max(1,width*height)));
+ canvas.width=Math.max(1,Math.round(width*dpr));
+ canvas.height=Math.max(1,Math.round(height*dpr));
+ if(anchor){const p=screen(anchor.x,anchor.y);cx+=width/2-p.x;cy+=height/2-p.y}
+ constrainCamera();
+ lastMiniDraw=-Infinity;
+}
 function screen(x,y){return {x:width/2+(x-y)*TW*.5*zoom+cx,y:height*.40+(x+y)*TH*.5*zoom+cy}}
 function world(x,y){let a=(x-width/2-cx)/(TW*.5*zoom),b=(y-height*.40-cy)/(TH*.5*zoom);return {x:(a+b)/2,y:(b-a)/2}}
 function poly(pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=Math.max(.5,zoom*.6);ctx.stroke()}}
