@@ -50,20 +50,27 @@ function findPath(sx,sy,ex,ey){
  const start=sy*N+sx,previous=new Int32Array(N*N).fill(-1),queue=new Int32Array(N*N);
  let head=0,tail=0;queue[tail++]=start;previous[start]=start;
  const dirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
- while(head<tail){
+ const requested=ey*N+ex,reachableTarget=!blocked(ex,ey);
+ // Ordinary movement stops as soon as the destination is discovered.
+ // Only obstructed/unreachable requests require exploring the whole reachable area.
+ let found=requested===start;
+ while(head<tail&&!found){
   const pos=queue[head++],x=pos%N,y=Math.floor(pos/N);
   for(const [dx,dy] of dirs){
    const nx=x+dx,ny=y+dy;
    if(blocked(nx,ny)||(dx&&dy&&(blocked(x+dx,y)||blocked(x,y+dy))))continue;
    const next=ny*N+nx;if(previous[next]!==-1)continue;
    previous[next]=pos;queue[tail++]=next;
+   if(reachableTarget&&next===requested){found=true;break}
   }
  }
- let goal=ey*N+ex;
+ let goal=requested;
  if(blocked(ex,ey)||previous[goal]===-1){
   // Prefer the nearest reachable cell within five tiles of the requested point.
   // Tie-break by travel steps, then coordinates for deterministic behavior.
   let best=-1,bestDistance=Infinity,bestSteps=Infinity;
+  const depth=new Int16Array(N*N);
+  for(let i=1;i<tail;i++){const node=queue[i];depth[node]=depth[previous[node]]+1}
   const minX=Math.max(0,ex-5),maxX=Math.min(N-1,ex+5);
   const minY=Math.max(0,ey-5),maxY=Math.min(N-1,ey+5);
   for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
@@ -71,7 +78,9 @@ function findPath(sx,sy,ex,ey){
    const index=y*N+x;if(previous[index]===-1)continue;
    const distance=(x-ex)**2+(y-ey)**2;
    if(distance>bestDistance)continue;
-   let steps=0;for(let at=index;at!==start;at=previous[at])steps++;
+   // BFS visitation order already represents shortest step count.
+   // Cache depths once rather than walking predecessor chains per candidate.
+   let steps=depth[index];
    if(distance<bestDistance||steps<bestSteps||(steps===bestSteps&&index<best)){
     best=index;bestDistance=distance;bestSteps=steps;
    }
