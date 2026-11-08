@@ -4,7 +4,7 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101f1c;color:#f5e8c8;font:13px system-ui}canvas{display:block;width:100%;height:100%;touch-action:none}
 header{position:fixed;top:env(safe-area-inset-top);left:env(safe-area-inset-left);max-width:calc(100vw - 110px);padding:10px 14px;background:#10251fef;border:1px solid #ae925f;border-radius:0 0 12px 0;pointer-events:none}h1{font:700 17px Georgia,serif;margin:0 0 4px}p{margin:0;color:#d5c69e;font-size:11px}#hud{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left));padding:9px 12px;background:#10251fe9;border:1px solid #ae925f;border-radius:9px;max-width:calc(100vw - 20px)}button{min-height:44px;min-width:44px;background:#25483b;color:#f5e8c8;border:1px solid #b89a64;border-radius:8px;font-size:18px;touch-action:manipulation}#controls{position:fixed;right:calc(10px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));display:flex;gap:6px}
 </style></head><body><canvas id="world" aria-label="Mapa isométrico interativo com quatro biomas, construções e tropas"></canvas>
-<header><h1>Crônicas das Eras · RTS</h1><p>Protótipo visual · arraste para explorar · toque na tropa e no destino · Shift+clique ou Rota adiciona destinos · ■ ou S cancela a rota</p></header>
+<header><h1>Crônicas das Eras · RTS</h1><p>Protótipo visual · arraste para explorar · toque na tropa e no destino · Shift+clique ou Rota adiciona destinos · ■ ou Esc cancela a rota · WASD move a câmera</p></header>
 <div id="controls"><button id="unit" aria-label="Selecionar próxima tropa" title="Próxima tropa">⚔</button><button id="route" aria-label="Ativar ou desativar fila de comandos" aria-pressed="false" title="Adicionar destinos à rota">↪</button><button id="stop" aria-label="Parar tropa selecionada" title="Parar tropa">■</button><button id="focus" aria-label="Centralizar tropa selecionada" title="Centralizar tropa">◎</button><button id="plus" aria-label="Aproximar">+</button><button id="minus" aria-label="Afastar">−</button></div>
 <div id="hud" role="status">Mapa 72 × 72 · quatro biomas · toque em uma tropa</div>
 <canvas id="minimap" aria-label="Minimapa navegável" style="position:fixed;right:calc(10px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));width:132px;height:132px;border:1px solid #b89a64;border-radius:8px;background:#142c27;touch-action:none"></canvas>
@@ -400,7 +400,7 @@ document.getElementById('focus').onclick=focusSelected;
 document.getElementById('stop').onclick=stopSelected;
 document.getElementById('plus').onclick=()=>zoomAt(1.2);
 document.getElementById('minus').onclick=()=>zoomAt(1/1.2);
-// Desktop: wheel zoom and WASD/arrow panning; ignore browser shortcuts.
+// Desktop: wheel zoom, WASD/arrow panning; Escape or Shift+S stops a unit.
 canvas.addEventListener('wheel',e=>{
  e.preventDefault();
  const r=canvas.getBoundingClientRect();
@@ -412,7 +412,7 @@ window.addEventListener('keydown',e=>{
  const k=e.key.toLowerCase();
  if(/^[1-4]$/.test(k)){selectUnit(Number(k)-1);e.preventDefault();return}
  if(k==='f'){focusSelected();e.preventDefault();return}
- if(k==='s'||k==='escape'){stopSelected();e.preventDefault();return}
+ if(k==='escape'||(k==='s'&&e.shiftKey)){stopSelected();e.preventDefault();return}
  if(k==='q'){setRouteMode(!routeMode);e.preventDefault();return}
  if(k==='tab'&&!e.shiftKey&&document.activeElement===document.body){selectUnit(selected+1);e.preventDefault();return}
  if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)){held.add(k);e.preventDefault()}
@@ -426,6 +426,6 @@ function keyboardPan(dt){
  if(left!==right)cx+=(left?1:-1)*speed;
  if(up!==down)cy+=(up?1:-1)*speed;
 }
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){last=performance.now();lastMiniDraw=-Infinity}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){held.clear();return}last=performance.now();lastMiniDraw=-Infinity});
 window.addEventListener('resize',resize);resize();const center=screen(27,27);cx+=width/2-center.x;cy+=height/2-center.y;requestAnimationFrame(draw);
 </script></body></html>
